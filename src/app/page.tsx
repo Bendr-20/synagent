@@ -197,12 +197,12 @@ function LaunchSection({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <section id="launch" style={{
+    <section id="launch" className="form-section" style={{
       maxWidth: "640px",
       margin: "0 auto",
       padding: "0 24px 80px",
     }}>
-      <div style={{
+      <div className="form-card" style={{
         background: "linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015))",
         border: "1px solid rgba(201, 168, 76, 0.25)",
         borderRadius: "20px",
@@ -312,7 +312,7 @@ function LaunchSection({ onClose }: { onClose: () => void }) {
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: "12px" }}>
+          <div className="form-row" style={{ display: "flex", gap: "12px" }}>
             <div style={{ flex: 1 }}>
               <label style={labelStyle}>Website (optional)</label>
               <input style={inputStyle} placeholder="https://" value={form.website} onChange={set("website")} />
@@ -323,7 +323,7 @@ function LaunchSection({ onClose }: { onClose: () => void }) {
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: "12px" }}>
+          <div className="form-row" style={{ display: "flex", gap: "12px" }}>
             <div style={{ flex: 1 }}>
               <label style={labelStyle}>Telegram (optional)</label>
               <input style={inputStyle} placeholder="https://t.me/..." value={form.telegram} onChange={set("telegram")} />
@@ -381,7 +381,7 @@ export default function Home() {
       color: platinum,
     }}>
       {/* Nav */}
-      <nav style={{
+      <nav className="nav-bar" style={{
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
@@ -401,16 +401,16 @@ export default function Home() {
         </a>
         <div style={{ display: "flex", alignItems: "center", gap: "32px" }}>
           {["SYNAGENT POOL", "DOCS"].map((item) => (
-            <a key={item} href="#" style={{ fontSize: "14px", color: silverDim, textDecoration: "none", letterSpacing: "0.05em" }}>
+            <a className="nav-links" key={item} href="#" style={{ fontSize: "14px", color: silverDim, textDecoration: "none", letterSpacing: "0.05em" }}>
               {item}
             </a>
           ))}
-          <button style={btnWallet}>CONNECT WALLET</button>
+          <button className="nav-wallet" style={btnWallet}>CONNECT WALLET</button>
         </div>
       </nav>
 
       {/* Hero */}
-      <section style={{
+      <section className="hero-section" style={{
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -419,7 +419,6 @@ export default function Home() {
         textAlign: "center",
         position: "relative",
       }}>
-        {/* Subtle radial glow */}
         <div style={{
           position: "absolute",
           top: "50%",
@@ -431,7 +430,7 @@ export default function Home() {
           pointerEvents: "none",
         }} />
 
-        <h1 style={{
+        <h1 className="hero-title" style={{
           fontSize: "56px",
           fontWeight: 700,
           fontFamily: "Space Grotesk, sans-serif",
@@ -444,7 +443,7 @@ export default function Home() {
         }}>
           Launch. Validate. Monetize.
         </h1>
-        <p style={{
+        <p className="hero-subtitle" style={{
           color: silverDim,
           fontSize: "18px",
           maxWidth: "520px",
@@ -453,7 +452,7 @@ export default function Home() {
         }}>
           Launch your agent token, claim your on-chain profile, and build credentials that follow you everywhere.
         </p>
-        <div style={{ display: "flex", gap: "16px" }}>
+        <div className="hero-buttons" style={{ display: "flex", gap: "16px" }}>
           <button style={btnGold} onClick={() => {
             setShowLaunch(true);
             setShowClaim(false);
@@ -476,12 +475,12 @@ export default function Home() {
 
       {/* Claim Form - hidden until button clicked */}
       {showClaim && (
-        <section id="claim" style={{
+        <section id="claim" className="form-section" style={{
           maxWidth: "640px",
           margin: "0 auto",
           padding: "0 24px 80px",
         }}>
-          <div style={{
+          <div className="claim-card" style={{
             background: "linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015))",
             border: "1px solid rgba(201, 168, 76, 0.25)",
             borderRadius: "20px",
@@ -526,7 +525,7 @@ export default function Home() {
       )}
 
       {/* 4 Column Cards */}
-      <section style={{
+      <section className="cards-grid" style={{
         maxWidth: "1320px",
         margin: "0 auto",
         padding: "0 24px 80px",

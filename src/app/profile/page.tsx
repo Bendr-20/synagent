@@ -88,7 +88,7 @@ export default function ProfilePage() {
       color: platinum,
     }}>
       {/* Nav */}
-      <nav style={{
+      <nav className="nav-bar" style={{
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
@@ -108,11 +108,11 @@ export default function ProfilePage() {
         </a>
         <div style={{ display: "flex", alignItems: "center", gap: "32px" }}>
           {["SYNAGENT POOL", "DOCS"].map((item) => (
-            <a key={item} href="#" style={{ fontSize: "14px", color: silverDim, textDecoration: "none", letterSpacing: "0.05em" }}>
+            <a className="nav-links" key={item} href="#" style={{ fontSize: "14px", color: silverDim, textDecoration: "none", letterSpacing: "0.05em" }}>
               {item}
             </a>
           ))}
-          <button style={{
+          <button className="nav-wallet" style={{
             background: "linear-gradient(135deg, #a8adb8, #cdd1d9, #8e939e)",
             color: "#0a0a0f",
             fontWeight: 600,
@@ -126,14 +126,14 @@ export default function ProfilePage() {
       </nav>
 
       {/* Back link */}
-      <div style={{ maxWidth: "1320px", margin: "0 auto", padding: "24px 24px 0" }}>
+      <div className="profile-back" style={{ maxWidth: "1320px", margin: "0 auto", padding: "24px 24px 0" }}>
         <a href="/" style={{ color: silverDim, textDecoration: "none", fontSize: "14px", display: "inline-flex", alignItems: "center", gap: "6px" }}>
           <span style={{ fontSize: "18px" }}>&larr;</span> Back
         </a>
       </div>
 
       {/* Profile Layout */}
-      <div style={{
+      <div className="profile-layout" style={{
         maxWidth: "1320px",
         margin: "0 auto",
         padding: "24px",
@@ -143,7 +143,7 @@ export default function ProfilePage() {
       }}>
 
         {/* Left Column - Profile Card */}
-        <div style={{ width: "340px", flexShrink: 0 }}>
+        <div className="profile-left" style={{ width: "340px", flexShrink: 0 }}>
           <div style={cardBg}>
             {/* Avatar */}
             <div style={{
@@ -251,7 +251,7 @@ export default function ProfilePage() {
         <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: "24px" }}>
 
           {/* Stat Cards Row */}
-          <div style={{ display: "flex", gap: "16px" }}>
+          <div className="profile-stats-row" style={{ display: "flex", gap: "16px" }}>
             {[
               { label: "Market Cap", value: stats.marketCap },
               { label: "Holders", value: stats.holders },
@@ -266,7 +266,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Secondary Stats */}
-          <div style={{ display: "flex", gap: "16px" }}>
+          <div className="profile-stats-row" style={{ display: "flex", gap: "16px" }}>
             {[
               { label: "Vouches", value: stats.vouches.toString() },
               { label: "Verifications", value: stats.verifications.toString() },
@@ -280,7 +280,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Tabs */}
-          <div style={{
+          <div className="profile-tabs" style={{
             display: "flex",
             gap: "0",
             borderBottom: "1px solid rgba(255,255,255,0.06)",
@@ -312,7 +312,7 @@ export default function ProfilePage() {
             {activeTab === "Activity" && (
               <div>
                 {activity.map((item, i) => (
-                  <div key={i} style={{
+                  <div key={i} className="activity-row" style={{
                     display: "flex",
                     alignItems: "center",
                     gap: "16px",
@@ -326,8 +326,8 @@ export default function ProfilePage() {
                       background: actionColor(item.type),
                       flexShrink: 0,
                     }} />
-                    <span style={{ fontSize: "13px", color: silverDim, width: "70px", flexShrink: 0, fontFamily: "monospace" }}>{item.date}</span>
-                    <span style={{ fontSize: "14px", fontWeight: 600, color: platinum, width: "140px", flexShrink: 0 }}>{item.action}</span>
+                    <span className="activity-date" style={{ fontSize: "13px", color: silverDim, width: "70px", flexShrink: 0, fontFamily: "monospace" }}>{item.date}</span>
+                    <span className="activity-action" style={{ fontSize: "14px", fontWeight: 600, color: platinum, width: "140px", flexShrink: 0 }}>{item.action}</span>
                     <span style={{ fontSize: "13px", color: silverDim }}>{item.detail}</span>
                   </div>
                 ))}
