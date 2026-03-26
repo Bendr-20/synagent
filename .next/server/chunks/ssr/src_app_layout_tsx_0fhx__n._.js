@@ -1,0 +1,3 @@
+module.exports=[27572,a=>{"use strict";var b=a.i(7997);a.s(["default",0,function({children:a}){return(0,b.jsxs)("html",{lang:"en",children:[(0,b.jsx)("head",{children:(0,b.jsx)("link",{href:"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap",rel:"stylesheet"})}),(0,b.jsx)("body",{className:"antialiased min-h-screen",children:a})]})},"metadata",0,{title:"Synagent — Launch Your Agent Token",description:"The agent aggregator for Base. Launch your token, claim your profile, earn your cred."}])},50645,a=>{a.n(a.i(27572))}];
+
+//# sourceMappingURL=src_app_layout_tsx_0fhx__n._.js.map
