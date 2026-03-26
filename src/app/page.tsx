@@ -250,14 +250,37 @@ function LaunchSection() {
 
           <div>
             <label style={labelStyle}>Vault Vesting</label>
-            <select style={selectStyle} value={form.vesting} onChange={set("vesting")}>
-              <option value="" disabled>Select lock period</option>
-              <option value="30">30 days</option>
-              <option value="60">60 days</option>
-              <option value="90">90 days</option>
-              <option value="180">180 days</option>
-              <option value="365">1 year</option>
-            </select>
+            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+              {[
+                { value: "30", label: "30 days" },
+                { value: "60", label: "60 days" },
+                { value: "90", label: "90 days" },
+                { value: "180", label: "180 days" },
+                { value: "365", label: "1 year" },
+              ].map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setForm((f) => ({ ...f, vesting: f.vesting === opt.value ? "" : opt.value }))}
+                  style={{
+                    background: form.vesting === opt.value
+                      ? `linear-gradient(135deg, ${gold}, #d4b85c)`
+                      : "rgba(255,255,255,0.04)",
+                    color: form.vesting === opt.value ? "#0a0a0f" : silverDim,
+                    border: form.vesting === opt.value
+                      ? "1px solid transparent"
+                      : "1px solid rgba(255,255,255,0.08)",
+                    borderRadius: "8px",
+                    padding: "10px 18px",
+                    fontSize: "13px",
+                    fontWeight: form.vesting === opt.value ? 700 : 500,
+                    cursor: "pointer",
+                    transition: "all 0.15s ease",
+                  }}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div style={{ display: "flex", gap: "12px" }}>
