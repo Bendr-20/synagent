@@ -121,7 +121,7 @@ export default function ProfilePage() {
             border: "none",
             cursor: "pointer",
             fontSize: "14px",
-          }}>CONNECT WALLET</button>
+          }}>CONNECT</button>
         </div>
       </nav>
 

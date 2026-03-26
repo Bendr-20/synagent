@@ -361,7 +361,7 @@ function LaunchSection({ onClose }: { onClose: () => void }) {
               Launch on Base
             </button>
             <button style={goldArrowBtn} onClick={onClose} title="Collapse form">
-              &#x25B2;
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 10L8 5L13 10"/></svg>
             </button>
           </div>
         </div>
@@ -405,7 +405,7 @@ export default function Home() {
               {item}
             </a>
           ))}
-          <button className="nav-wallet" style={btnWallet}>CONNECT WALLET</button>
+          <button className="nav-wallet" style={btnWallet}>CONNECT</button>
         </div>
       </nav>
 
@@ -517,7 +517,7 @@ export default function Home() {
                 Claim my profile
               </button>
               <button style={goldArrowBtn} onClick={() => setShowClaim(false)} title="Collapse form">
-                &#x25B2;
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 10L8 5L13 10"/></svg>
               </button>
             </div>
           </div>
