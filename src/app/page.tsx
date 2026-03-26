@@ -171,13 +171,23 @@ function LaunchModal({ onClose }: { onClose: () => void }) {
     name: "",
     symbol: "",
     description: "",
-    supply: "1000000000",
+    vault: "",
+    vesting: "",
     website: "",
     twitter: "",
   });
 
-  const set = (key: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+  const set = (key: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [key]: e.target.value }));
+
+  const selectStyle: React.CSSProperties = {
+    ...inputStyle,
+    appearance: "none",
+    backgroundImage: `url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%235a6170' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")`,
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "right 14px center",
+    paddingRight: "36px",
+  };
 
   return (
     <div style={overlayStyle} onClick={onClose}>
@@ -214,19 +224,22 @@ function LaunchModal({ onClose }: { onClose: () => void }) {
             <input style={inputStyle} placeholder="e.g. Bendr 2.0" value={form.name} onChange={set("name")} />
           </div>
 
-          <div style={{ display: "flex", gap: "12px" }}>
-            <div style={{ flex: 1 }}>
-              <label style={labelStyle}>Token Symbol</label>
-              <input style={inputStyle} placeholder="e.g. BENDR" value={form.symbol} onChange={set("symbol")} />
-            </div>
-            <div style={{ flex: 1 }}>
-              <label style={labelStyle}>Total Supply</label>
-              <input style={inputStyle} placeholder="1000000000" value={form.supply} onChange={set("supply")} />
-            </div>
+          <div>
+            <label style={labelStyle}>Token Symbol</label>
+            <input style={inputStyle} placeholder="e.g. BENDR" value={form.symbol} onChange={set("symbol")} />
           </div>
 
           <div>
-            <label style={labelStyle}>Description</label>
+            <label style={labelStyle}>Total Supply</label>
+            <input
+              style={{ ...inputStyle, color: silverDim, cursor: "not-allowed" }}
+              value="1,000,000,000"
+              disabled
+            />
+          </div>
+
+          <div>
+            <label style={labelStyle}>Token Description</label>
             <textarea
               style={{ ...inputStyle, minHeight: "80px", resize: "vertical" }}
               placeholder="What does your agent do?"
@@ -235,13 +248,54 @@ function LaunchModal({ onClose }: { onClose: () => void }) {
             />
           </div>
 
+          <div>
+            <label style={labelStyle}>Vault (bundle amount, up to 70% of supply)</label>
+            <div style={{ position: "relative" }}>
+              <input
+                style={inputStyle}
+                type="number"
+                min="0"
+                max="70"
+                placeholder="e.g. 30"
+                value={form.vault}
+                onChange={set("vault")}
+              />
+              <span style={{
+                position: "absolute",
+                right: "14px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: silverDim,
+                fontSize: "13px",
+                pointerEvents: "none",
+              }}>%</span>
+            </div>
+            {form.vault && Number(form.vault) > 0 && (
+              <span style={{ fontSize: "11px", color: silverDim, marginTop: "4px", display: "block" }}>
+                {(Number(form.vault) / 100 * 1_000_000_000).toLocaleString()} tokens vaulted
+              </span>
+            )}
+          </div>
+
+          <div>
+            <label style={labelStyle}>Vault Vesting</label>
+            <select style={selectStyle} value={form.vesting} onChange={set("vesting")}>
+              <option value="" disabled>Select lock period</option>
+              <option value="30">30 days</option>
+              <option value="60">60 days</option>
+              <option value="90">90 days</option>
+              <option value="180">180 days</option>
+              <option value="365">1 year</option>
+            </select>
+          </div>
+
           <div style={{ display: "flex", gap: "12px" }}>
             <div style={{ flex: 1 }}>
               <label style={labelStyle}>Website (optional)</label>
               <input style={inputStyle} placeholder="https://" value={form.website} onChange={set("website")} />
             </div>
             <div style={{ flex: 1 }}>
-              <label style={labelStyle}>Twitter (optional)</label>
+              <label style={labelStyle}>X (Twitter) (optional)</label>
               <input style={inputStyle} placeholder="@handle" value={form.twitter} onChange={set("twitter")} />
             </div>
           </div>
