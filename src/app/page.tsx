@@ -88,15 +88,24 @@ function credTier(cred: number) {
 }
 
 function AgentRow({ name, right, sub, href }: { name: string; right: string; sub: string; href?: string }) {
+  const [hovered, setHovered] = useState(false);
   const inner = (
-    <div style={{
-      display: "flex",
-      alignItems: "center",
-      gap: "12px",
-      padding: "10px 0",
-      borderBottom: "1px solid rgba(255,255,255,0.03)",
-      cursor: href ? "pointer" : undefined,
-    }}>
+    <div
+      onMouseEnter={() => href && setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "12px",
+        padding: "10px 0",
+        borderBottom: "1px solid rgba(255,255,255,0.03)",
+        cursor: href ? "pointer" : undefined,
+        background: hovered ? "rgba(201, 168, 76, 0.06)" : "transparent",
+        borderRadius: hovered ? "8px" : undefined,
+        paddingLeft: hovered ? "8px" : undefined,
+        paddingRight: hovered ? "8px" : undefined,
+        transition: "all 0.15s ease",
+      }}>
       <div style={{
         width: "36px",
         height: "36px",
@@ -115,7 +124,7 @@ function AgentRow({ name, right, sub, href }: { name: string; right: string; sub
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontWeight: 600, fontSize: "14px", color: platinum }}>{name}</span>
+          <span style={{ fontWeight: 600, fontSize: "14px", color: hovered ? gold : platinum, transition: "color 0.15s ease" }}>{name}</span>
           <span style={{ fontSize: "12px", fontFamily: "monospace", color: silver }}>{right}</span>
         </div>
         <span style={{ fontSize: "12px", color: silverDim }}>{sub}</span>
