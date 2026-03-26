@@ -156,7 +156,22 @@ const labelStyle: React.CSSProperties = {
   letterSpacing: "0.03em",
 };
 
-function LaunchSection() {
+const goldArrowBtn: React.CSSProperties = {
+  background: `linear-gradient(135deg, ${gold}, #d4b85c)`,
+  color: "#0a0a0f",
+  border: "none",
+  borderRadius: "10px",
+  padding: "16px 20px",
+  cursor: "pointer",
+  fontSize: "18px",
+  fontWeight: 700,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  flexShrink: 0,
+};
+
+function LaunchSection({ onClose }: { onClose: () => void }) {
   const [form, setForm] = useState({
     name: "",
     symbol: "",
@@ -331,20 +346,24 @@ function LaunchSection() {
             </p>
           </div>
 
-          <button
-            style={{
-              ...btnGold,
-              width: "100%",
-              padding: "16px",
-              fontSize: "16px",
-              marginTop: "4px",
-            }}
-            onClick={() => {
-              alert("Token launch coming soon - connect wallet first");
-            }}
-          >
-            Launch on Base
-          </button>
+          <div style={{ display: "flex", gap: "10px", marginTop: "4px" }}>
+            <button
+              style={{
+                ...btnGold,
+                flex: 1,
+                padding: "16px",
+                fontSize: "16px",
+              }}
+              onClick={() => {
+                alert("Token launch coming soon - connect wallet first");
+              }}
+            >
+              Launch on Base
+            </button>
+            <button style={goldArrowBtn} onClick={onClose} title="Collapse form">
+              &#x25B2;
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -353,6 +372,7 @@ function LaunchSection() {
 
 export default function Home() {
   const [showLaunch, setShowLaunch] = useState(false);
+  const [showClaim, setShowClaim] = useState(false);
 
   return (
     <div style={{
@@ -436,18 +456,74 @@ export default function Home() {
         <div style={{ display: "flex", gap: "16px" }}>
           <button style={btnGold} onClick={() => {
             setShowLaunch(true);
+            setShowClaim(false);
             setTimeout(() => document.getElementById("launch")?.scrollIntoView({ behavior: "smooth" }), 50);
           }}>
             Launch token and claim your profile
           </button>
-          <button style={btnGlass}>
+          <button style={btnGlass} onClick={() => {
+            setShowClaim(true);
+            setShowLaunch(false);
+            setTimeout(() => document.getElementById("claim")?.scrollIntoView({ behavior: "smooth" }), 50);
+          }}>
             I have a token and want to claim my profile
           </button>
         </div>
       </section>
 
       {/* Launch Form - hidden until button clicked */}
-      {showLaunch && <LaunchSection />}
+      {showLaunch && <LaunchSection onClose={() => setShowLaunch(false)} />}
+
+      {/* Claim Form - hidden until button clicked */}
+      {showClaim && (
+        <section id="claim" style={{
+          maxWidth: "640px",
+          margin: "0 auto",
+          padding: "0 24px 80px",
+        }}>
+          <div style={{
+            background: "linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015))",
+            border: "1px solid rgba(201, 168, 76, 0.25)",
+            borderRadius: "20px",
+            padding: "40px",
+          }}>
+            <h2 style={{
+              fontSize: "28px",
+              fontWeight: 700,
+              fontFamily: "Space Grotesk, sans-serif",
+              color: silverLight,
+              margin: "0 0 24px 0",
+            }}>
+              Claim Your Profile
+            </h2>
+            <p style={{ fontSize: "14px", color: silverDim, marginBottom: "24px", lineHeight: 1.6 }}>
+              Already launched a token on Base? Enter its contract address to claim your Synagent profile.
+            </p>
+            <div style={{ marginBottom: "20px" }}>
+              <label style={labelStyle}>Token Address</label>
+              <input style={inputStyle} placeholder="0x..." />
+            </div>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button
+                style={{
+                  ...btnGold,
+                  flex: 1,
+                  padding: "16px",
+                  fontSize: "16px",
+                }}
+                onClick={() => {
+                  alert("Profile claiming coming soon - connect wallet first");
+                }}
+              >
+                Claim my profile
+              </button>
+              <button style={goldArrowBtn} onClick={() => setShowClaim(false)} title="Collapse form">
+                &#x25B2;
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* 4 Column Cards */}
       <section style={{
