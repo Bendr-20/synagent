@@ -87,14 +87,15 @@ function credTier(cred: number) {
   return "Junk";
 }
 
-function AgentRow({ name, right, sub }: { name: string; right: string; sub: string }) {
-  return (
+function AgentRow({ name, right, sub, href }: { name: string; right: string; sub: string; href?: string }) {
+  const inner = (
     <div style={{
       display: "flex",
       alignItems: "center",
       gap: "12px",
       padding: "10px 0",
       borderBottom: "1px solid rgba(255,255,255,0.03)",
+      cursor: href ? "pointer" : undefined,
     }}>
       <div style={{
         width: "36px",
@@ -121,6 +122,8 @@ function AgentRow({ name, right, sub }: { name: string; right: string; sub: stri
       </div>
     </div>
   );
+  if (href) return <a href={href} style={{ textDecoration: "none", color: "inherit" }}>{inner}</a>;
+  return inner;
 }
 
 const inputStyle: React.CSSProperties = {
@@ -464,6 +467,7 @@ export default function Home() {
               name={a.name}
               right={a.change}
               sub={`${a.symbol} · ${credTier(a.cred)} ${a.cred}`}
+              href={a.name === "Bendr 2.0" ? "/profile" : undefined}
             />
           ))}
         </div>
@@ -510,6 +514,7 @@ export default function Home() {
               name={a.name}
               right={a.mcap}
               sub={`${a.holders} holders`}
+              href={a.name === "Bendr 2.0" ? "/profile" : undefined}
             />
           ))}
         </div>
