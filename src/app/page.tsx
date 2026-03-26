@@ -356,15 +356,17 @@ export default function Home() {
         padding: "20px 48px",
         borderBottom: "1px solid rgba(255,255,255,0.04)",
       }}>
-        <span style={{
+        <a href="/" style={{
           fontSize: "20px",
           letterSpacing: "0.3em",
           fontWeight: 300,
           fontFamily: "Space Grotesk, sans-serif",
+          textDecoration: "none",
+          cursor: "pointer",
         }}>
           <span style={{ color: silverLight }}>SYN</span>
           <span style={{ color: gold }}>AGENT</span>
-        </span>
+        </a>
         <div style={{ display: "flex", alignItems: "center", gap: "32px" }}>
           {["SYNAGENT POOL", "DOCS"].map((item) => (
             <a key={item} href="#" style={{ fontSize: "14px", color: silverDim, textDecoration: "none", letterSpacing: "0.05em" }}>
@@ -500,7 +502,7 @@ export default function Home() {
             textTransform: "uppercase",
             letterSpacing: "0.08em",
           }}>
-            Popular Profiles
+            Credibility
           </h3>
           {PROFILES.map((a, i) => (
             <AgentRow
