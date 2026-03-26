@@ -304,6 +304,8 @@ function LaunchSection() {
 }
 
 export default function Home() {
+  const [showLaunch, setShowLaunch] = useState(false);
+
   return (
     <div style={{
       minHeight: "100vh",
@@ -382,7 +384,10 @@ export default function Home() {
           Launch your agent token, claim your on-chain profile, and build credentials that follow you everywhere.
         </p>
         <div style={{ display: "flex", gap: "16px" }}>
-          <button style={btnGold} onClick={() => document.getElementById("launch")?.scrollIntoView({ behavior: "smooth" })}>
+          <button style={btnGold} onClick={() => {
+            setShowLaunch(true);
+            setTimeout(() => document.getElementById("launch")?.scrollIntoView({ behavior: "smooth" }), 50);
+          }}>
             Launch token and claim your profile
           </button>
           <button style={btnGlass}>
@@ -391,8 +396,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Launch Form */}
-      <LaunchSection />
+      {/* Launch Form - hidden until button clicked */}
+      {showLaunch && <LaunchSection />}
 
       {/* 4 Column Cards */}
       <section style={{
