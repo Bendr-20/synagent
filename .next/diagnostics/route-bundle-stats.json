@@ -13,10 +13,10 @@
   },
   {
     "route": "/profile",
-    "firstLoadUncompressedJsBytes": 522571,
+    "firstLoadUncompressedJsBytes": 522597,
     "firstLoadChunkPaths": [
       ".next/static/chunks/0dbhjjzl8qfwv.js",
-      ".next/static/chunks/0y9dd0me471va.js",
+      ".next/static/chunks/14z80h5kjkfx6.js",
       ".next/static/chunks/0ht900cau6_ur.js",
       ".next/static/chunks/0p5.qr0b94vxo.js",
       ".next/static/chunks/16g.ca89g7fib.js",

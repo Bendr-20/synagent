@@ -248,7 +248,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Right Column */}
-        <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: "24px" }}>
+        <div className="profile-right" style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: "24px" }}>
 
           {/* Stat Cards Row */}
           <div className="profile-stats-row" style={{ display: "flex", gap: "16px" }}>

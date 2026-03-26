@@ -89,12 +89,21 @@
     flex-direction: column !important;
     padding: 16px !important;
   }
+  .profile-right {
+    width: 100% !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    flex: unset !important;
+  }
   .profile-left {
     width: 100% !important;
   }
   .profile-stats-row {
     flex-direction: column !important;
     gap: 12px !important;
+  }
+  .profile-stats-row > div {
+    min-width: 0 !important;
   }
   .profile-tabs {
     overflow-x: auto !important;
