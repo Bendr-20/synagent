@@ -153,6 +153,8 @@ function LaunchSection() {
     vesting: "",
     website: "",
     twitter: "",
+    telegram: "",
+    discord: "",
   });
 
   const set = (key: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
@@ -291,6 +293,17 @@ function LaunchSection() {
             <div style={{ flex: 1 }}>
               <label style={labelStyle}>X (Twitter) (optional)</label>
               <input style={inputStyle} placeholder="@handle" value={form.twitter} onChange={set("twitter")} />
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: "12px" }}>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Telegram (optional)</label>
+              <input style={inputStyle} placeholder="https://t.me/..." value={form.telegram} onChange={set("telegram")} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Discord (optional)</label>
+              <input style={inputStyle} placeholder="https://discord.gg/..." value={form.discord} onChange={set("discord")} />
             </div>
           </div>
 
