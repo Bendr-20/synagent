@@ -2,20 +2,58 @@
 
 import { useState } from "react";
 
-const NODES = [
-  { top: "8%", left: "5%", size: 8, color: "#00e5cc", duration: "7s", delay: "0s" },
-  { top: "15%", left: "85%", size: 6, color: "#8b5cf6", duration: "5s", delay: "1s" },
-  { top: "30%", left: "12%", size: 10, color: "#00e5cc", duration: "8s", delay: "0.5s" },
-  { top: "55%", left: "90%", size: 7, color: "#8b5cf6", duration: "6s", delay: "2s" },
-  { top: "75%", left: "8%", size: 5, color: "#00e5cc", duration: "9s", delay: "1.5s" },
-  { top: "85%", left: "78%", size: 9, color: "#8b5cf6", duration: "7s", delay: "0.8s" },
-  { top: "45%", left: "3%", size: 4, color: "#00b8a3", duration: "6s", delay: "3s" },
-  { top: "20%", left: "50%", size: 5, color: "#7c3aed", duration: "10s", delay: "2s" },
-  { top: "65%", left: "95%", size: 6, color: "#00e5cc", duration: "8s", delay: "1s" },
-  { top: "90%", left: "40%", size: 4, color: "#8b5cf6", duration: "7s", delay: "0.5s" },
-  { top: "5%", left: "35%", size: 3, color: "#00e5cc", duration: "6s", delay: "4s" },
-  { top: "40%", left: "75%", size: 5, color: "#7c3aed", duration: "9s", delay: "1.2s" },
-];
+const platinum = "#c0c6d0";
+const silver = "#8a919c";
+const silverLight = "#d4d8e0";
+const silverDim = "#5a6170";
+const gold = "#c9a84c";
+
+const cardStyle: React.CSSProperties = {
+  background: "linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015))",
+  border: "1px solid rgba(201, 168, 76, 0.25)",
+  borderRadius: "16px",
+  padding: "24px",
+  flex: 1,
+  minWidth: 0,
+};
+
+const btnGold: React.CSSProperties = {
+  background: "linear-gradient(135deg, #a8adb8, #cdd1d9, #8e939e)",
+  color: "#0a0a0f",
+  fontWeight: 700,
+  borderRadius: "10px",
+  padding: "16px 36px",
+  border: "none",
+  cursor: "pointer",
+  fontSize: "15px",
+  boxShadow: "0 2px 20px rgba(180, 190, 205, 0.15)",
+  whiteSpace: "nowrap" as const,
+};
+
+const btnGlass: React.CSSProperties = {
+  background: "rgba(255,255,255,0.04)",
+  backdropFilter: "blur(12px)",
+  WebkitBackdropFilter: "blur(12px)",
+  color: silverLight,
+  fontWeight: 600,
+  borderRadius: "10px",
+  padding: "16px 36px",
+  border: "1px solid rgba(201, 168, 76, 0.25)",
+  cursor: "pointer",
+  fontSize: "15px",
+  whiteSpace: "nowrap" as const,
+};
+
+const btnWallet: React.CSSProperties = {
+  background: "linear-gradient(135deg, #a8adb8, #cdd1d9, #8e939e)",
+  color: "#0a0a0f",
+  fontWeight: 600,
+  borderRadius: "8px",
+  padding: "8px 20px",
+  border: "none",
+  cursor: "pointer",
+  fontSize: "14px",
+};
 
 const TRENDING = [
   { name: "Bendr 2.0", cred: 72, symbol: "$BENDR", change: "+12.4%" },
@@ -25,12 +63,21 @@ const TRENDING = [
   { name: "DataForge", cred: 44, symbol: "$FORGE", change: "+3.9%" },
 ];
 
-function credColor(cred: number) {
-  if (cred >= 70) return "#00e5cc";
-  if (cred >= 55) return "#8b5cf6";
-  if (cred >= 40) return "#f5d060";
-  return "#8892a8";
-}
+const RECENT = [
+  { name: "Solari", symbol: "$SOL1", time: "2m ago" },
+  { name: "CodeWeaver", symbol: "$WEAV", time: "8m ago" },
+  { name: "Oracle9", symbol: "$ORC9", time: "14m ago" },
+  { name: "PixelMind", symbol: "$PIXL", time: "22m ago" },
+  { name: "TradeBot", symbol: "$TRDB", time: "31m ago" },
+];
+
+const PROFILES = [
+  { name: "Bendr 2.0", holders: "1.2K", mcap: "$340K" },
+  { name: "Quigbot", holders: "890", mcap: "$210K" },
+  { name: "NeonMind", holders: "654", mcap: "$185K" },
+  { name: "DataForge", holders: "412", mcap: "$92K" },
+  { name: "AgentX", holders: "389", mcap: "$78K" },
+];
 
 function credTier(cred: number) {
   if (cred >= 80) return "Preferred";
@@ -40,233 +87,427 @@ function credTier(cred: number) {
   return "Junk";
 }
 
-export default function Home() {
-  const [bundle, setBundle] = useState(30);
-  const [activeTab, setActiveTab] = useState<"launch" | "connect">("launch");
+function AgentRow({ name, right, sub }: { name: string; right: string; sub: string }) {
+  return (
+    <div style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "12px",
+      padding: "10px 0",
+      borderBottom: "1px solid rgba(255,255,255,0.03)",
+    }}>
+      <div style={{
+        width: "36px",
+        height: "36px",
+        borderRadius: "50%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: "13px",
+        fontWeight: 700,
+        flexShrink: 0,
+        background: "rgba(180, 190, 205, 0.06)",
+        color: silver,
+        border: "1px solid rgba(180, 190, 205, 0.1)",
+      }}>
+        {name[0]}
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{ fontWeight: 600, fontSize: "14px", color: platinum }}>{name}</span>
+          <span style={{ fontSize: "12px", fontFamily: "monospace", color: silver }}>{right}</span>
+        </div>
+        <span style={{ fontSize: "12px", color: silverDim }}>{sub}</span>
+      </div>
+    </div>
+  );
+}
+
+const overlayStyle: React.CSSProperties = {
+  position: "fixed",
+  inset: 0,
+  background: "rgba(0,0,0,0.7)",
+  backdropFilter: "blur(8px)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  zIndex: 1000,
+};
+
+const modalStyle: React.CSSProperties = {
+  background: "linear-gradient(160deg, #12141a, #0e1016)",
+  border: "1px solid rgba(201, 168, 76, 0.25)",
+  borderRadius: "20px",
+  padding: "40px",
+  width: "480px",
+  maxWidth: "90vw",
+  maxHeight: "90vh",
+  overflowY: "auto",
+};
+
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  background: "rgba(255,255,255,0.04)",
+  border: "1px solid rgba(255,255,255,0.08)",
+  borderRadius: "10px",
+  padding: "12px 16px",
+  color: platinum,
+  fontSize: "14px",
+  outline: "none",
+  fontFamily: "Inter, sans-serif",
+};
+
+const labelStyle: React.CSSProperties = {
+  fontSize: "13px",
+  fontWeight: 600,
+  color: silverDim,
+  marginBottom: "6px",
+  display: "block",
+  letterSpacing: "0.03em",
+};
+
+function LaunchModal({ onClose }: { onClose: () => void }) {
+  const [form, setForm] = useState({
+    name: "",
+    symbol: "",
+    description: "",
+    supply: "1000000000",
+    website: "",
+    twitter: "",
+  });
+
+  const set = (key: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    setForm((f) => ({ ...f, [key]: e.target.value }));
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
-      {/* Animated network background */}
-      <div className="fixed inset-0 pointer-events-none">
-        {NODES.map((node, i) => (
-          <div
-            key={i}
-            className="node"
+    <div style={overlayStyle} onClick={onClose}>
+      <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "32px" }}>
+          <h2 style={{
+            fontSize: "24px",
+            fontWeight: 700,
+            fontFamily: "Space Grotesk, sans-serif",
+            color: silverLight,
+            margin: 0,
+          }}>
+            Launch Token
+          </h2>
+          <button
+            onClick={onClose}
             style={{
-              top: node.top,
-              left: node.left,
-              width: node.size,
-              height: node.size,
-              background: node.color,
-              ["--duration" as string]: node.duration,
-              ["--delay" as string]: node.delay,
+              background: "none",
+              border: "none",
+              color: silverDim,
+              fontSize: "24px",
+              cursor: "pointer",
+              padding: "4px",
+              lineHeight: 1,
             }}
-          />
-        ))}
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#060a14]/80 via-transparent to-[#060a14]/90" />
-      </div>
-
-      {/* Navigation */}
-      <nav className="relative z-10 flex items-center justify-between px-8 py-5 border-b border-white/5">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl font-bold tracking-tight" style={{ fontFamily: "Space Grotesk" }}>
-            <span style={{ color: "#00e5cc" }}>SYN</span>AGENT
-          </span>
+          >
+            x
+          </button>
         </div>
-        <div className="hidden md:flex items-center gap-8">
-          <a href="#" className="text-sm text-[#8892a8] hover:text-[#00e5cc] transition-colors">Explore Agents</a>
-          <a href="#" className="text-sm text-[#8892a8] hover:text-[#00e5cc] transition-colors">Leaderboard</a>
-          <a href="#" className="text-sm text-[#8892a8] hover:text-[#00e5cc] transition-colors">Pool</a>
-          <a href="#" className="text-sm text-[#8892a8] hover:text-[#00e5cc] transition-colors">Docs</a>
-        </div>
-        <button className="btn-teal text-sm !py-2.5 !px-6">Connect Wallet</button>
-      </nav>
 
-      {/* Main content */}
-      <main className="relative z-10 max-w-7xl mx-auto px-6 py-12 flex flex-col lg:flex-row gap-8">
-        {/* Left: Token Launch Form */}
-        <div className="flex-1 flex flex-col items-center">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold mb-3" style={{ fontFamily: "Space Grotesk" }}>
-              Launch Your Agent Token
-            </h1>
-            <p className="text-[#8892a8] text-lg max-w-lg mx-auto">
-              Deploy your token, claim your profile, and start building cred on Base.
+        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+          <div>
+            <label style={labelStyle}>Agent Name</label>
+            <input style={inputStyle} placeholder="e.g. Bendr 2.0" value={form.name} onChange={set("name")} />
+          </div>
+
+          <div style={{ display: "flex", gap: "12px" }}>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Token Symbol</label>
+              <input style={inputStyle} placeholder="e.g. BENDR" value={form.symbol} onChange={set("symbol")} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Total Supply</label>
+              <input style={inputStyle} placeholder="1000000000" value={form.supply} onChange={set("supply")} />
+            </div>
+          </div>
+
+          <div>
+            <label style={labelStyle}>Description</label>
+            <textarea
+              style={{ ...inputStyle, minHeight: "80px", resize: "vertical" }}
+              placeholder="What does your agent do?"
+              value={form.description}
+              onChange={set("description")}
+            />
+          </div>
+
+          <div style={{ display: "flex", gap: "12px" }}>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Website (optional)</label>
+              <input style={inputStyle} placeholder="https://" value={form.website} onChange={set("website")} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Twitter (optional)</label>
+              <input style={inputStyle} placeholder="@handle" value={form.twitter} onChange={set("twitter")} />
+            </div>
+          </div>
+
+          <div style={{
+            padding: "14px 16px",
+            borderRadius: "10px",
+            background: "rgba(201, 168, 76, 0.06)",
+            border: "1px solid rgba(201, 168, 76, 0.15)",
+          }}>
+            <p style={{ fontSize: "12px", color: silverDim, margin: 0, lineHeight: 1.5 }}>
+              5% of your token supply goes to the <span style={{ color: gold, fontWeight: 600 }}>Synagent Pool</span>.
+              Your token launches on Base via bonding curve.
             </p>
           </div>
 
-          <div className="glass-card w-full max-w-xl p-8">
-            {/* Tabs */}
-            <div className="flex mb-8 bg-[#0a1020] rounded-xl p-1">
-              <button
-                className={`flex-1 py-3 rounded-lg text-sm font-semibold transition-all ${
-                  activeTab === "launch"
-                    ? "bg-gradient-to-r from-[#00e5cc]/20 to-[#00b8a3]/20 text-[#00e5cc]"
-                    : "text-[#8892a8] hover:text-white"
-                }`}
-                onClick={() => setActiveTab("launch")}
-              >
-                Launch New Token
-              </button>
-              <button
-                className={`flex-1 py-3 rounded-lg text-sm font-semibold transition-all ${
-                  activeTab === "connect"
-                    ? "bg-gradient-to-r from-[#8b5cf6]/20 to-[#7c3aed]/20 text-[#8b5cf6]"
-                    : "text-[#8892a8] hover:text-white"
-                }`}
-                onClick={() => setActiveTab("connect")}
-              >
-                I Have a Token
-              </button>
-            </div>
+          <button
+            style={{
+              ...btnGold,
+              width: "100%",
+              padding: "16px",
+              fontSize: "16px",
+              marginTop: "4px",
+            }}
+            onClick={() => {
+              // TODO: wire to contract / Bankr launch
+              alert("Token launch coming soon - connect wallet first");
+            }}
+          >
+            Launch on Base
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-            {activeTab === "launch" ? (
-              <div className="space-y-5">
-                <div>
-                  <label className="block text-sm text-[#8892a8] mb-2">Token Name</label>
-                  <input type="text" placeholder="e.g. MyAgent" className="form-input" />
-                </div>
-                <div>
-                  <label className="block text-sm text-[#8892a8] mb-2">Token Symbol</label>
-                  <input type="text" placeholder="e.g. $AGENT" className="form-input" />
-                </div>
-                <div>
-                  <label className="block text-sm text-[#8892a8] mb-2">Description</label>
-                  <textarea placeholder="What does your agent do?" className="form-input min-h-[100px] resize-none" />
-                </div>
-                <div>
-                  <label className="block text-sm text-[#8892a8] mb-2">Agent Avatar</label>
-                  <div className="form-input border-dashed flex items-center justify-center min-h-[80px] cursor-pointer hover:border-[#00e5cc]/40 transition-colors">
-                    <span className="text-[#8892a8] text-sm">Click or drag to upload</span>
-                  </div>
-                </div>
-                <div>
-                  <div className="flex justify-between mb-2">
-                    <label className="text-sm text-[#8892a8]">Bundle Percentage</label>
-                    <span className="text-sm font-semibold text-[#00e5cc]">{bundle}%</span>
-                  </div>
-                  <input
-                    type="range"
-                    min={1}
-                    max={70}
-                    value={bundle}
-                    onChange={(e) => setBundle(Number(e.target.value))}
-                  />
-                  <div className="flex justify-between text-xs text-[#8892a8] mt-1">
-                    <span>1%</span>
-                    <span>70%</span>
-                  </div>
-                </div>
-                <div className="pt-2">
-                  <button className="btn-teal w-full text-lg">Launch Token</button>
-                </div>
-                <p className="text-center text-xs text-[#8892a8]">
-                  Includes free Aura NFT mint + Helixa cred profile
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-5">
-                <div>
-                  <label className="block text-sm text-[#8892a8] mb-2">Token Contract Address</label>
-                  <input type="text" placeholder="0x..." className="form-input font-mono" />
-                </div>
-                <div>
-                  <label className="block text-sm text-[#8892a8] mb-2">Agent Name</label>
-                  <input type="text" placeholder="Your agent's name" className="form-input" />
-                </div>
-                <div>
-                  <label className="block text-sm text-[#8892a8] mb-2">Description</label>
-                  <textarea placeholder="What does your agent do?" className="form-input min-h-[100px] resize-none" />
-                </div>
-                <div>
-                  <label className="block text-sm text-[#8892a8] mb-2">Agent Avatar</label>
-                  <div className="form-input border-dashed flex items-center justify-center min-h-[80px] cursor-pointer hover:border-[#8b5cf6]/40 transition-colors">
-                    <span className="text-[#8892a8] text-sm">Click or drag to upload</span>
-                  </div>
-                </div>
-                <div className="pt-2">
-                  <button className="btn-violet-outline w-full text-lg">Claim Profile</button>
-                </div>
-                <p className="text-center text-xs text-[#8892a8]">
-                  We&apos;ll verify your token ownership on Base
-                </p>
-              </div>
-            )}
-          </div>
+export default function Home() {
+  const [showLaunch, setShowLaunch] = useState(false);
+
+  return (
+    <div style={{
+      minHeight: "100vh",
+      background: "linear-gradient(160deg, #08080c 0%, #0c0e14 25%, #10131a 50%, #0c0e14 75%, #08080c 100%)",
+      color: platinum,
+    }}>
+      {/* Nav */}
+      <nav style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "20px 48px",
+        borderBottom: "1px solid rgba(255,255,255,0.04)",
+      }}>
+        <span style={{
+          fontSize: "20px",
+          letterSpacing: "0.3em",
+          fontWeight: 300,
+          fontFamily: "Space Grotesk, sans-serif",
+        }}>
+          <span style={{ color: silverLight }}>SYN</span>
+          <span style={{ color: gold }}>AGENT</span>
+        </span>
+        <div style={{ display: "flex", alignItems: "center", gap: "32px" }}>
+          {["SYNAGENT POOL", "DOCS"].map((item) => (
+            <a key={item} href="#" style={{ fontSize: "14px", color: silverDim, textDecoration: "none", letterSpacing: "0.05em" }}>
+              {item}
+            </a>
+          ))}
+          <button style={btnWallet}>CONNECT WALLET</button>
+        </div>
+      </nav>
+
+      {/* Hero */}
+      <section style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "80px 24px 72px",
+        textAlign: "center",
+        position: "relative",
+      }}>
+        {/* Subtle radial glow */}
+        <div style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "600px",
+          height: "400px",
+          background: "radial-gradient(ellipse, rgba(180, 190, 210, 0.04) 0%, transparent 70%)",
+          pointerEvents: "none",
+        }} />
+
+        <h1 style={{
+          fontSize: "56px",
+          fontWeight: 700,
+          fontFamily: "Space Grotesk, sans-serif",
+          lineHeight: 1.1,
+          marginBottom: "20px",
+          background: "linear-gradient(135deg, #c8cdd6, #e8ecf2, #a0a6b2)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          maxWidth: "700px",
+        }}>
+          Launch. Validate. Monetize.
+        </h1>
+        <p style={{
+          color: silverDim,
+          fontSize: "18px",
+          maxWidth: "520px",
+          lineHeight: 1.6,
+          marginBottom: "40px",
+        }}>
+          Launch your agent token, claim your on-chain profile, and build credentials that follow you everywhere.
+        </p>
+        <div style={{ display: "flex", gap: "16px" }}>
+          <button style={btnGold} onClick={() => setShowLaunch(true)}>
+            Launch token and claim your profile
+          </button>
+          <button style={btnGlass}>
+            I have a token and want to claim my profile
+          </button>
+        </div>
+      </section>
+
+      {/* 4 Column Cards */}
+      <section style={{
+        maxWidth: "1320px",
+        margin: "0 auto",
+        padding: "0 24px 80px",
+        display: "flex",
+        gap: "16px",
+      }}>
+        {/* Trending Agents */}
+        <div style={cardStyle}>
+          <h3 style={{
+            fontSize: "15px",
+            fontWeight: 700,
+            marginBottom: "16px",
+            fontFamily: "Space Grotesk, sans-serif",
+            color: silverLight,
+            textTransform: "uppercase",
+            letterSpacing: "0.08em",
+          }}>
+            Trending Agents
+          </h3>
+          {TRENDING.map((a, i) => (
+            <AgentRow
+              key={i}
+              name={a.name}
+              right={a.change}
+              sub={`${a.symbol} · ${credTier(a.cred)} ${a.cred}`}
+            />
+          ))}
         </div>
 
-        {/* Right: Trending Sidebar */}
-        <div className="w-full lg:w-80">
-          <div className="glass-card p-6">
-            <h2 className="text-lg font-bold mb-5" style={{ fontFamily: "Space Grotesk" }}>
-              Trending Agents
-            </h2>
-            <div className="space-y-4">
-              {TRENDING.map((agent, i) => (
-                <div key={i} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors cursor-pointer">
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold"
-                    style={{
-                      background: `${credColor(agent.cred)}20`,
-                      color: credColor(agent.cred),
-                      border: `1px solid ${credColor(agent.cred)}40`,
-                    }}
-                  >
-                    {agent.name[0]}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold text-sm truncate">{agent.name}</span>
-                      <span className={`text-xs font-mono ${agent.change.startsWith("+") ? "text-[#00e5cc]" : "text-red-400"}`}>
-                        {agent.change}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-xs text-[#8892a8]">{agent.symbol}</span>
-                      <span className="text-xs px-1.5 py-0.5 rounded" style={{ background: `${credColor(agent.cred)}15`, color: credColor(agent.cred) }}>
-                        {credTier(agent.cred)} {agent.cred}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+        {/* Recently Launched */}
+        <div style={cardStyle}>
+          <h3 style={{
+            fontSize: "15px",
+            fontWeight: 700,
+            marginBottom: "16px",
+            fontFamily: "Space Grotesk, sans-serif",
+            color: silverLight,
+            textTransform: "uppercase",
+            letterSpacing: "0.08em",
+          }}>
+            Recently Launched
+          </h3>
+          {RECENT.map((a, i) => (
+            <AgentRow
+              key={i}
+              name={a.name}
+              right={a.time}
+              sub={a.symbol}
+            />
+          ))}
+        </div>
 
-          {/* Pool Stats */}
-          <div className="glass-card p-6 mt-4">
-            <h2 className="text-lg font-bold mb-4" style={{ fontFamily: "Space Grotesk" }}>
-              Synagent Pool
-            </h2>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-sm text-[#8892a8]">Total Agents</span>
-                <span className="text-sm font-semibold">247</span>
+        {/* Popular Profiles */}
+        <div style={cardStyle}>
+          <h3 style={{
+            fontSize: "15px",
+            fontWeight: 700,
+            marginBottom: "16px",
+            fontFamily: "Space Grotesk, sans-serif",
+            color: silverLight,
+            textTransform: "uppercase",
+            letterSpacing: "0.08em",
+          }}>
+            Popular Profiles
+          </h3>
+          {PROFILES.map((a, i) => (
+            <AgentRow
+              key={i}
+              name={a.name}
+              right={a.mcap}
+              sub={`${a.holders} holders`}
+            />
+          ))}
+        </div>
+
+        {/* Synagent Pool */}
+        <div style={cardStyle}>
+          <h3 style={{
+            fontSize: "15px",
+            fontWeight: 700,
+            marginBottom: "16px",
+            fontFamily: "Space Grotesk, sans-serif",
+            color: silverLight,
+            textTransform: "uppercase",
+            letterSpacing: "0.08em",
+          }}>
+            Synagent Pool
+          </h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "8px" }}>
+            {[
+              { label: "Total Agents", value: "247" },
+              { label: "Pool Value", value: "$1.2M" },
+              { label: "Tokens Held", value: "247" },
+              { label: "24h Volume", value: "$89.4K" },
+              { label: "Avg Cred", value: "54" },
+            ].map((stat, i) => (
+              <div key={i} style={{
+                display: "flex",
+                justifyContent: "space-between",
+                padding: "8px 0",
+                borderBottom: "1px solid rgba(255,255,255,0.03)",
+              }}>
+                <span style={{ fontSize: "13px", color: silverDim }}>{stat.label}</span>
+                <span style={{ fontSize: "14px", fontWeight: 600, color: platinum, fontFamily: "monospace" }}>{stat.value}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-[#8892a8]">Pool Value</span>
-                <span className="text-sm font-semibold text-[#00e5cc]">$1.2M</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-[#8892a8]">Tokens Held</span>
-                <span className="text-sm font-semibold">247</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-[#8892a8]">24h Volume</span>
-                <span className="text-sm font-semibold">$89.4K</span>
-              </div>
-            </div>
+            ))}
+          </div>
+          <div style={{
+            marginTop: "20px",
+            padding: "16px",
+            borderRadius: "12px",
+            background: "linear-gradient(135deg, rgba(168,173,184,0.1), rgba(205,209,217,0.06))",
+            border: "1px solid rgba(180,190,205,0.12)",
+            textAlign: "center",
+          }}>
+            <p style={{ fontSize: "12px", color: silverDim, marginBottom: "4px" }}>
+              5% of every launched token
+            </p>
+            <p style={{ fontSize: "12px", color: silverDim }}>
+              feeds the Synagent Pool
+            </p>
           </div>
         </div>
-      </main>
+      </section>
 
       {/* Footer */}
-      <footer className="relative z-10 text-center py-8 border-t border-white/5">
-        <p className="text-sm text-[#8892a8]">
-          Powered by <span className="text-[#00e5cc] font-semibold">Helixa</span> on Base
+      <footer style={{
+        textAlign: "center",
+        padding: "32px",
+        borderTop: "1px solid rgba(255,255,255,0.04)",
+      }}>
+        <p style={{ fontSize: "14px", color: silverDim }}>
+          Powered by <span style={{ color: platinum, fontWeight: 600 }}>Helixa</span> on Base
         </p>
       </footer>
+
+      {showLaunch && <LaunchModal onClose={() => setShowLaunch(false)} />}
     </div>
   );
 }
