@@ -33,6 +33,31 @@ const getMapDelta = (country: string) => {
   return 4;
 };
 
+const renderMaskedContact = (value: string, type: "handle" | "email" = "handle") => {
+  const prefix = type === "handle" && value.startsWith("@") ? "@" : "";
+  const core = type === "email" ? value.split("@")[0] : value.replace(/^@/, "");
+  const first = core.slice(0, 1);
+  const middle = core.slice(1, -1);
+  const last = core.slice(-1);
+
+  return (
+    <span style={{ display: "inline-flex", alignItems: "center" }}>
+      <span>{prefix}{first}</span>
+      {middle && (
+        <span style={{
+          filter: "blur(4px)",
+          opacity: 0.9,
+          userSelect: "none",
+          pointerEvents: "none",
+        }}>
+          {middle}
+        </span>
+      )}
+      <span>{last}</span>
+    </span>
+  );
+};
+
 export default function SynagentProfilePage() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const params = useParams<{ slug: string }>();
@@ -194,9 +219,9 @@ export default function SynagentProfilePage() {
                 <div style={{ padding: "12px 14px", borderRadius: "14px", border: `1px solid ${border}`, background: "rgba(5,10,14,0.24)" }}>
                   <div style={{ fontSize: "11px", color: silverDim, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>Contact Methods</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: "6px", color: silverLight, fontSize: "14px" }}>
-                    <span>X: {agent.contacts.x}</span>
-                    <span>Telegram: {agent.contacts.telegram}</span>
-                    <span>Email: {agent.contacts.email}</span>
+                    <span>X: {renderMaskedContact(agent.contacts.x, "handle")}</span>
+                    <span>Telegram: {renderMaskedContact(agent.contacts.telegram, "handle")}</span>
+                    <span>Email: {renderMaskedContact(agent.contacts.email, "email")}</span>
                   </div>
                 </div>
               </div>
