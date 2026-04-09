@@ -549,7 +549,7 @@ export default function Home() {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        padding: "88px 24px 72px",
+        padding: "88px 24px 47px",
         textAlign: "center",
         position: "relative",
       }}>
