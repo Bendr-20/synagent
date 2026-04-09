@@ -597,7 +597,7 @@ export default function Home() {
         <div style={{
           fontSize: "16px",
           color: silverDim,
-          marginBottom: "28px",
+          marginBottom: "14px",
           letterSpacing: "0.08em",
           textTransform: "uppercase",
         }}>
@@ -612,13 +612,15 @@ export default function Home() {
         padding: "0 24px 88px",
         display: "flex",
         gap: "16px",
+        alignItems: "stretch",
       }}>
         {serviceCards.map((card) => (
           <div key={card.title} style={{
             ...cardStyle,
             display: "flex",
             flexDirection: "column",
-            height: "100%",
+            alignSelf: "stretch",
+            flex: "1 1 0",
           }}>
             <div style={{
               fontSize: "12px",
