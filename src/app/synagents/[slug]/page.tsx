@@ -94,7 +94,7 @@ export default function SynagentProfilePage() {
   const { lat, lng } = parseCoords(agent.coords);
   const delta = getMapDelta(agent.country);
   const bbox = `${(lng - delta).toFixed(4)},${(lat - delta).toFixed(4)},${(lng + delta).toFixed(4)},${(lat + delta).toFixed(4)}`;
-  const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lng}`;
+  const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik`;
 
   return (
     <div style={{ minHeight: "100vh", background: bg, color: platinum, position: "relative", overflow: "hidden", display: "flex", flexDirection: "column" }}>
@@ -194,6 +194,18 @@ export default function SynagentProfilePage() {
                     }}
                   />
                   <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(5,10,14,0.16), rgba(5,10,14,0.28))", pointerEvents: "none" }} />
+                  <div style={{
+                    position: "absolute",
+                    left: "50%",
+                    top: "50%",
+                    width: "14px",
+                    height: "14px",
+                    borderRadius: "50%",
+                    background: gold,
+                    transform: "translate(-50%, -50%)",
+                    boxShadow: "0 0 0 6px rgba(0,229,255,0.14), 0 0 22px rgba(0,229,255,0.9)",
+                    pointerEvents: "none",
+                  }} />
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                   <div style={{ padding: "12px 14px", borderRadius: "14px", border: `1px solid ${border}`, background: "rgba(5,10,14,0.24)" }}>
