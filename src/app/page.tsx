@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 
 const bg = "#050a0e";
 const surface = "#0a1218";
@@ -457,6 +457,14 @@ export default function Home() {
     },
   ];
 
+  const flowSteps = [
+    "Idea",
+    "AI Agent Swarm",
+    "Alpha Product",
+    "Human Refinement",
+    "MVP",
+  ];
+
   return (
     <div style={{
       minHeight: "100vh",
@@ -600,6 +608,45 @@ export default function Home() {
           textTransform: "uppercase",
         }}>
           or
+        </div>
+
+        <div style={{
+          width: "100%",
+          maxWidth: "1100px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexWrap: "wrap",
+          gap: "10px",
+        }}>
+          {flowSteps.map((step, index) => (
+            <Fragment key={step}>
+              <div style={{
+                padding: "10px 14px",
+                borderRadius: "12px",
+                border: "1px solid rgba(0,229,255,0.18)",
+                background: "rgba(5,10,14,0.28)",
+                color: index === flowSteps.length - 1 ? silverLight : gold,
+                fontSize: "12px",
+                fontFamily: "JetBrains Mono, monospace",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                boxShadow: "inset 0 0 0 1px rgba(0,229,255,0.03)",
+              }}>
+                {step}
+              </div>
+              {index < flowSteps.length - 1 && (
+                <div style={{
+                  color: silverDim,
+                  fontSize: "16px",
+                  fontFamily: "JetBrains Mono, monospace",
+                  letterSpacing: "0.04em",
+                }}>
+                  &gt;
+                </div>
+              )}
+            </Fragment>
+          ))}
         </div>
       </section>
 
