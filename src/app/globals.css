@@ -45,9 +45,39 @@
 }
 
 @media (max-width: 768px) {
-  .nav-bar {
+  .site-header {
     flex-direction: column !important;
-    gap: 16px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 12px !important;
     padding: 18px 20px !important;
+  }
+
+  .site-brand {
+    order: 1;
+  }
+
+  .site-status {
+    order: 2;
+    max-width: 100%;
+    padding: 8px 12px !important;
+  }
+
+  .site-status-text {
+    font-size: 10px !important;
+    letter-spacing: 0.08em !important;
+    white-space: nowrap !important;
+  }
+
+  .site-header-links {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    gap: 18px !important;
+    flex-wrap: wrap;
+  }
+
+  .site-connect-button {
+    padding: 8px 16px !important;
   }
 }

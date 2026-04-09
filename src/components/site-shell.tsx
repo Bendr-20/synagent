@@ -87,6 +87,7 @@ export function SiteShell({ children, mainStyle, showFooter = true }: SiteShellP
 
       <div style={{ position: "relative", zIndex: 2, display: "flex", flexDirection: "column", minHeight: "100vh" }}>
         <header
+          className="site-header"
           style={{
             display: "flex",
             alignItems: "center",
@@ -98,6 +99,7 @@ export function SiteShell({ children, mainStyle, showFooter = true }: SiteShellP
           }}
         >
           <Link
+            className="site-brand"
             href="/"
             style={{
               fontSize: "20px",
@@ -113,6 +115,7 @@ export function SiteShell({ children, mainStyle, showFooter = true }: SiteShellP
           </Link>
 
           <div
+            className="site-status"
             style={{
               display: "flex",
               alignItems: "center",
@@ -135,19 +138,21 @@ export function SiteShell({ children, mainStyle, showFooter = true }: SiteShellP
               }}
             />
             <span
+              className="site-status-text"
               style={{
                 fontSize: "11px",
                 fontFamily: "JetBrains Mono, monospace",
                 letterSpacing: "0.12em",
                 color: theme.textStrong,
                 textTransform: "uppercase",
+                whiteSpace: "nowrap",
               }}
             >
               Systems Active | Accepting Ideas
             </span>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "32px" }}>
+          <div className="site-header-links" style={{ display: "flex", alignItems: "center", gap: "32px" }}>
             <Link href="#" style={{ fontSize: "14px", color: theme.textMuted, textDecoration: "none", letterSpacing: "0.05em" }}>
               $CRED
             </Link>
@@ -155,6 +160,7 @@ export function SiteShell({ children, mainStyle, showFooter = true }: SiteShellP
               DOCS
             </Link>
             <button
+              className="site-connect-button"
               style={{
                 background: `linear-gradient(135deg, ${theme.accent}, ${theme.accentDark})`,
                 color: theme.bg,
