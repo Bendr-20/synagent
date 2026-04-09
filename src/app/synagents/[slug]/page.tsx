@@ -30,7 +30,10 @@ function MaskedContact({ value, type = "handle" }: { value: string; type?: "hand
 
   return (
     <span style={{ display: "inline-flex", alignItems: "center" }}>
-      <span>{prefix}{first}</span>
+      <span>
+        {prefix}
+        {first}
+      </span>
       {middle ? (
         <span style={{ filter: "blur(4px)", opacity: 0.9, userSelect: "none", pointerEvents: "none" }}>{middle}</span>
       ) : null}
@@ -38,6 +41,14 @@ function MaskedContact({ value, type = "handle" }: { value: string; type?: "hand
     </span>
   );
 }
+
+const eyebrowStyle = {
+  fontSize: "12px",
+  color: theme.textMuted,
+  fontFamily: "JetBrains Mono, monospace",
+  letterSpacing: "0.12em",
+  textTransform: "uppercase" as const,
+};
 
 export default async function SynagentProfilePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -50,39 +61,77 @@ export default async function SynagentProfilePage({ params }: { params: Promise<
   const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik`;
 
   return (
-    <SiteShell mainStyle={{ padding: "36px 32px 24px" }}>
-      <div style={{ maxWidth: "1280px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "24px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: "16px" }}>
+    <SiteShell mainStyle={{ padding: "clamp(24px, 4vw, 36px) clamp(16px, 3vw, 32px) 24px" }}>
+      <div className="dossier-page" style={{ maxWidth: "1280px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "24px" }}>
+        <div className="dossier-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: "16px" }}>
           <div>
-            <div style={{ fontSize: "12px", color: theme.textMuted, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "8px" }}>
-              Synagent Dossier
-            </div>
-            <h1 style={{ fontSize: "34px", color: theme.textStrong, fontFamily: "Space Grotesk, sans-serif" }}>{agent.name}</h1>
+            <div style={{ ...eyebrowStyle, marginBottom: "8px" }}>Synagent Dossier</div>
+            <h1 className="dossier-title" style={{ fontSize: "34px", color: theme.textStrong, fontFamily: "Space Grotesk, sans-serif", wordBreak: "break-word" }}>
+              {agent.name}
+            </h1>
           </div>
-          <Link href="/synagents" style={{ ...outlineButtonStyle, width: "auto", padding: "10px 14px", marginTop: 0 }}>
+          <Link className="dossier-back-link" href="/synagents" style={{ ...outlineButtonStyle, width: "auto", padding: "10px 14px", marginTop: 0 }}>
             <span>Back to Directory</span>
           </Link>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1.25fr 1fr", gap: "20px" }}>
-          <div style={{ ...glassCardStyle, borderRadius: "20px", display: "flex", gap: "18px" }}>
-            <div style={{ width: "92px", height: "92px", borderRadius: "18px", border: "1px solid rgba(0,229,255,0.18)", background: "rgba(0,229,255,0.08)", color: theme.accent, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "28px", fontWeight: 700, fontFamily: "JetBrains Mono, monospace", flexShrink: 0 }}>
+        <div className="dossier-top-grid" style={{ display: "grid", gridTemplateColumns: "1.25fr 1fr", gap: "20px" }}>
+          <div className="dossier-hero-card" style={{ ...glassCardStyle, borderRadius: "20px", display: "flex", gap: "18px" }}>
+            <div
+              style={{
+                width: "92px",
+                height: "92px",
+                borderRadius: "18px",
+                border: "1px solid rgba(0,229,255,0.18)",
+                background: "rgba(0,229,255,0.08)",
+                color: theme.accent,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "28px",
+                fontWeight: 700,
+                fontFamily: "JetBrains Mono, monospace",
+                flexShrink: 0,
+              }}
+            >
               {agent.avatar}
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "10px", minWidth: 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-                <span style={{ padding: "4px 8px", borderRadius: "999px", border: "1px solid rgba(0,229,255,0.18)", color: theme.accent, fontSize: "10px", fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                <span
+                  style={{
+                    padding: "4px 8px",
+                    borderRadius: "999px",
+                    border: "1px solid rgba(0,229,255,0.18)",
+                    color: theme.accent,
+                    fontSize: "10px",
+                    fontFamily: "JetBrains Mono, monospace",
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                  }}
+                >
                   {agent.featured ? "Featured" : "Active"}
                 </span>
-                <span style={{ padding: "4px 8px", borderRadius: "999px", border: `1px solid ${theme.border}`, color: theme.textMuted, fontSize: "10px", fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                <span
+                  style={{
+                    padding: "4px 8px",
+                    borderRadius: "999px",
+                    border: `1px solid ${theme.border}`,
+                    color: theme.textMuted,
+                    fontSize: "10px",
+                    fontFamily: "JetBrains Mono, monospace",
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                  }}
+                >
                   {agent.country}
                 </span>
               </div>
-              <div style={{ fontSize: "13px", color: theme.textMuted, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+              <div className="dossier-subhead" style={{ fontSize: "13px", color: theme.textMuted, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.06em", textTransform: "uppercase" }}>
                 Credibility {agent.cred} • Last Active {agent.lastActive}
               </div>
-              <p style={{ color: theme.textMuted, lineHeight: 1.8, fontSize: "15px" }}>{agent.bio}</p>
-              <Link href={`/match?agent=${agent.slug}`} style={{ ...outlineButtonStyle, width: "fit-content", padding: "12px 16px", marginTop: "6px", gap: "10px" }}>
+              <p style={{ color: theme.textMuted, lineHeight: 1.8, fontSize: "15px", margin: 0 }}>{agent.bio}</p>
+              <Link className="dossier-cta" href={`/match?agent=${agent.slug}`} style={{ ...outlineButtonStyle, width: "fit-content", padding: "12px 16px", marginTop: "6px", gap: "10px" }}>
                 <span>{`Submit A Proposal To ${agent.name}`}</span>
                 <span>{">"}</span>
               </Link>
@@ -90,8 +139,8 @@ export default async function SynagentProfilePage({ params }: { params: Promise<
           </div>
 
           <div style={{ ...glassCardStyle, borderRadius: "20px", display: "flex", flexDirection: "column", gap: "14px" }}>
-            <div style={{ fontSize: "12px", color: theme.textMuted, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.12em", textTransform: "uppercase" }}>Agent Intel</div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+            <div style={eyebrowStyle}>Agent Intel</div>
+            <div className="dossier-intel-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
               <div style={{ padding: "12px", borderRadius: "14px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.24)" }}>
                 <div style={{ fontSize: "11px", color: theme.textMuted, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "6px" }}>Member Since</div>
                 <div style={{ color: theme.textStrong }}>{agent.memberSince}</div>
@@ -103,7 +152,7 @@ export default async function SynagentProfilePage({ params }: { params: Promise<
             </div>
             <div style={{ padding: "12px 14px", borderRadius: "14px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.24)" }}>
               <div style={{ fontSize: "11px", color: theme.textMuted, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>Contact Methods</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "6px", color: theme.textStrong, fontSize: "14px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "6px", color: theme.textStrong, fontSize: "14px", overflowWrap: "anywhere" }}>
                 <span>X: <MaskedContact value={agent.contacts.x} /></span>
                 <span>Telegram: <MaskedContact value={agent.contacts.telegram} /></span>
                 <span>Email: <MaskedContact value={agent.contacts.email} type="email" /></span>
@@ -112,9 +161,9 @@ export default async function SynagentProfilePage({ params }: { params: Promise<
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "0.95fr 1.05fr", gap: "20px" }}>
+        <div className="dossier-bottom-grid" style={{ display: "grid", gridTemplateColumns: "0.95fr 1.05fr", gap: "20px" }}>
           <div style={{ ...glassCardStyle, borderRadius: "20px", display: "flex", flexDirection: "column", gap: "16px" }}>
-            <div style={{ fontSize: "12px", color: theme.textMuted, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.12em", textTransform: "uppercase" }}>Location Grid</div>
+            <div style={eyebrowStyle}>Location Grid</div>
             <div style={{ position: "relative", minHeight: "260px", borderRadius: "16px", border: `1px solid ${theme.border}`, background: "linear-gradient(145deg, rgba(0,229,255,0.04), rgba(5,10,14,0.28))", overflow: "hidden" }}>
               <iframe
                 title={`${agent.name} location map`}
@@ -125,7 +174,7 @@ export default async function SynagentProfilePage({ params }: { params: Promise<
               <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(5,10,14,0.16), rgba(5,10,14,0.28))", pointerEvents: "none" }} />
               <div style={{ position: "absolute", left: "50%", top: "50%", width: "14px", height: "14px", borderRadius: "50%", background: theme.accent, transform: "translate(-50%, -50%)", boxShadow: "0 0 0 6px rgba(0,229,255,0.14), 0 0 22px rgba(0,229,255,0.9)", pointerEvents: "none" }} />
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+            <div className="dossier-location-meta" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
               <div style={{ padding: "12px 14px", borderRadius: "14px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.24)" }}>
                 <div style={{ fontSize: "11px", color: theme.textMuted, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "6px" }}>Timezone</div>
                 <div style={{ color: theme.textStrong }}>{agent.timezone}</div>
@@ -138,17 +187,17 @@ export default async function SynagentProfilePage({ params }: { params: Promise<
           </div>
 
           <div style={{ ...glassCardStyle, borderRadius: "20px", display: "flex", flexDirection: "column", gap: "16px" }}>
-            <div style={{ fontSize: "12px", color: theme.textMuted, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.12em", textTransform: "uppercase" }}>Finished Projects</div>
+            <div style={eyebrowStyle}>Finished Projects</div>
             {agent.projects.map((project) => (
               <div key={project.name} style={{ padding: "16px", borderRadius: "16px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.24)", display: "flex", flexDirection: "column", gap: "8px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
+                <div className="dossier-project-head" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
                   <div>
                     <div style={{ color: theme.textStrong, fontSize: "15px", fontWeight: 600 }}>{project.name}</div>
                     <div style={{ color: theme.textMuted, fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: "4px" }}>{project.type}</div>
                   </div>
-                  <div style={{ color: theme.accent, fontFamily: "JetBrains Mono, monospace", fontSize: "13px" }}>{project.rating.toFixed(1)}</div>
+                  <div style={{ color: theme.accent, fontFamily: "JetBrains Mono, monospace", fontSize: "13px", flexShrink: 0 }}>{project.rating.toFixed(1)}</div>
                 </div>
-                <p style={{ color: theme.textMuted, fontSize: "14px", lineHeight: 1.7 }}>{project.result}</p>
+                <p style={{ color: theme.textMuted, fontSize: "14px", lineHeight: 1.7, margin: 0 }}>{project.result}</p>
               </div>
             ))}
           </div>
