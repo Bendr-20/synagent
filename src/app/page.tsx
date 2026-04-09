@@ -445,9 +445,15 @@ export default function Home() {
     },
     {
       number: "03",
-      title: "AI Consulting Agent",
+      title: "Human AI Consultants",
       description: "Get strategic guidance on agents, workflows, tooling, and how to actually make the system useful.",
       titleColor: goldDark,
+      featuredHumans: [
+        { name: "Synagent Alpha", cred: 91 },
+        { name: "Synagent Beta", cred: 88 },
+        { name: "Synagent Gamma", cred: 85 },
+        { name: "Synagent Delta", cred: 83 },
+      ],
     },
   ];
 
@@ -651,7 +657,7 @@ export default function Home() {
                   textTransform: "uppercase",
                   marginBottom: "14px",
                 }}>
-                  Featured Humans
+                  {card.number === "03" ? "Synagents" : "Featured Humans"}
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                   {card.featuredHumans.map((human) => (
