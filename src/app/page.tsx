@@ -633,17 +633,21 @@ export default function Home() {
                 marginTop: "22px",
                 padding: "14px 18px",
                 borderRadius: "12px",
-                border: "1px solid rgba(0,229,255,0.18)",
-                background: `linear-gradient(135deg, ${gold}, ${goldDark})`,
-                color: bg,
+                border: "1px solid rgba(0,229,255,0.26)",
+                background: "rgba(5,10,14,0.18)",
+                color: gold,
                 fontSize: "13px",
                 fontWeight: 700,
                 letterSpacing: "0.08em",
                 textTransform: "uppercase",
                 cursor: "pointer",
-                boxShadow: "0 6px 20px rgba(0,229,255,0.2)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                boxShadow: "inset 0 0 0 1px rgba(0,229,255,0.03)",
               }}>
-                {card.buttonText}
+                <span>{card.buttonText}</span>
+                <span>{">"}</span>
               </button>
             )}
           </div>
