@@ -375,14 +375,17 @@ export default function Home() {
     {
       title: "Hire A Human",
       description: "Get direct help from a trusted human operator for specific tasks, fixes, and fast execution.",
+      titleColor: "#e4cf93",
     },
     {
       title: "Create An MVP",
       description: "Turn an idea into a working first version with hands-on build support and a clearer path to launch.",
+      titleColor: "#c9a84c",
     },
     {
       title: "AI Consulting Agent",
       description: "Get strategic guidance on agents, workflows, tooling, and how to actually make the system useful.",
+      titleColor: "#8f6f2a",
     },
   ];
 
@@ -444,23 +447,21 @@ export default function Home() {
           fontFamily: "Space Grotesk, sans-serif",
           lineHeight: 1.1,
           marginBottom: "32px",
-          background: "linear-gradient(135deg, #c8cdd6, #e8ecf2, #a0a6b2)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
           maxWidth: "760px",
         }}>
-          Build with AI. Refine with Humans.
+          <span style={{ color: silverLight }}>Build with AI.</span>{" "}
+          <span style={{ color: gold }}>Refine with Humans.</span>
         </h1>
 
         <div style={{ width: "100%", maxWidth: "860px", marginBottom: "20px" }}>
-          <textarea
+          <input
+            type="text"
             style={{
               ...inputStyle,
-              minHeight: "120px",
-              resize: "vertical",
-              padding: "20px 22px",
+              height: "60px",
+              padding: "0 22px",
               fontSize: "16px",
-              lineHeight: 1.6,
+              lineHeight: 1,
               borderRadius: "16px",
               background: "linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))",
               border: "1px solid rgba(201, 168, 76, 0.22)",
@@ -494,7 +495,7 @@ export default function Home() {
               fontWeight: 700,
               marginBottom: "16px",
               fontFamily: "Space Grotesk, sans-serif",
-              color: silverLight,
+              color: card.titleColor,
               letterSpacing: "0.01em",
             }}>
               {card.title}
