@@ -431,10 +431,10 @@ export default function Home() {
       titleColor: "#9ff9ff",
       featuredLabel: "Featured Synagents",
       featuredHumans: [
-        { name: "Operator One", cred: 92 },
-        { name: "Promptsmith", cred: 89 },
-        { name: "Builder Core", cred: 86 },
-        { name: "Systems Human", cred: 84 },
+        { name: "Synagent Atlas", cred: 94, slug: "synagent-atlas" },
+        { name: "Promptsmith One", cred: 92, slug: "promptsmith-one" },
+        { name: "Signal Forge", cred: 90, slug: "signal-forge" },
+        { name: "Builder Core", cred: 89, slug: "builder-core" },
       ],
       buttonText: "Make Your Match",
     },
@@ -540,6 +540,9 @@ export default function Home() {
           </span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "32px" }}>
+          <a className="nav-links" href="#" style={{ fontSize: "14px", color: silverDim, textDecoration: "none", letterSpacing: "0.05em" }}>
+            $CRED
+          </a>
           <a className="nav-links" href="#" style={{ fontSize: "14px", color: silverDim, textDecoration: "none", letterSpacing: "0.05em" }}>
             DOCS
           </a>
@@ -744,26 +747,40 @@ export default function Home() {
                   {card.featuredLabel || "Featured Humans"}
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                  {card.featuredHumans.map((human) => (
-                    <div key={human.name} style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      paddingBottom: "10px",
-                      borderBottom: "1px solid rgba(0,229,255,0.08)",
-                    }}>
-                      <span style={{ fontSize: "14px", color: silverLight, fontWeight: 500 }}>{human.name}</span>
-                      <span style={{
-                        fontSize: "12px",
-                        fontFamily: "JetBrains Mono, monospace",
-                        color: gold,
-                        letterSpacing: "0.08em",
-                        textTransform: "uppercase",
+                  {card.featuredHumans.map((human) => {
+                    const row = (
+                      <div style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        paddingBottom: "10px",
+                        borderBottom: "1px solid rgba(0,229,255,0.08)",
                       }}>
-                        Cred {human.cred}
-                      </span>
-                    </div>
-                  ))}
+                        <span style={{ fontSize: "14px", color: silverLight, fontWeight: 500 }}>{human.name}</span>
+                        <span style={{
+                          fontSize: "12px",
+                          fontFamily: "JetBrains Mono, monospace",
+                          color: gold,
+                          letterSpacing: "0.08em",
+                          textTransform: "uppercase",
+                        }}>
+                          Cred {human.cred}
+                        </span>
+                      </div>
+                    );
+
+                    return "slug" in human ? (
+                      <a
+                        key={human.name}
+                        href={`/synagents/${human.slug}`}
+                        style={{ textDecoration: "none" }}
+                      >
+                        {row}
+                      </a>
+                    ) : (
+                      <div key={human.name}>{row}</div>
+                    );
+                  })}
                 </div>
               </div>
             )}
