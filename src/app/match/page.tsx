@@ -181,6 +181,9 @@ export default function MatchPage() {
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "32px" }}>
             <a href="#" style={{ fontSize: "14px", color: silverDim, textDecoration: "none", letterSpacing: "0.05em" }}>
+              $CRED
+            </a>
+            <a href="#" style={{ fontSize: "14px", color: silverDim, textDecoration: "none", letterSpacing: "0.05em" }}>
               DOCS
             </a>
             <button style={{

@@ -114,6 +114,7 @@ export default function SynagentProfilePage() {
             </span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "32px" }}>
+            <a href="#" style={{ fontSize: "14px", color: silverDim, textDecoration: "none", letterSpacing: "0.05em" }}>$CRED</a>
             <a href="#" style={{ fontSize: "14px", color: silverDim, textDecoration: "none", letterSpacing: "0.05em" }}>DOCS</a>
             <button style={{ background: `linear-gradient(135deg, ${gold}, ${goldDark})`, color: bg, fontWeight: 600, borderRadius: "8px", padding: "8px 20px", border: "none", cursor: "pointer", fontSize: "13px" }}>CONNECT</button>
           </div>
@@ -155,23 +156,23 @@ export default function SynagentProfilePage() {
               </div>
 
               <div style={{ borderRadius: "20px", border: `1px solid ${border}`, background: "linear-gradient(145deg, rgba(10,18,24,0.94), rgba(8,14,18,0.88))", boxShadow: "0 20px 45px rgba(0,0,0,0.22)", padding: "24px", display: "flex", flexDirection: "column", gap: "14px" }}>
-                <div style={{ fontSize: "12px", color: silverDim, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.12em", textTransform: "uppercase" }}>Field Contact</div>
+                <div style={{ fontSize: "12px", color: silverDim, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.12em", textTransform: "uppercase" }}>Agent Intel</div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
                   <div style={{ padding: "12px", borderRadius: "14px", border: `1px solid ${border}`, background: "rgba(5,10,14,0.24)" }}>
                     <div style={{ fontSize: "11px", color: silverDim, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "6px" }}>Member Since</div>
                     <div style={{ color: silverLight }}>{agent.memberSince}</div>
                   </div>
                   <div style={{ padding: "12px", borderRadius: "14px", border: `1px solid ${border}`, background: "rgba(5,10,14,0.24)" }}>
-                    <div style={{ fontSize: "11px", color: silverDim, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "6px" }}>Timezone</div>
-                    <div style={{ color: silverLight }}>{agent.timezone}</div>
-                  </div>
-                  <div style={{ padding: "12px", borderRadius: "14px", border: `1px solid ${border}`, background: "rgba(5,10,14,0.24)" }}>
                     <div style={{ fontSize: "11px", color: silverDim, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "6px" }}>Payment</div>
                     <div style={{ color: gold, fontFamily: "JetBrains Mono, monospace" }}>{agent.payment}</div>
                   </div>
-                  <div style={{ padding: "12px", borderRadius: "14px", border: `1px solid ${border}`, background: "rgba(5,10,14,0.24)" }}>
-                    <div style={{ fontSize: "11px", color: silverDim, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "6px" }}>Operational Region</div>
-                    <div style={{ color: silverLight }}>{agent.city}, {agent.country}</div>
+                </div>
+                <div style={{ padding: "12px 14px", borderRadius: "14px", border: `1px solid ${border}`, background: "rgba(5,10,14,0.24)" }}>
+                  <div style={{ fontSize: "11px", color: silverDim, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>Contact Methods</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px", color: silverLight, fontSize: "14px" }}>
+                    <span>X: {agent.contacts.x}</span>
+                    <span>Telegram: {agent.contacts.telegram}</span>
+                    <span>Email: {agent.contacts.email}</span>
                   </div>
                 </div>
               </div>
@@ -179,7 +180,7 @@ export default function SynagentProfilePage() {
 
             <div style={{ display: "grid", gridTemplateColumns: "0.95fr 1.05fr", gap: "20px" }}>
               <div style={{ borderRadius: "20px", border: `1px solid ${border}`, background: "linear-gradient(145deg, rgba(10,18,24,0.94), rgba(8,14,18,0.88))", boxShadow: "0 20px 45px rgba(0,0,0,0.22)", padding: "24px", display: "flex", flexDirection: "column", gap: "16px" }}>
-                <div style={{ fontSize: "12px", color: silverDim, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.12em", textTransform: "uppercase" }}>Location Map</div>
+                <div style={{ fontSize: "12px", color: silverDim, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.12em", textTransform: "uppercase" }}>Location Grid</div>
                 <div style={{ position: "relative", minHeight: "260px", borderRadius: "16px", border: `1px solid ${border}`, background: "linear-gradient(145deg, rgba(0,229,255,0.04), rgba(5,10,14,0.28))", overflow: "hidden" }}>
                   <iframe
                     title={`${agent.name} location map`}
@@ -189,26 +190,19 @@ export default function SynagentProfilePage() {
                       width: "100%",
                       height: "260px",
                       border: 0,
-                      filter: "grayscale(0.75) saturate(0.7) brightness(0.72) contrast(1.08)",
+                      filter: "invert(0.92) hue-rotate(180deg) saturate(0.55) brightness(0.55) contrast(1.15)",
                     }}
                   />
-                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(5,10,14,0.04), rgba(5,10,14,0.18))", pointerEvents: "none" }} />
-                  <div style={{ position: "absolute", right: "18px", top: "18px", padding: "8px 10px", borderRadius: "12px", border: "1px solid rgba(0,229,255,0.18)", background: "rgba(5,10,14,0.68)", color: silverLight, fontSize: "11px", fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.08em", textTransform: "uppercase", pointerEvents: "none" }}>
-                    {agent.city}
-                  </div>
-                  <div style={{ position: "absolute", left: "24px", bottom: "24px", display: "flex", flexDirection: "column", gap: "6px", padding: "10px 12px", borderRadius: "12px", border: "1px solid rgba(0,229,255,0.18)", background: "rgba(5,10,14,0.68)", pointerEvents: "none" }}>
-                    <div style={{ fontSize: "11px", color: silverDim, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.08em", textTransform: "uppercase" }}>Coordinates</div>
-                    <div style={{ color: silverLight, fontFamily: "JetBrains Mono, monospace", fontSize: "13px" }}>{agent.coords}</div>
-                  </div>
+                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(5,10,14,0.16), rgba(5,10,14,0.28))", pointerEvents: "none" }} />
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "10px" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                   <div style={{ padding: "12px 14px", borderRadius: "14px", border: `1px solid ${border}`, background: "rgba(5,10,14,0.24)" }}>
-                    <div style={{ fontSize: "11px", color: silverDim, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "6px" }}>Contact Methods</div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "6px", color: silverLight, fontSize: "14px" }}>
-                      <span>X: {agent.contacts.x}</span>
-                      <span>Telegram: {agent.contacts.telegram}</span>
-                      <span>Email: {agent.contacts.email}</span>
-                    </div>
+                    <div style={{ fontSize: "11px", color: silverDim, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "6px" }}>Timezone</div>
+                    <div style={{ color: silverLight }}>{agent.timezone}</div>
+                  </div>
+                  <div style={{ padding: "12px 14px", borderRadius: "14px", border: `1px solid ${border}`, background: "rgba(5,10,14,0.24)" }}>
+                    <div style={{ fontSize: "11px", color: silverDim, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "6px" }}>Operational Region</div>
+                    <div style={{ color: silverLight }}>{agent.city}, {agent.country}</div>
                   </div>
                 </div>
               </div>
