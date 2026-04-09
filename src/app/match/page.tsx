@@ -256,10 +256,28 @@ export default function MatchPage() {
               Set your priorities, describe what you need, and we’ll surface the strongest matches.
             </p>
 
+            <div style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              fontSize: "11px",
+              color: silverDim,
+              fontFamily: "JetBrains Mono, monospace",
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              marginTop: "2px",
+              marginBottom: "2px",
+            }}>
+              <span>Least Important</span>
+              <span>Most Important</span>
+            </div>
+
             {renderSlider("cost", "Cost")}
             {renderSlider("time", "Time")}
             {renderSlider("quality", "Quality")}
             {renderSlider("credibility", "Credibility")}
+
+            <div style={{ height: "10px" }} />
 
             <textarea
               rows={3}
