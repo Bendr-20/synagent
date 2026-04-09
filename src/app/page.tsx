@@ -428,6 +428,13 @@ export default function Home() {
       title: "Hire A Human",
       description: "Get direct help from a trusted human operator for specific tasks, fixes, and fast execution.",
       titleColor: "#9ff9ff",
+      featuredHumans: [
+        { name: "Operator One", cred: 92 },
+        { name: "Promptsmith", cred: 89 },
+        { name: "Builder Core", cred: 86 },
+        { name: "Systems Human", cred: 84 },
+      ],
+      buttonText: "Find Your Human",
     },
     {
       number: "02",
@@ -627,6 +634,49 @@ export default function Home() {
             }}>
               {card.description}
             </p>
+            {card.featuredHumans && (
+              <div style={{
+                marginTop: "22px",
+                padding: "18px",
+                borderRadius: "14px",
+                border: "1px solid rgba(0,229,255,0.18)",
+                background: "rgba(5,10,14,0.32)",
+                boxShadow: "inset 0 0 0 1px rgba(0,229,255,0.03)",
+              }}>
+                <div style={{
+                  fontSize: "11px",
+                  fontFamily: "JetBrains Mono, monospace",
+                  letterSpacing: "0.14em",
+                  color: silverDim,
+                  textTransform: "uppercase",
+                  marginBottom: "14px",
+                }}>
+                  Featured Humans
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {card.featuredHumans.map((human) => (
+                    <div key={human.name} style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      paddingBottom: "10px",
+                      borderBottom: "1px solid rgba(0,229,255,0.08)",
+                    }}>
+                      <span style={{ fontSize: "14px", color: silverLight, fontWeight: 500 }}>{human.name}</span>
+                      <span style={{
+                        fontSize: "12px",
+                        fontFamily: "JetBrains Mono, monospace",
+                        color: gold,
+                        letterSpacing: "0.08em",
+                        textTransform: "uppercase",
+                      }}>
+                        Cred {human.cred}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             {card.buttonText && (
               <button style={{
                 width: "100%",
