@@ -441,7 +441,7 @@ export default function Home() {
       title: "Create An MVP",
       description: "Submit your idea and our AI swarm builds it, humans refine it, and you own everything - code, IP, all of it. Delivered in 7-10 days.",
       titleColor: gold,
-      buttonText: "Learn More",
+      buttonText: "Start Building Now",
     },
     {
       number: "03",
@@ -454,6 +454,7 @@ export default function Home() {
         { name: "Synagent Gamma", cred: 85 },
         { name: "Synagent Delta", cred: 83 },
       ],
+      buttonText: "Engage With Synagent",
     },
   ];
 
@@ -613,7 +614,12 @@ export default function Home() {
         gap: "16px",
       }}>
         {serviceCards.map((card) => (
-          <div key={card.title} style={cardStyle}>
+          <div key={card.title} style={{
+            ...cardStyle,
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+          }}>
             <div style={{
               fontSize: "12px",
               fontFamily: "JetBrains Mono, monospace",
@@ -644,7 +650,6 @@ export default function Home() {
             </p>
             {card.number === "02" && (
               <div style={{
-                width: "100%",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
@@ -652,7 +657,6 @@ export default function Home() {
                 marginTop: "20px",
               }}>
                 <div style={{
-                  width: "100%",
                   padding: "12px 14px",
                   borderRadius: "12px",
                   border: "1px solid rgba(0,229,255,0.18)",
@@ -676,7 +680,6 @@ export default function Home() {
                   ↓
                 </div>
                 <div style={{
-                  width: "100%",
                   padding: "10px 12px",
                   borderRadius: "12px",
                   border: "1px solid rgba(0,229,255,0.18)",
@@ -700,7 +703,6 @@ export default function Home() {
                   ↓
                 </div>
                 <div style={{
-                  width: "100%",
                   padding: "10px 12px",
                   borderRadius: "12px",
                   border: "1px solid rgba(0,229,255,0.18)",
@@ -760,6 +762,7 @@ export default function Home() {
                 </div>
               </div>
             )}
+            <div style={{ flex: 1 }} />
             {card.buttonText && (
               <button style={{
                 width: "100%",
