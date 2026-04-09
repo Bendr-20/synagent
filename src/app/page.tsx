@@ -379,8 +379,9 @@ export default function Home() {
     },
     {
       title: "Create An MVP",
-      description: "Turn an idea into a working first version with hands-on build support and a clearer path to launch.",
+      description: "Submit your idea and our AI swarm builds it, humans refine it, and you own everything - code, IP, all of it. Delivered in 7-10 days.",
       titleColor: "#c9a84c",
+      buttonText: "Learn More",
     },
     {
       title: "AI Consulting Agent",
@@ -508,6 +509,16 @@ export default function Home() {
             }}>
               {card.description}
             </p>
+            {card.buttonText && (
+              <button style={{
+                ...btnGlass,
+                marginTop: "22px",
+                padding: "12px 18px",
+                fontSize: "14px",
+              }}>
+                {card.buttonText}
+              </button>
+            )}
           </div>
         ))}
       </section>
