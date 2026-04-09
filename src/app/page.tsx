@@ -371,8 +371,20 @@ function LaunchSection({ onClose }: { onClose: () => void }) {
 }
 
 export default function Home() {
-  const [showLaunch, setShowLaunch] = useState(false);
-  const [showClaim, setShowClaim] = useState(false);
+  const serviceCards = [
+    {
+      title: "Hire A Human",
+      description: "Get direct help from a trusted human operator for specific tasks, fixes, and fast execution.",
+    },
+    {
+      title: "Create An MVP",
+      description: "Turn an idea into a working first version with hands-on build support and a clearer path to launch.",
+    },
+    {
+      title: "AI Consulting Agent",
+      description: "Get strategic guidance on agents, workflows, tooling, and how to actually make the system useful.",
+    },
+  ];
 
   return (
     <div style={{
@@ -380,7 +392,6 @@ export default function Home() {
       background: "linear-gradient(160deg, #08080c 0%, #0c0e14 25%, #10131a 50%, #0c0e14 75%, #08080c 100%)",
       color: platinum,
     }}>
-      {/* Nav */}
       <nav className="nav-bar" style={{
         display: "flex",
         alignItems: "center",
@@ -400,22 +411,19 @@ export default function Home() {
           <span style={{ color: gold }}>AGENT</span>
         </a>
         <div style={{ display: "flex", alignItems: "center", gap: "32px" }}>
-          {["SYNAGENT POOL", "DOCS"].map((item) => (
-            <a className="nav-links" key={item} href="#" style={{ fontSize: "14px", color: silverDim, textDecoration: "none", letterSpacing: "0.05em" }}>
-              {item}
-            </a>
-          ))}
+          <a className="nav-links" href="#" style={{ fontSize: "14px", color: silverDim, textDecoration: "none", letterSpacing: "0.05em" }}>
+            DOCS
+          </a>
           <button className="nav-wallet" style={btnWallet}>CONNECT</button>
         </div>
       </nav>
 
-      {/* Hero */}
       <section className="hero-section" style={{
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        padding: "80px 24px 72px",
+        padding: "88px 24px 72px",
         textAlign: "center",
         position: "relative",
       }}>
@@ -435,225 +443,74 @@ export default function Home() {
           fontWeight: 700,
           fontFamily: "Space Grotesk, sans-serif",
           lineHeight: 1.1,
-          marginBottom: "20px",
+          marginBottom: "32px",
           background: "linear-gradient(135deg, #c8cdd6, #e8ecf2, #a0a6b2)",
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
-          maxWidth: "700px",
+          maxWidth: "760px",
         }}>
-          Launch. Validate. Monetize.
+          Build with AI. Refine with Humans.
         </h1>
-        <p className="hero-subtitle" style={{
+
+        <div style={{ width: "100%", maxWidth: "860px", marginBottom: "20px" }}>
+          <textarea
+            style={{
+              ...inputStyle,
+              minHeight: "120px",
+              resize: "vertical",
+              padding: "20px 22px",
+              fontSize: "16px",
+              lineHeight: 1.6,
+              borderRadius: "16px",
+              background: "linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))",
+              border: "1px solid rgba(201, 168, 76, 0.22)",
+            }}
+            placeholder="Explain what you would like to build or what you need help with....."
+          />
+        </div>
+
+        <div style={{
+          fontSize: "16px",
           color: silverDim,
-          fontSize: "18px",
-          maxWidth: "520px",
-          lineHeight: 1.6,
-          marginBottom: "40px",
+          marginBottom: "28px",
+          letterSpacing: "0.08em",
+          textTransform: "uppercase",
         }}>
-          Launch your agent token, claim your on-chain profile, and build credentials that follow you everywhere.
-        </p>
-        <div className="hero-buttons" style={{ display: "flex", gap: "16px" }}>
-          <button style={btnGold} onClick={() => {
-            setShowLaunch(true);
-            setShowClaim(false);
-            setTimeout(() => document.getElementById("launch")?.scrollIntoView({ behavior: "smooth" }), 50);
-          }}>
-            Launch token and claim your profile
-          </button>
-          <button style={btnGlass} onClick={() => {
-            setShowClaim(true);
-            setShowLaunch(false);
-            setTimeout(() => document.getElementById("claim")?.scrollIntoView({ behavior: "smooth" }), 50);
-          }}>
-            I have a token and want to claim my profile
-          </button>
+          or
         </div>
       </section>
 
-      {/* Launch Form - hidden until button clicked */}
-      {showLaunch && <LaunchSection onClose={() => setShowLaunch(false)} />}
-
-      {/* Claim Form - hidden until button clicked */}
-      {showClaim && (
-        <section id="claim" className="form-section" style={{
-          maxWidth: "640px",
-          margin: "0 auto",
-          padding: "0 24px 80px",
-        }}>
-          <div className="claim-card" style={{
-            background: "linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015))",
-            border: "1px solid rgba(201, 168, 76, 0.25)",
-            borderRadius: "20px",
-            padding: "40px",
-          }}>
-            <h2 style={{
-              fontSize: "28px",
-              fontWeight: 700,
-              fontFamily: "Space Grotesk, sans-serif",
-              color: silverLight,
-              margin: "0 0 24px 0",
-            }}>
-              Claim Your Profile
-            </h2>
-            <p style={{ fontSize: "14px", color: silverDim, marginBottom: "24px", lineHeight: 1.6 }}>
-              Already launched a token on Base? Enter its contract address to claim your Synagent profile.
-            </p>
-            <div style={{ marginBottom: "20px" }}>
-              <label style={labelStyle}>Token Address</label>
-              <input style={inputStyle} placeholder="0x..." />
-            </div>
-            <div style={{ display: "flex", gap: "10px" }}>
-              <button
-                style={{
-                  ...btnGold,
-                  flex: 1,
-                  padding: "16px",
-                  fontSize: "16px",
-                }}
-                onClick={() => {
-                  alert("Profile claiming coming soon - connect wallet first");
-                }}
-              >
-                Claim my profile
-              </button>
-              <button style={goldArrowBtn} onClick={() => setShowClaim(false)} title="Collapse form">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 10L8 5L13 10"/></svg>
-              </button>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* 4 Column Cards */}
       <section className="cards-grid" style={{
-        maxWidth: "1320px",
+        maxWidth: "1200px",
         margin: "0 auto",
-        padding: "0 24px 80px",
+        padding: "0 24px 88px",
         display: "flex",
         gap: "16px",
       }}>
-        {/* Trending Agents */}
-        <div style={cardStyle}>
-          <h3 style={{
-            fontSize: "15px",
-            fontWeight: 700,
-            marginBottom: "16px",
-            fontFamily: "Space Grotesk, sans-serif",
-            color: silverLight,
-            textTransform: "uppercase",
-            letterSpacing: "0.08em",
-          }}>
-            Trending Agents
-          </h3>
-          {TRENDING.map((a, i) => (
-            <AgentRow
-              key={i}
-              name={a.name}
-              right={a.change}
-              sub={`${a.symbol} · ${credTier(a.cred)} ${a.cred}`}
-              href={a.name === "Bendr 2.0" ? "/profile" : undefined}
-            />
-          ))}
-        </div>
-
-        {/* Recently Launched */}
-        <div style={cardStyle}>
-          <h3 style={{
-            fontSize: "15px",
-            fontWeight: 700,
-            marginBottom: "16px",
-            fontFamily: "Space Grotesk, sans-serif",
-            color: silverLight,
-            textTransform: "uppercase",
-            letterSpacing: "0.08em",
-          }}>
-            Recently Launched
-          </h3>
-          {RECENT.map((a, i) => (
-            <AgentRow
-              key={i}
-              name={a.name}
-              right={a.time}
-              sub={a.symbol}
-            />
-          ))}
-        </div>
-
-        {/* Popular Profiles */}
-        <div style={cardStyle}>
-          <h3 style={{
-            fontSize: "15px",
-            fontWeight: 700,
-            marginBottom: "16px",
-            fontFamily: "Space Grotesk, sans-serif",
-            color: silverLight,
-            textTransform: "uppercase",
-            letterSpacing: "0.08em",
-          }}>
-            Credibility
-          </h3>
-          {PROFILES.map((a, i) => (
-            <AgentRow
-              key={i}
-              name={a.name}
-              right={a.mcap}
-              sub={`${a.holders} holders`}
-              href={a.name === "Bendr 2.0" ? "/profile" : undefined}
-            />
-          ))}
-        </div>
-
-        {/* Synagent Pool */}
-        <div style={cardStyle}>
-          <h3 style={{
-            fontSize: "15px",
-            fontWeight: 700,
-            marginBottom: "16px",
-            fontFamily: "Space Grotesk, sans-serif",
-            color: silverLight,
-            textTransform: "uppercase",
-            letterSpacing: "0.08em",
-          }}>
-            Synagent Pool
-          </h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "8px" }}>
-            {[
-              { label: "Total Agents", value: "247" },
-              { label: "Pool Value", value: "$1.2M" },
-              { label: "Tokens Held", value: "247" },
-              { label: "24h Volume", value: "$89.4K" },
-              { label: "Avg Cred", value: "54" },
-            ].map((stat, i) => (
-              <div key={i} style={{
-                display: "flex",
-                justifyContent: "space-between",
-                padding: "8px 0",
-                borderBottom: "1px solid rgba(255,255,255,0.03)",
-              }}>
-                <span style={{ fontSize: "13px", color: silverDim }}>{stat.label}</span>
-                <span style={{ fontSize: "14px", fontWeight: 600, color: platinum, fontFamily: "monospace" }}>{stat.value}</span>
-              </div>
-            ))}
-          </div>
-          <div style={{
-            marginTop: "20px",
-            padding: "16px",
-            borderRadius: "12px",
-            background: "linear-gradient(135deg, rgba(168,173,184,0.1), rgba(205,209,217,0.06))",
-            border: "1px solid rgba(180,190,205,0.12)",
-            textAlign: "center",
-          }}>
-            <p style={{ fontSize: "12px", color: silverDim, marginBottom: "4px" }}>
-              5% of every launched token
-            </p>
-            <p style={{ fontSize: "12px", color: silverDim }}>
-              feeds the Synagent Pool
+        {serviceCards.map((card) => (
+          <div key={card.title} style={cardStyle}>
+            <h3 style={{
+              fontSize: "22px",
+              fontWeight: 700,
+              marginBottom: "16px",
+              fontFamily: "Space Grotesk, sans-serif",
+              color: silverLight,
+              letterSpacing: "0.01em",
+            }}>
+              {card.title}
+            </h3>
+            <p style={{
+              fontSize: "15px",
+              lineHeight: 1.7,
+              color: silverDim,
+              margin: 0,
+            }}>
+              {card.description}
             </p>
           </div>
-        </div>
+        ))}
       </section>
 
-      {/* Footer */}
       <footer style={{
         textAlign: "center",
         padding: "32px",
@@ -663,7 +520,6 @@ export default function Home() {
           Powered by <span style={{ color: platinum, fontWeight: 600 }}>Helixa</span> on Base
         </p>
       </footer>
-
     </div>
   );
 }
