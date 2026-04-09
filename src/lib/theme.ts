@@ -33,6 +33,11 @@ export const outlineButtonStyle: CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "space-between",
+  gap: "12px",
+  flexWrap: "wrap",
+  whiteSpace: "normal",
+  lineHeight: 1.4,
+  textAlign: "left",
   boxShadow: "inset 0 0 0 1px rgba(0,229,255,0.03)",
   textDecoration: "none",
 };
@@ -53,4 +58,9 @@ export const solidButtonStyle: CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
+  gap: "12px",
+  flexWrap: "wrap",
+  whiteSpace: "normal",
+  lineHeight: 1.4,
+  textAlign: "center",
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import Link from "next/link";
 import { theme } from "@/lib/theme";
 
@@ -12,6 +12,7 @@ type SiteShellProps = {
 
 export function SiteShell({ children, mainStyle, showFooter = true }: SiteShellProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -58,6 +59,20 @@ export function SiteShell({ children, mainStyle, showFooter = true }: SiteShellP
     };
   }, []);
 
+  useEffect(() => {
+    const closeOnDesktop = () => {
+      if (window.innerWidth > 768) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    closeOnDesktop();
+    window.addEventListener("resize", closeOnDesktop);
+    return () => window.removeEventListener("resize", closeOnDesktop);
+  }, []);
+
+  const closeMobileMenu = () => setMobileMenuOpen(false);
+
   return (
     <div
       style={{
@@ -98,21 +113,61 @@ export function SiteShell({ children, mainStyle, showFooter = true }: SiteShellP
             backdropFilter: "blur(8px)",
           }}
         >
-          <Link
-            className="site-brand"
-            href="/"
-            style={{
-              fontSize: "20px",
-              letterSpacing: "0.3em",
-              fontWeight: 300,
-              fontFamily: "Space Grotesk, sans-serif",
-              textDecoration: "none",
-              cursor: "pointer",
-            }}
-          >
-            <span style={{ color: theme.textStrong }}>SYN</span>
-            <span style={{ color: theme.accent }}>AGENT</span>
-          </Link>
+          <div className="site-header-top" style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+            <Link
+              className="site-brand"
+              href="/"
+              onClick={closeMobileMenu}
+              style={{
+                fontSize: "20px",
+                letterSpacing: "0.3em",
+                fontWeight: 300,
+                fontFamily: "Space Grotesk, sans-serif",
+                textDecoration: "none",
+                cursor: "pointer",
+              }}
+            >
+              <span style={{ color: theme.textStrong }}>SYN</span>
+              <span style={{ color: theme.accent }}>AGENT</span>
+            </Link>
+
+            <button
+              type="button"
+              className="site-mobile-menu-button"
+              aria-label="Toggle navigation menu"
+              aria-expanded={mobileMenuOpen}
+              onClick={() => setMobileMenuOpen((open) => !open)}
+              style={{
+                display: "none",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "44px",
+                height: "44px",
+                borderRadius: "12px",
+                border: `1px solid ${theme.border}`,
+                background: "rgba(10,18,24,0.88)",
+                boxShadow: "0 0 0 1px rgba(0,229,255,0.04) inset",
+                cursor: "pointer",
+                padding: 0,
+                flexShrink: 0,
+              }}
+            >
+              <span style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                {[0, 1, 2].map((bar) => (
+                  <span
+                    key={bar}
+                    style={{
+                      display: "block",
+                      width: "18px",
+                      height: "2px",
+                      borderRadius: "999px",
+                      background: theme.textStrong,
+                    }}
+                  />
+                ))}
+              </span>
+            </button>
+          </div>
 
           <div
             className="site-status"
@@ -138,7 +193,7 @@ export function SiteShell({ children, mainStyle, showFooter = true }: SiteShellP
               }}
             />
             <span
-              className="site-status-text"
+              className="site-status-text wrap-safe"
               style={{
                 fontSize: "11px",
                 fontFamily: "JetBrains Mono, monospace",
@@ -160,6 +215,7 @@ export function SiteShell({ children, mainStyle, showFooter = true }: SiteShellP
               DOCS
             </Link>
             <button
+              type="button"
               className="site-connect-button"
               style={{
                 background: `linear-gradient(135deg, ${theme.accent}, ${theme.accentDark})`,
@@ -175,6 +231,78 @@ export function SiteShell({ children, mainStyle, showFooter = true }: SiteShellP
               CONNECT
             </button>
           </div>
+
+          {mobileMenuOpen && (
+            <div
+              className="site-mobile-menu"
+              style={{
+                display: "none",
+                flexDirection: "column",
+                gap: "10px",
+                padding: "14px",
+                borderRadius: "18px",
+                border: `1px solid ${theme.border}`,
+                background: "rgba(8,14,18,0.96)",
+                boxShadow: "0 14px 32px rgba(0,0,0,0.28)",
+              }}
+            >
+              <Link
+                href="#"
+                onClick={closeMobileMenu}
+                className="site-mobile-menu-link"
+                style={{
+                  textDecoration: "none",
+                  color: theme.textStrong,
+                  fontSize: "14px",
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  padding: "10px 12px",
+                  borderRadius: "12px",
+                  border: `1px solid ${theme.border}`,
+                  background: "rgba(5,10,14,0.2)",
+                }}
+              >
+                $CRED
+              </Link>
+              <Link
+                href="#"
+                onClick={closeMobileMenu}
+                className="site-mobile-menu-link"
+                style={{
+                  textDecoration: "none",
+                  color: theme.textStrong,
+                  fontSize: "14px",
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  padding: "10px 12px",
+                  borderRadius: "12px",
+                  border: `1px solid ${theme.border}`,
+                  background: "rgba(5,10,14,0.2)",
+                }}
+              >
+                DOCS
+              </Link>
+              <button
+                type="button"
+                className="site-mobile-connect"
+                onClick={closeMobileMenu}
+                style={{
+                  background: `linear-gradient(135deg, ${theme.accent}, ${theme.accentDark})`,
+                  color: theme.bg,
+                  fontWeight: 700,
+                  borderRadius: "12px",
+                  padding: "12px 16px",
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: "13px",
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                }}
+              >
+                Connect
+              </button>
+            </div>
+          )}
         </header>
 
         <main style={{ flex: 1, ...mainStyle }}>{children}</main>

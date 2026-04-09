@@ -24,7 +24,7 @@ export default function SynagentsPage() {
       <div className="directory-page" style={{ maxWidth: "1280px", margin: "0 auto" }}>
         <div style={{ marginBottom: "24px" }}>
           <div style={{ ...eyebrowStyle, marginBottom: "8px" }}>Browse Synagents</div>
-          <h1 className="directory-title" style={{ fontSize: "34px", color: theme.textStrong, fontFamily: "Space Grotesk, sans-serif" }}>
+          <h1 className="directory-title wrap-safe" style={{ fontSize: "34px", color: theme.textStrong, fontFamily: "Space Grotesk, sans-serif" }}>
             Synagent Directory
           </h1>
         </div>
@@ -116,7 +116,7 @@ export default function SynagentsPage() {
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "16px", marginBottom: "14px" }}>
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ color: theme.textStrong, fontSize: "18px", fontWeight: 600, lineHeight: 1.25, wordBreak: "break-word" }}>{agent.name}</div>
+                  <div className="wrap-safe" style={{ color: theme.textStrong, fontSize: "18px", fontWeight: 600, lineHeight: 1.25, wordBreak: "break-word" }}>{agent.name}</div>
                   <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", marginTop: "10px" }}>
                     {agent.featured && (
                       <span
@@ -160,11 +160,11 @@ export default function SynagentsPage() {
               <div className="directory-mobile-meta">
                 <div>
                   <div style={mobileMetaLabelStyle}>Payment</div>
-                  <div style={{ color: theme.accent, fontSize: "14px", fontFamily: "JetBrains Mono, monospace" }}>{agent.payment}</div>
+                  <div className="wrap-safe" style={{ color: theme.accent, fontSize: "14px", fontFamily: "JetBrains Mono, monospace" }}>{agent.payment}</div>
                 </div>
                 <div>
                   <div style={mobileMetaLabelStyle}>Last Active</div>
-                  <div style={{ color: theme.textStrong, fontSize: "14px" }}>{agent.lastActive}</div>
+                  <div className="wrap-safe" style={{ color: theme.textStrong, fontSize: "14px" }}>{agent.lastActive}</div>
                 </div>
               </div>
             </Link>

@@ -66,7 +66,7 @@ export default async function SynagentProfilePage({ params }: { params: Promise<
         <div className="dossier-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: "16px" }}>
           <div>
             <div style={{ ...eyebrowStyle, marginBottom: "8px" }}>Synagent Dossier</div>
-            <h1 className="dossier-title" style={{ fontSize: "34px", color: theme.textStrong, fontFamily: "Space Grotesk, sans-serif", wordBreak: "break-word" }}>
+            <h1 className="dossier-title wrap-safe" style={{ fontSize: "34px", color: theme.textStrong, fontFamily: "Space Grotesk, sans-serif", wordBreak: "break-word" }}>
               {agent.name}
             </h1>
           </div>
@@ -127,12 +127,12 @@ export default async function SynagentProfilePage({ params }: { params: Promise<
                   {agent.country}
                 </span>
               </div>
-              <div className="dossier-subhead" style={{ fontSize: "13px", color: theme.textMuted, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+              <div className="dossier-subhead wrap-safe" style={{ fontSize: "13px", color: theme.textMuted, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.06em", textTransform: "uppercase" }}>
                 Credibility {agent.cred} • Last Active {agent.lastActive}
               </div>
-              <p style={{ color: theme.textMuted, lineHeight: 1.8, fontSize: "15px", margin: 0 }}>{agent.bio}</p>
+              <p className="wrap-safe" style={{ color: theme.textMuted, lineHeight: 1.8, fontSize: "15px", margin: 0 }}>{agent.bio}</p>
               <Link className="dossier-cta" href={`/match?agent=${agent.slug}`} style={{ ...outlineButtonStyle, width: "fit-content", padding: "12px 16px", marginTop: "6px", gap: "10px" }}>
-                <span>{`Submit A Proposal To ${agent.name}`}</span>
+                <span className="wrap-safe" style={{ flex: 1 }}>{`Submit A Proposal To ${agent.name}`}</span>
                 <span>{">"}</span>
               </Link>
             </div>
@@ -152,7 +152,7 @@ export default async function SynagentProfilePage({ params }: { params: Promise<
             </div>
             <div style={{ padding: "12px 14px", borderRadius: "14px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.24)" }}>
               <div style={{ fontSize: "11px", color: theme.textMuted, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>Contact Methods</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "6px", color: theme.textStrong, fontSize: "14px", overflowWrap: "anywhere" }}>
+              <div className="wrap-safe" style={{ display: "flex", flexDirection: "column", gap: "6px", color: theme.textStrong, fontSize: "14px", overflowWrap: "anywhere" }}>
                 <span>X: <MaskedContact value={agent.contacts.x} /></span>
                 <span>Telegram: <MaskedContact value={agent.contacts.telegram} /></span>
                 <span>Email: <MaskedContact value={agent.contacts.email} type="email" /></span>
@@ -177,11 +177,11 @@ export default async function SynagentProfilePage({ params }: { params: Promise<
             <div className="dossier-location-meta" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
               <div style={{ padding: "12px 14px", borderRadius: "14px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.24)" }}>
                 <div style={{ fontSize: "11px", color: theme.textMuted, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "6px" }}>Timezone</div>
-                <div style={{ color: theme.textStrong }}>{agent.timezone}</div>
+                <div className="wrap-safe" style={{ color: theme.textStrong }}>{agent.timezone}</div>
               </div>
               <div style={{ padding: "12px 14px", borderRadius: "14px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.24)" }}>
                 <div style={{ fontSize: "11px", color: theme.textMuted, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "6px" }}>Operational Region</div>
-                <div style={{ color: theme.textStrong }}>{agent.city}, {agent.country}</div>
+                <div className="wrap-safe" style={{ color: theme.textStrong }}>{agent.city}, {agent.country}</div>
               </div>
             </div>
           </div>
@@ -192,12 +192,12 @@ export default async function SynagentProfilePage({ params }: { params: Promise<
               <div key={project.name} style={{ padding: "16px", borderRadius: "16px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.24)", display: "flex", flexDirection: "column", gap: "8px" }}>
                 <div className="dossier-project-head" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
                   <div>
-                    <div style={{ color: theme.textStrong, fontSize: "15px", fontWeight: 600 }}>{project.name}</div>
+                    <div className="wrap-safe" style={{ color: theme.textStrong, fontSize: "15px", fontWeight: 600 }}>{project.name}</div>
                     <div style={{ color: theme.textMuted, fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: "4px" }}>{project.type}</div>
                   </div>
                   <div style={{ color: theme.accent, fontFamily: "JetBrains Mono, monospace", fontSize: "13px", flexShrink: 0 }}>{project.rating.toFixed(1)}</div>
                 </div>
-                <p style={{ color: theme.textMuted, fontSize: "14px", lineHeight: 1.7, margin: 0 }}>{project.result}</p>
+                <p className="wrap-safe" style={{ color: theme.textMuted, fontSize: "14px", lineHeight: 1.7, margin: 0 }}>{project.result}</p>
               </div>
             ))}
           </div>
