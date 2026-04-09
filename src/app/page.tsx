@@ -590,7 +590,7 @@ export default function Home() {
               border: `1px solid ${border}`,
               boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
             }}
-            placeholder="Explain what you would like to build or what you need help with....."
+            placeholder="Tell us what you're building or how we can help...."
           />
         </div>
 
