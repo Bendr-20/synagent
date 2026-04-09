@@ -423,15 +423,6 @@ export default function Home() {
     };
   }, []);
 
-  const [showMatchForm, setShowMatchForm] = useState(false);
-  const [matchPreferences, setMatchPreferences] = useState({
-    cost: 5,
-    time: 5,
-    quality: 5,
-    credibility: 5,
-    needs: "",
-  });
-
   const serviceCards = [
     {
       number: "01",
@@ -781,7 +772,7 @@ export default function Home() {
               <button
                 onClick={() => {
                   if (card.number === "01") {
-                    setShowMatchForm((v) => !v);
+                    window.location.href = "/match";
                     return;
                   }
                 }}
@@ -806,102 +797,6 @@ export default function Home() {
                 <span>{card.buttonText}</span>
                 <span>{">"}</span>
               </button>
-            )}
-            {card.number === "01" && showMatchForm && (
-              <div style={{
-                marginTop: "18px",
-                padding: "18px",
-                borderRadius: "14px",
-                border: "1px solid rgba(0,229,255,0.18)",
-                background: "rgba(5,10,14,0.32)",
-                boxShadow: "inset 0 0 0 1px rgba(0,229,255,0.03)",
-                display: "flex",
-                flexDirection: "column",
-                gap: "14px",
-              }}>
-                {[
-                  ["cost", "Cost"],
-                  ["time", "Time"],
-                  ["quality", "Quality"],
-                  ["credibility", "Credibility"],
-                ].map(([key, label]) => (
-                  <div key={key}>
-                    <div style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      marginBottom: "8px",
-                    }}>
-                      <span style={{
-                        fontSize: "12px",
-                        color: silverLight,
-                        fontFamily: "JetBrains Mono, monospace",
-                        letterSpacing: "0.08em",
-                        textTransform: "uppercase",
-                      }}>
-                        {label}
-                      </span>
-                      <span style={{
-                        fontSize: "12px",
-                        color: gold,
-                        fontFamily: "JetBrains Mono, monospace",
-                      }}>
-                        {matchPreferences[key as keyof typeof matchPreferences]}
-                      </span>
-                    </div>
-                    <input
-                      type="range"
-                      min="1"
-                      max="10"
-                      value={matchPreferences[key as keyof typeof matchPreferences] as number}
-                      onChange={(e) => setMatchPreferences((prev) => ({
-                        ...prev,
-                        [key]: Number(e.target.value),
-                      }))}
-                      style={{ width: "100%" }}
-                    />
-                  </div>
-                ))}
-                <div>
-                  <div style={{
-                    fontSize: "12px",
-                    color: silverLight,
-                    fontFamily: "JetBrains Mono, monospace",
-                    letterSpacing: "0.08em",
-                    textTransform: "uppercase",
-                    marginBottom: "8px",
-                  }}>
-                    What do you need?
-                  </div>
-                  <input
-                    type="text"
-                    value={matchPreferences.needs}
-                    onChange={(e) => setMatchPreferences((prev) => ({ ...prev, needs: e.target.value }))}
-                    placeholder="Describe what you need help with..."
-                    style={{
-                      ...inputStyle,
-                      height: "48px",
-                      fontSize: "14px",
-                    }}
-                  />
-                </div>
-                <button style={{
-                  width: "100%",
-                  marginTop: "4px",
-                  padding: "14px 18px",
-                  borderRadius: "12px",
-                  border: "1px solid rgba(0,229,255,0.26)",
-                  background: `linear-gradient(135deg, ${gold}, ${goldDark})`,
-                  color: bg,
-                  fontSize: "13px",
-                  fontWeight: 700,
-                  letterSpacing: "0.08em",
-                  textTransform: "uppercase",
-                  cursor: "pointer",
-                }}>
-                  Find Your Matches
-                </button>
-              </div>
             )}
           </div>
         ))}
