@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const bg = "#050a0e";
 const surface = "#0a1218";
@@ -457,13 +457,6 @@ export default function Home() {
     },
   ];
 
-  const flowSteps = [
-    "Idea",
-    "AI Agent Swarm",
-    "Alpha Product",
-    "Human Refinement",
-    "MVP",
-  ];
 
   return (
     <div style={{
@@ -653,38 +646,75 @@ export default function Home() {
               <div style={{
                 width: "100%",
                 display: "flex",
+                flexDirection: "column",
                 alignItems: "center",
-                flexWrap: "wrap",
-                gap: "8px",
+                gap: "10px",
                 marginTop: "20px",
               }}>
-                {flowSteps.map((step, index) => (
-                  <Fragment key={step}>
-                    <div style={{
-                      padding: "8px 10px",
-                      borderRadius: "10px",
-                      border: "1px solid rgba(0,229,255,0.18)",
-                      background: "rgba(5,10,14,0.28)",
-                      color: index === flowSteps.length - 1 ? silverLight : gold,
-                      fontSize: "11px",
-                      fontFamily: "JetBrains Mono, monospace",
-                      letterSpacing: "0.06em",
-                      textTransform: "uppercase",
-                      boxShadow: "inset 0 0 0 1px rgba(0,229,255,0.03)",
-                    }}>
-                      {step}
-                    </div>
-                    {index < flowSteps.length - 1 && (
-                      <div style={{
-                        color: silverDim,
-                        fontSize: "14px",
-                        fontFamily: "JetBrains Mono, monospace",
-                      }}>
-                        &gt;
-                      </div>
-                    )}
-                  </Fragment>
-                ))}
+                <div style={{
+                  width: "100%",
+                  padding: "12px 14px",
+                  borderRadius: "12px",
+                  border: "1px solid rgba(0,229,255,0.18)",
+                  background: "rgba(5,10,14,0.28)",
+                  color: silverLight,
+                  fontSize: "12px",
+                  fontFamily: "JetBrains Mono, monospace",
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  textAlign: "center",
+                  boxShadow: "inset 0 0 0 1px rgba(0,229,255,0.03)",
+                }}>
+                  Your Idea
+                </div>
+                <div style={{
+                  color: silverDim,
+                  fontSize: "18px",
+                  fontFamily: "JetBrains Mono, monospace",
+                  lineHeight: 1,
+                }}>
+                  ↓
+                </div>
+                <div style={{
+                  width: "100%",
+                  padding: "10px 12px",
+                  borderRadius: "12px",
+                  border: "1px solid rgba(0,229,255,0.18)",
+                  background: "rgba(5,10,14,0.28)",
+                  color: gold,
+                  fontSize: "11px",
+                  fontFamily: "JetBrains Mono, monospace",
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  textAlign: "center",
+                  boxShadow: "inset 0 0 0 1px rgba(0,229,255,0.03)",
+                }}>
+                  Agent Swam &gt; Human Refinement
+                </div>
+                <div style={{
+                  color: silverDim,
+                  fontSize: "18px",
+                  fontFamily: "JetBrains Mono, monospace",
+                  lineHeight: 1,
+                }}>
+                  ↓
+                </div>
+                <div style={{
+                  width: "100%",
+                  padding: "10px 12px",
+                  borderRadius: "12px",
+                  border: "1px solid rgba(0,229,255,0.18)",
+                  background: "rgba(5,10,14,0.28)",
+                  color: silverLight,
+                  fontSize: "11px",
+                  fontFamily: "JetBrains Mono, monospace",
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  textAlign: "center",
+                  boxShadow: "inset 0 0 0 1px rgba(0,229,255,0.03)",
+                }}>
+                  MVP / Beta
+                </div>
               </div>
             )}
             {card.featuredHumans && (
