@@ -1,8 +1,7 @@
 {
   "name": "synagent",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Boutique AI build and matching front end for Synagent.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -21,5 +20,6 @@
     "react-dom": "^19.2.4",
     "tailwindcss": "^4.2.2",
     "typescript": "^6.0.2"
-  }
+  },
+  "private": true
 }
