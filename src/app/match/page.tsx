@@ -232,6 +232,13 @@ export default function MatchPage() {
                 <h1 style={{ fontSize: "28px", color: silverLight, fontFamily: "Space Grotesk, sans-serif" }}>
                   Make Your Match
                 </h1>
+                <div style={{
+                  marginTop: "8px",
+                  fontSize: "13px",
+                  color: silverDim,
+                }}>
+                  (<a href="/" style={{ color: gold, textDecoration: "none" }}>or Browse Synagents</a>)
+                </div>
               </div>
               <button
                 onClick={() => window.location.href = "/"}
