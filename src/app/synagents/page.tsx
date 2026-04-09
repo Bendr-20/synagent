@@ -100,16 +100,11 @@ export default function SynagentsPage() {
 
         <main style={{ flex: 1, padding: "36px 32px 24px" }}>
           <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: "16px", marginBottom: "24px" }}>
-              <div>
-                <div style={{ fontSize: "12px", color: silverDim, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "8px" }}>
-                  Browse Synagents
-                </div>
-                <h1 style={{ fontSize: "34px", color: silverLight, fontFamily: "Space Grotesk, sans-serif" }}>Synagent Directory</h1>
+            <div style={{ marginBottom: "24px" }}>
+              <div style={{ fontSize: "12px", color: silverDim, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "8px" }}>
+                Browse Synagents
               </div>
-              <a href="/match" style={{ padding: "10px 14px", borderRadius: "12px", border: "1px solid rgba(0,229,255,0.26)", background: "rgba(5,10,14,0.18)", color: gold, fontSize: "12px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", textDecoration: "none" }}>
-                Back to Match
-              </a>
+              <h1 style={{ fontSize: "34px", color: silverLight, fontFamily: "Space Grotesk, sans-serif" }}>Synagent Directory</h1>
             </div>
 
             <div style={{ borderRadius: "20px", border: `1px solid ${border}`, background: "linear-gradient(145deg, rgba(10,18,24,0.94), rgba(8,14,18,0.88))", boxShadow: "0 20px 45px rgba(0,0,0,0.22)", overflow: "hidden" }}>
