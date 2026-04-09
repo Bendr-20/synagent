@@ -12,6 +12,27 @@ const silverDim = "#5a8a9a";
 const gold = "#00e5ff";
 const goldDark = "#00bcd4";
 
+const parseCoords = (coords: string) => {
+  const [latPart, lngPart] = coords.split("/").map((part) => part.trim());
+  const latMatch = latPart.match(/([0-9.]+)\s*([NS])/i);
+  const lngMatch = lngPart.match(/([0-9.]+)\s*([EW])/i);
+
+  const lat = latMatch
+    ? (latMatch[2].toUpperCase() === "S" ? -1 : 1) * Number(latMatch[1])
+    : 0;
+  const lng = lngMatch
+    ? (lngMatch[2].toUpperCase() === "W" ? -1 : 1) * Number(lngMatch[1])
+    : 0;
+
+  return { lat, lng };
+};
+
+const getMapDelta = (country: string) => {
+  if (["United States", "Australia", "Brazil", "India"].includes(country)) return 7;
+  if (["Singapore", "Netherlands", "Portugal", "Ireland", "United Kingdom"].includes(country)) return 2.2;
+  return 4;
+};
+
 export default function SynagentProfilePage() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const params = useParams<{ slug: string }>();
@@ -69,6 +90,11 @@ export default function SynagentProfilePage() {
       </div>
     );
   }
+
+  const { lat, lng } = parseCoords(agent.coords);
+  const delta = getMapDelta(agent.country);
+  const bbox = `${(lng - delta).toFixed(4)},${(lat - delta).toFixed(4)},${(lng + delta).toFixed(4)},${(lat + delta).toFixed(4)}`;
+  const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lng}`;
 
   return (
     <div style={{ minHeight: "100vh", background: bg, color: platinum, position: "relative", overflow: "hidden", display: "flex", flexDirection: "column" }}>
@@ -153,12 +179,24 @@ export default function SynagentProfilePage() {
 
             <div style={{ display: "grid", gridTemplateColumns: "0.95fr 1.05fr", gap: "20px" }}>
               <div style={{ borderRadius: "20px", border: `1px solid ${border}`, background: "linear-gradient(145deg, rgba(10,18,24,0.94), rgba(8,14,18,0.88))", boxShadow: "0 20px 45px rgba(0,0,0,0.22)", padding: "24px", display: "flex", flexDirection: "column", gap: "16px" }}>
-                <div style={{ fontSize: "12px", color: silverDim, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.12em", textTransform: "uppercase" }}>Location Grid</div>
+                <div style={{ fontSize: "12px", color: silverDim, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.12em", textTransform: "uppercase" }}>Location Map</div>
                 <div style={{ position: "relative", minHeight: "260px", borderRadius: "16px", border: `1px solid ${border}`, background: "linear-gradient(145deg, rgba(0,229,255,0.04), rgba(5,10,14,0.28))", overflow: "hidden" }}>
-                  <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(0,229,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,0.08) 1px, transparent 1px)", backgroundSize: "36px 36px" }} />
-                  <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at 68% 42%, rgba(0,229,255,0.14), transparent 16%)" }} />
-                  <div style={{ position: "absolute", top: "40%", left: "66%", width: "12px", height: "12px", borderRadius: "50%", background: gold, boxShadow: "0 0 14px rgba(0,229,255,0.8)" }} />
-                  <div style={{ position: "absolute", left: "24px", bottom: "24px", display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <iframe
+                    title={`${agent.name} location map`}
+                    src={mapSrc}
+                    loading="lazy"
+                    style={{
+                      width: "100%",
+                      height: "260px",
+                      border: 0,
+                      filter: "grayscale(0.75) saturate(0.7) brightness(0.72) contrast(1.08)",
+                    }}
+                  />
+                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(5,10,14,0.04), rgba(5,10,14,0.18))", pointerEvents: "none" }} />
+                  <div style={{ position: "absolute", right: "18px", top: "18px", padding: "8px 10px", borderRadius: "12px", border: "1px solid rgba(0,229,255,0.18)", background: "rgba(5,10,14,0.68)", color: silverLight, fontSize: "11px", fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.08em", textTransform: "uppercase", pointerEvents: "none" }}>
+                    {agent.city}
+                  </div>
+                  <div style={{ position: "absolute", left: "24px", bottom: "24px", display: "flex", flexDirection: "column", gap: "6px", padding: "10px 12px", borderRadius: "12px", border: "1px solid rgba(0,229,255,0.18)", background: "rgba(5,10,14,0.68)", pointerEvents: "none" }}>
                     <div style={{ fontSize: "11px", color: silverDim, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.08em", textTransform: "uppercase" }}>Coordinates</div>
                     <div style={{ color: silverLight, fontFamily: "JetBrains Mono, monospace", fontSize: "13px" }}>{agent.coords}</div>
                   </div>
