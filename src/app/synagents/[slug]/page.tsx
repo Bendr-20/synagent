@@ -173,7 +173,7 @@ export default function SynagentProfilePage() {
                       boxShadow: "inset 0 0 0 1px rgba(0,229,255,0.03)",
                     }}
                   >
-                    <span>Submit A Proposal</span>
+                    <span>{`Submit A Proposal To ${agent.name}`}</span>
                     <span>{">"}</span>
                   </a>
                 </div>
