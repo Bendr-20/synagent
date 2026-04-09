@@ -152,6 +152,30 @@ export default function SynagentProfilePage() {
                     Credibility {agent.cred} • Last Active {agent.lastActive}
                   </div>
                   <p style={{ color: silverDim, lineHeight: 1.8, fontSize: "15px" }}>{agent.bio}</p>
+                  <a
+                    href={`/match?agent=${agent.slug}`}
+                    style={{
+                      marginTop: "6px",
+                      width: "fit-content",
+                      padding: "12px 16px",
+                      borderRadius: "12px",
+                      border: "1px solid rgba(0,229,255,0.26)",
+                      background: "rgba(5,10,14,0.18)",
+                      color: gold,
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                      textDecoration: "none",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      boxShadow: "inset 0 0 0 1px rgba(0,229,255,0.03)",
+                    }}
+                  >
+                    <span>Submit A Proposal</span>
+                    <span>{">"}</span>
+                  </a>
                 </div>
               </div>
 
