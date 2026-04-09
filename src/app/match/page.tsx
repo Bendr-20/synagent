@@ -237,7 +237,7 @@ export default function MatchPage() {
                   fontSize: "13px",
                   color: silverDim,
                 }}>
-                  (<a href="/" style={{ color: gold, textDecoration: "none" }}>or Browse Synagents</a>)
+                  (<a href="/synagents" style={{ color: gold, textDecoration: "none" }}>or Browse Synagents</a>)
                 </div>
               </div>
               <button
