@@ -424,17 +424,20 @@ export default function Home() {
   }, []);
   const serviceCards = [
     {
+      number: "01",
       title: "Hire A Human",
       description: "Get direct help from a trusted human operator for specific tasks, fixes, and fast execution.",
       titleColor: "#9ff9ff",
     },
     {
+      number: "02",
       title: "Create An MVP",
       description: "Submit your idea and our AI swarm builds it, humans refine it, and you own everything - code, IP, all of it. Delivered in 7-10 days.",
       titleColor: gold,
       buttonText: "Learn More",
     },
     {
+      number: "03",
       title: "AI Consulting Agent",
       description: "Get strategic guidance on agents, workflows, tooling, and how to actually make the system useful.",
       titleColor: goldDark,
@@ -490,6 +493,34 @@ export default function Home() {
           <span style={{ color: silverLight }}>SYN</span>
           <span style={{ color: gold }}>AGENT</span>
         </a>
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          padding: "8px 14px",
+          borderRadius: "999px",
+          border: `1px solid ${border}`,
+          background: "rgba(10,18,24,0.88)",
+          boxShadow: "0 0 0 1px rgba(0,229,255,0.04) inset",
+        }}>
+          <span style={{
+            width: "8px",
+            height: "8px",
+            borderRadius: "50%",
+            background: gold,
+            boxShadow: "0 0 12px rgba(0,229,255,0.7)",
+            flexShrink: 0,
+          }} />
+          <span style={{
+            fontSize: "11px",
+            fontFamily: "JetBrains Mono, monospace",
+            letterSpacing: "0.12em",
+            color: silverLight,
+            textTransform: "uppercase",
+          }}>
+            Systems Active | Accepting Ideas
+          </span>
+        </div>
         <div style={{ display: "flex", alignItems: "center", gap: "32px" }}>
           <a className="nav-links" href="#" style={{ fontSize: "14px", color: silverDim, textDecoration: "none", letterSpacing: "0.05em" }}>
             DOCS
@@ -568,6 +599,16 @@ export default function Home() {
       }}>
         {serviceCards.map((card) => (
           <div key={card.title} style={cardStyle}>
+            <div style={{
+              fontSize: "12px",
+              fontFamily: "JetBrains Mono, monospace",
+              letterSpacing: "0.18em",
+              color: silverDim,
+              marginBottom: "18px",
+              textTransform: "uppercase",
+            }}>
+              {card.number}
+            </div>
             <h3 style={{
               fontSize: "22px",
               fontWeight: 700,
@@ -588,10 +629,19 @@ export default function Home() {
             </p>
             {card.buttonText && (
               <button style={{
-                ...btnGlass,
+                width: "100%",
                 marginTop: "22px",
-                padding: "12px 18px",
-                fontSize: "14px",
+                padding: "14px 18px",
+                borderRadius: "12px",
+                border: "1px solid rgba(0,229,255,0.18)",
+                background: `linear-gradient(135deg, ${gold}, ${goldDark})`,
+                color: bg,
+                fontSize: "13px",
+                fontWeight: 700,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                cursor: "pointer",
+                boxShadow: "0 6px 20px rgba(0,229,255,0.2)",
               }}>
                 {card.buttonText}
               </button>
