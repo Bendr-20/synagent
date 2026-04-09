@@ -610,44 +610,6 @@ export default function Home() {
           or
         </div>
 
-        <div style={{
-          width: "100%",
-          maxWidth: "1100px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexWrap: "wrap",
-          gap: "10px",
-        }}>
-          {flowSteps.map((step, index) => (
-            <Fragment key={step}>
-              <div style={{
-                padding: "10px 14px",
-                borderRadius: "12px",
-                border: "1px solid rgba(0,229,255,0.18)",
-                background: "rgba(5,10,14,0.28)",
-                color: index === flowSteps.length - 1 ? silverLight : gold,
-                fontSize: "12px",
-                fontFamily: "JetBrains Mono, monospace",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                boxShadow: "inset 0 0 0 1px rgba(0,229,255,0.03)",
-              }}>
-                {step}
-              </div>
-              {index < flowSteps.length - 1 && (
-                <div style={{
-                  color: silverDim,
-                  fontSize: "16px",
-                  fontFamily: "JetBrains Mono, monospace",
-                  letterSpacing: "0.04em",
-                }}>
-                  &gt;
-                </div>
-              )}
-            </Fragment>
-          ))}
-        </div>
       </section>
 
       <section className="cards-grid" style={{
@@ -687,6 +649,44 @@ export default function Home() {
             }}>
               {card.description}
             </p>
+            {card.number === "02" && (
+              <div style={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: "8px",
+                marginTop: "20px",
+              }}>
+                {flowSteps.map((step, index) => (
+                  <Fragment key={step}>
+                    <div style={{
+                      padding: "8px 10px",
+                      borderRadius: "10px",
+                      border: "1px solid rgba(0,229,255,0.18)",
+                      background: "rgba(5,10,14,0.28)",
+                      color: index === flowSteps.length - 1 ? silverLight : gold,
+                      fontSize: "11px",
+                      fontFamily: "JetBrains Mono, monospace",
+                      letterSpacing: "0.06em",
+                      textTransform: "uppercase",
+                      boxShadow: "inset 0 0 0 1px rgba(0,229,255,0.03)",
+                    }}>
+                      {step}
+                    </div>
+                    {index < flowSteps.length - 1 && (
+                      <div style={{
+                        color: silverDim,
+                        fontSize: "14px",
+                        fontFamily: "JetBrains Mono, monospace",
+                      }}>
+                        &gt;
+                      </div>
+                    )}
+                  </Fragment>
+                ))}
+              </div>
+            )}
             {card.featuredHumans && (
               <div style={{
                 marginTop: "22px",
