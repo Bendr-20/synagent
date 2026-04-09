@@ -1,52 +1,57 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-const platinum = "#c0c6d0";
-const silver = "#8a919c";
-const silverLight = "#d4d8e0";
-const silverDim = "#5a6170";
-const gold = "#c9a84c";
+const bg = "#050a0e";
+const surface = "#0a1218";
+const border = "#0f2a3a";
+const platinum = "#e0f0f8";
+const silver = "#7dc8d8";
+const silverLight = "#f0fbff";
+const silverDim = "#5a8a9a";
+const gold = "#00e5ff";
+const goldDark = "#00bcd4";
 
 const cardStyle: React.CSSProperties = {
-  background: "linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015))",
-  border: "1px solid rgba(201, 168, 76, 0.25)",
+  background: "linear-gradient(145deg, rgba(10,18,24,0.92), rgba(8,14,18,0.82))",
+  border: `1px solid ${border}`,
   borderRadius: "16px",
   padding: "24px",
   flex: 1,
   minWidth: 0,
+  boxShadow: "0 20px 45px rgba(0,0,0,0.22)",
 };
 
 const btnGold: React.CSSProperties = {
-  background: "linear-gradient(135deg, #a8adb8, #cdd1d9, #8e939e)",
-  color: "#0a0a0f",
+  background: `linear-gradient(135deg, ${gold}, ${goldDark})`,
+  color: bg,
   fontWeight: 700,
   borderRadius: "10px",
   padding: "16px 36px",
   border: "none",
   cursor: "pointer",
   fontSize: "15px",
-  boxShadow: "0 2px 20px rgba(180, 190, 205, 0.15)",
+  boxShadow: "0 2px 20px rgba(0, 229, 255, 0.18)",
   whiteSpace: "nowrap" as const,
 };
 
 const btnGlass: React.CSSProperties = {
-  background: "rgba(255,255,255,0.04)",
+  background: "rgba(10,18,24,0.72)",
   backdropFilter: "blur(12px)",
   WebkitBackdropFilter: "blur(12px)",
   color: silverLight,
   fontWeight: 600,
   borderRadius: "10px",
   padding: "16px 36px",
-  border: "1px solid rgba(201, 168, 76, 0.25)",
+  border: `1px solid ${border}`,
   cursor: "pointer",
   fontSize: "15px",
   whiteSpace: "nowrap" as const,
 };
 
 const btnWallet: React.CSSProperties = {
-  background: "linear-gradient(135deg, #a8adb8, #cdd1d9, #8e939e)",
-  color: "#0a0a0f",
+  background: `linear-gradient(135deg, ${gold}, ${goldDark})`,
+  color: bg,
   fontWeight: 600,
   borderRadius: "8px",
   padding: "8px 20px",
@@ -100,7 +105,7 @@ function AgentRow({ name, right, sub, href }: { name: string; right: string; sub
         padding: "10px 0",
         borderBottom: "1px solid rgba(255,255,255,0.03)",
         cursor: href ? "pointer" : undefined,
-        background: hovered ? "rgba(201, 168, 76, 0.06)" : "transparent",
+        background: hovered ? "rgba(0, 229, 255, 0.06)" : "transparent",
         borderRadius: hovered ? "8px" : undefined,
         paddingLeft: hovered ? "8px" : undefined,
         paddingRight: hovered ? "8px" : undefined,
@@ -116,9 +121,9 @@ function AgentRow({ name, right, sub, href }: { name: string; right: string; sub
         fontSize: "13px",
         fontWeight: 700,
         flexShrink: 0,
-        background: "rgba(180, 190, 205, 0.06)",
+        background: "rgba(0, 229, 255, 0.05)",
         color: silver,
-        border: "1px solid rgba(180, 190, 205, 0.1)",
+        border: `1px solid ${border}`,
       }}>
         {name[0]}
       </div>
@@ -137,8 +142,8 @@ function AgentRow({ name, right, sub, href }: { name: string; right: string; sub
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
-  background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(255,255,255,0.08)",
+  background: "rgba(10,18,24,0.9)",
+  border: `1px solid ${border}`,
   borderRadius: "10px",
   padding: "12px 16px",
   color: platinum,
@@ -157,8 +162,8 @@ const labelStyle: React.CSSProperties = {
 };
 
 const goldArrowBtn: React.CSSProperties = {
-  background: `linear-gradient(135deg, ${gold}, #d4b85c)`,
-  color: "#0a0a0f",
+  background: `linear-gradient(135deg, ${gold}, ${goldDark})`,
+  color: bg,
   border: "none",
   borderRadius: "10px",
   padding: "16px 20px",
@@ -204,7 +209,7 @@ function LaunchSection({ onClose }: { onClose: () => void }) {
     }}>
       <div className="form-card" style={{
         background: "linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015))",
-        border: "1px solid rgba(201, 168, 76, 0.25)",
+        border: `1px solid ${border}`,
         borderRadius: "20px",
         padding: "40px",
       }}>
@@ -371,37 +376,108 @@ function LaunchSection({ onClose }: { onClose: () => void }) {
 }
 
 export default function Home() {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const chars = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン01";
+    const fontSize = 14;
+    let drops: number[] = [];
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const columns = Math.floor(canvas.width / fontSize);
+      drops = Array(columns).fill(1);
+    };
+
+    const drawMatrix = () => {
+      ctx.fillStyle = "rgba(5, 10, 14, 0.10)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "rgba(0, 229, 255, 0.34)";
+      ctx.font = `${fontSize}px monospace`;
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = chars[Math.floor(Math.random() * chars.length)];
+        const x = i * fontSize;
+        const y = drops[i] * fontSize;
+        ctx.fillText(text, x, y);
+
+        if (y > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i] += 1;
+      }
+    };
+
+    resize();
+    const interval = window.setInterval(drawMatrix, 55);
+    window.addEventListener("resize", resize);
+
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("resize", resize);
+    };
+  }, []);
   const serviceCards = [
     {
       title: "Hire A Human",
       description: "Get direct help from a trusted human operator for specific tasks, fixes, and fast execution.",
-      titleColor: "#e4cf93",
+      titleColor: "#9ff9ff",
     },
     {
       title: "Create An MVP",
       description: "Submit your idea and our AI swarm builds it, humans refine it, and you own everything - code, IP, all of it. Delivered in 7-10 days.",
-      titleColor: "#c9a84c",
+      titleColor: gold,
       buttonText: "Learn More",
     },
     {
       title: "AI Consulting Agent",
       description: "Get strategic guidance on agents, workflows, tooling, and how to actually make the system useful.",
-      titleColor: "#8f6f2a",
+      titleColor: goldDark,
     },
   ];
 
   return (
     <div style={{
       minHeight: "100vh",
-      background: "linear-gradient(160deg, #08080c 0%, #0c0e14 25%, #10131a 50%, #0c0e14 75%, #08080c 100%)",
+      background: bg,
       color: platinum,
+      position: "relative",
+      overflow: "hidden",
     }}>
+      <canvas
+        ref={canvasRef}
+        style={{
+          position: "fixed",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          zIndex: 0,
+          opacity: 0.18,
+          pointerEvents: "none",
+        }}
+      />
+      <div style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 1,
+        pointerEvents: "none",
+        opacity: 0.22,
+        background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,229,255,0.04) 3px)",
+      }} />
+      <div style={{ position: "relative", zIndex: 2 }}>
       <nav className="nav-bar" style={{
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
         padding: "20px 48px",
-        borderBottom: "1px solid rgba(255,255,255,0.04)",
+        borderBottom: `1px solid ${border}`,
+        background: "rgba(5,10,14,0.72)",
+        backdropFilter: "blur(8px)",
       }}>
         <a href="/" style={{
           fontSize: "20px",
@@ -438,7 +514,7 @@ export default function Home() {
           transform: "translate(-50%, -50%)",
           width: "600px",
           height: "400px",
-          background: "radial-gradient(ellipse, rgba(180, 190, 210, 0.04) 0%, transparent 70%)",
+          background: "radial-gradient(ellipse, rgba(0, 229, 255, 0.08) 0%, transparent 70%)",
           pointerEvents: "none",
         }} />
 
@@ -464,8 +540,9 @@ export default function Home() {
               fontSize: "16px",
               lineHeight: 1,
               borderRadius: "16px",
-              background: "linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))",
-              border: "1px solid rgba(201, 168, 76, 0.22)",
+              background: "linear-gradient(145deg, rgba(10,18,24,0.92), rgba(8,14,18,0.84))",
+              border: `1px solid ${border}`,
+              boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
             }}
             placeholder="Explain what you would like to build or what you need help with....."
           />
@@ -526,12 +603,13 @@ export default function Home() {
       <footer style={{
         textAlign: "center",
         padding: "32px",
-        borderTop: "1px solid rgba(255,255,255,0.04)",
+        borderTop: `1px solid ${border}`,
       }}>
         <p style={{ fontSize: "14px", color: silverDim }}>
           Powered by <span style={{ color: platinum, fontWeight: 600 }}>Helixa</span> on Base
         </p>
       </footer>
+      </div>
     </div>
   );
 }
