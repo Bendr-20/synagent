@@ -597,7 +597,7 @@ export default function Home() {
         <div style={{
           fontSize: "16px",
           color: silverDim,
-          marginBottom: "14px",
+          marginBottom: "7px",
           letterSpacing: "0.08em",
           textTransform: "uppercase",
         }}>
