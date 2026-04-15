@@ -5,6 +5,7 @@ import { useState, type CSSProperties, type ReactNode } from "react";
 import { SiteShell } from "@/components/site-shell";
 import { solidButtonStyle, glassCardStyle, theme } from "@/lib/theme";
 import type { Synagent } from "@/app/synagents/data";
+import type { MatchResult } from "@/lib/match-types";
 
 const inputStyle: CSSProperties = {
   width: "100%",
@@ -57,6 +58,11 @@ export function MatchClient({ selectedAgent }: { selectedAgent?: Synagent }) {
     desiredOutcome: "",
     needs: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [requestId, setRequestId] = useState<string | null>(null);
+  const [notificationsQueued, setNotificationsQueued] = useState<number>(0);
+  const [matches, setMatches] = useState<MatchResult[]>([]);
 
   const sliderBackground = (value: number) => {
     const pct = ((value - 1) / 9) * 100;
@@ -80,7 +86,7 @@ export function MatchClient({ selectedAgent }: { selectedAgent?: Synagent }) {
     </div>
   );
 
-  const intakePreview = {
+  const intakePayload = {
     selectedAgent: selectedAgent?.slug || null,
     title: prefs.title || null,
     category: prefs.category,
@@ -92,6 +98,7 @@ export function MatchClient({ selectedAgent }: { selectedAgent?: Synagent }) {
     confidentiality: prefs.confidentiality,
     paymentPreference: prefs.paymentPreference,
     desiredOutcome: prefs.desiredOutcome || null,
+    brief: prefs.needs || null,
     contact: {
       email: prefs.email || null,
       telegram: prefs.telegram || null,
@@ -103,6 +110,30 @@ export function MatchClient({ selectedAgent }: { selectedAgent?: Synagent }) {
       credibility: prefs.credibility,
     },
   };
+
+  async function handleSubmit() {
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/match", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(intakePayload),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Submission failed");
+      }
+      setRequestId(data.requestId || null);
+      setNotificationsQueued(data.notificationsQueued || 0);
+      setMatches(Array.isArray(data.matchedAgents) ? data.matchedAgents : []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Submission failed");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
   return (
     <SiteShell mainStyle={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "32px" }}>
@@ -127,17 +158,12 @@ export function MatchClient({ selectedAgent }: { selectedAgent?: Synagent }) {
         )}
 
         <p style={{ color: theme.textMuted, lineHeight: 1.7, fontSize: "15px" }}>
-          Tell us what you need, how urgent it is, how you want to work, and how to reach you. We’ll use this to route stronger matches.
+          Tell us what you need, how urgent it is, how you want to work, and how to reach you. This now creates a real request record and queues provider notifications.
         </p>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
           <Field label="Project Title">
-            <input
-              value={prefs.title}
-              onChange={(e) => setPrefs((prev) => ({ ...prev, title: e.target.value }))}
-              placeholder="AI intake MVP, launch strategy, operator support..."
-              style={inputStyle}
-            />
+            <input value={prefs.title} onChange={(e) => setPrefs((prev) => ({ ...prev, title: e.target.value }))} placeholder="AI intake MVP, launch strategy, operator support..." style={inputStyle} />
           </Field>
           <Field label="Category">
             <select value={prefs.category} onChange={(e) => setPrefs((prev) => ({ ...prev, category: e.target.value }))} style={inputStyle}>
@@ -186,12 +212,7 @@ export function MatchClient({ selectedAgent }: { selectedAgent?: Synagent }) {
             </select>
           </Field>
           <Field label="Timezone">
-            <input
-              value={prefs.timezone}
-              onChange={(e) => setPrefs((prev) => ({ ...prev, timezone: e.target.value }))}
-              placeholder="America/Chicago"
-              style={inputStyle}
-            />
+            <input value={prefs.timezone} onChange={(e) => setPrefs((prev) => ({ ...prev, timezone: e.target.value }))} placeholder="America/Chicago" style={inputStyle} />
           </Field>
           <Field label="Confidentiality">
             <select value={prefs.confidentiality} onChange={(e) => setPrefs((prev) => ({ ...prev, confidentiality: e.target.value }))} style={inputStyle}>
@@ -209,41 +230,19 @@ export function MatchClient({ selectedAgent }: { selectedAgent?: Synagent }) {
             </select>
           </Field>
           <Field label="Email">
-            <input
-              value={prefs.email}
-              onChange={(e) => setPrefs((prev) => ({ ...prev, email: e.target.value }))}
-              placeholder="you@example.com"
-              style={inputStyle}
-            />
+            <input value={prefs.email} onChange={(e) => setPrefs((prev) => ({ ...prev, email: e.target.value }))} placeholder="you@example.com" style={inputStyle} />
           </Field>
           <Field label="Telegram">
-            <input
-              value={prefs.telegram}
-              onChange={(e) => setPrefs((prev) => ({ ...prev, telegram: e.target.value }))}
-              placeholder="@handle"
-              style={inputStyle}
-            />
+            <input value={prefs.telegram} onChange={(e) => setPrefs((prev) => ({ ...prev, telegram: e.target.value }))} placeholder="@handle" style={inputStyle} />
           </Field>
         </div>
 
         <Field label="Desired Outcome">
-          <textarea
-            rows={2}
-            value={prefs.desiredOutcome}
-            onChange={(e) => setPrefs((prev) => ({ ...prev, desiredOutcome: e.target.value }))}
-            placeholder="What does success look like for this project?"
-            style={{ ...inputStyle, minHeight: "84px", resize: "vertical" }}
-          />
+          <textarea rows={2} value={prefs.desiredOutcome} onChange={(e) => setPrefs((prev) => ({ ...prev, desiredOutcome: e.target.value }))} placeholder="What does success look like for this project?" style={{ ...inputStyle, minHeight: "84px", resize: "vertical" }} />
         </Field>
 
         <Field label="Project Brief">
-          <textarea
-            rows={4}
-            value={prefs.needs}
-            onChange={(e) => setPrefs((prev) => ({ ...prev, needs: e.target.value }))}
-            placeholder="Tell us what you're building, what is blocked, what kind of help you want, and any constraints that matter...."
-            style={{ ...inputStyle, minHeight: "120px", resize: "vertical" }}
-          />
+          <textarea rows={4} value={prefs.needs} onChange={(e) => setPrefs((prev) => ({ ...prev, needs: e.target.value }))} placeholder="Tell us what you're building, what is blocked, what kind of help you want, and any constraints that matter...." style={{ ...inputStyle, minHeight: "120px", resize: "vertical" }} />
         </Field>
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "11px", color: theme.textMuted, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.08em", textTransform: "uppercase", marginTop: "2px", marginBottom: "2px" }}>
@@ -259,11 +258,47 @@ export function MatchClient({ selectedAgent }: { selectedAgent?: Synagent }) {
         <div style={{ padding: "14px 16px", borderRadius: "14px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.24)", color: theme.textMuted, lineHeight: 1.7 }}>
           <div style={{ ...labelStyle, marginBottom: "10px" }}>Structured Intake Preview</div>
           <pre style={{ margin: 0, whiteSpace: "pre-wrap", overflowWrap: "anywhere", color: theme.textStrong, fontSize: "12px", lineHeight: 1.7, fontFamily: "JetBrains Mono, monospace" }}>
-            {JSON.stringify(intakePreview, null, 2)}
+            {JSON.stringify(intakePayload, null, 2)}
           </pre>
         </div>
 
-        <button style={solidButtonStyle}>Find Your Matches</button>
+        {error && (
+          <div style={{ padding: "14px 16px", borderRadius: "14px", border: "1px solid rgba(255,120,120,0.35)", background: "rgba(60,10,10,0.18)", color: "#ffb3b3", lineHeight: 1.7 }}>
+            {error}
+          </div>
+        )}
+
+        {requestId && (
+          <div style={{ padding: "14px 16px", borderRadius: "14px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.24)", color: theme.textMuted, lineHeight: 1.7 }}>
+            <div style={{ ...labelStyle, marginBottom: "10px" }}>Request Created</div>
+            <div style={{ color: theme.textStrong, marginBottom: "8px" }}>Request ID: {requestId}</div>
+            <div>{notificationsQueued} provider notifications queued for delivery review.</div>
+          </div>
+        )}
+
+        {matches.length > 0 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <div style={labelStyle}>Top Matches</div>
+            {matches.map((match) => (
+              <div key={match.slug} style={{ padding: "14px 16px", borderRadius: "14px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.24)", color: theme.textMuted, lineHeight: 1.7 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", alignItems: "center", marginBottom: "8px" }}>
+                  <div style={{ color: theme.textStrong, fontWeight: 600 }}>{match.name}</div>
+                  <div style={{ color: theme.accent, fontFamily: "JetBrains Mono, monospace" }}>Score {match.score}</div>
+                </div>
+                <div style={{ fontSize: "13px", marginBottom: "8px" }}>Timezone {match.timezone} • Payment {match.payment}</div>
+                <ul style={{ margin: 0, paddingLeft: "18px" }}>
+                  {match.reasons.map((reason) => (
+                    <li key={reason}>{reason}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <button style={{ ...solidButtonStyle, opacity: isSubmitting ? 0.7 : 1, cursor: isSubmitting ? "progress" : "pointer" }} onClick={handleSubmit} disabled={isSubmitting}>
+          {isSubmitting ? "Submitting..." : "Find Your Matches"}
+        </button>
       </div>
     </SiteShell>
   );
