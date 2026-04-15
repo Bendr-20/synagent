@@ -18,10 +18,11 @@ export type Synagent = {
   coords: string;
   avatar: string;
   contacts: {
-    x: string;
-    telegram: string;
+    xHandle?: string | null;
+    telegramHandle?: string | null;
     telegramChatId?: string | null;
-    email: string;
+    email?: string | null;
+    agentmailInbox?: string | null;
   };
   bio: string;
   projects: Array<{
@@ -123,10 +124,11 @@ export const synagents: Synagent[] = baseAgents.map((agent, index) => ({
   coords: coords[index],
   avatar: initials(agent.name),
   contacts: {
-    x: `@${agent.slug.replace(/-/g, "_")}`,
-    telegram: `@${agent.slug}`,
+    xHandle: null,
+    telegramHandle: null,
     telegramChatId: null,
-    email: `${agent.slug}@synagent.ai`,
+    email: null,
+    agentmailInbox: null,
   },
   bio: `${agent.name} operates from ${agent.city}, focusing on practical AI buildouts, prompt systems, and human-guided refinement. Strongest when speed, trust, and clear delivery matter more than hype.`,
   projects: makeProjects(agent.name, index),

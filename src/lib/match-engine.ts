@@ -133,8 +133,8 @@ export function buildMatches(intake: MatchRequestPayload, count = 3): MatchResul
     .map((agent) => {
       const scored = scoreAgent(agent, intake);
       const contactsAvailable: Array<"email" | "telegram"> = [];
-      if (agent.contacts.email) contactsAvailable.push("email");
-      if (agent.contacts.telegram) contactsAvailable.push("telegram");
+      if (agent.contacts.email || agent.contacts.agentmailInbox) contactsAvailable.push("email");
+      if (agent.contacts.telegramChatId) contactsAvailable.push("telegram");
       return {
         slug: agent.slug,
         name: agent.name,
@@ -160,13 +160,15 @@ export function buildNotifications(requestId: string, intake: MatchRequestPayloa
     const summary = intake.title || intake.desiredOutcome || intake.brief || "New Synagent request";
     const requesterLine = intake.contact.email || intake.contact.telegram || "Requester contact captured in Synagent";
 
-    if (agent.contacts.email) {
+    const emailTarget = agent.contacts.email || agent.contacts.agentmailInbox;
+
+    if (emailTarget) {
       notifications.push({
         id: `${requestId}:${match.slug}:email`,
         requestId,
         agentSlug: match.slug,
         channel: "email",
-        target: agent.contacts.email,
+        target: emailTarget,
         status: "queued",
         subject: `New Synagent request: ${summary}`,
         html: null,

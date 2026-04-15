@@ -281,6 +281,6 @@ export function getNotificationSummary() {
 export function getAgentDeliveryTarget(agentSlug: string, channel: MatchNotification["channel"]) {
   const agent = synagents.find((entry) => entry.slug === agentSlug);
   if (!agent) return null;
-  if (channel === "email") return agent.contacts.email || null;
-  return agent.contacts.telegramChatId || agent.contacts.telegram || null;
+  if (channel === "email") return agent.contacts.email || agent.contacts.agentmailInbox || null;
+  return agent.contacts.telegramChatId || null;
 }

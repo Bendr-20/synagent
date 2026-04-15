@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { ReactNode } from "react";
 import { SiteShell } from "@/components/site-shell";
 import { glassCardStyle, outlineButtonStyle, theme } from "@/lib/theme";
 import { getSynagentBySlug } from "../data";
@@ -59,6 +60,11 @@ export default async function SynagentProfilePage({ params }: { params: Promise<
   const delta = getMapDelta(agent.country);
   const bbox = `${(lng - delta).toFixed(4)},${(lat - delta).toFixed(4)},${(lng + delta).toFixed(4)},${(lat + delta).toFixed(4)}`;
   const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik`;
+  const contactLines: Array<{ label: string; value: ReactNode }> = [];
+  if (agent.contacts.xHandle) contactLines.push({ label: "X", value: <MaskedContact value={agent.contacts.xHandle} /> });
+  if (agent.contacts.telegramHandle) contactLines.push({ label: "Telegram", value: <MaskedContact value={agent.contacts.telegramHandle} /> });
+  if (agent.contacts.email) contactLines.push({ label: "Email", value: <MaskedContact value={agent.contacts.email} type="email" /> });
+  if (agent.contacts.agentmailInbox) contactLines.push({ label: "AgentMail", value: <MaskedContact value={agent.contacts.agentmailInbox} type="email" /> });
 
   return (
     <SiteShell mainStyle={{ padding: "clamp(24px, 4vw, 36px) clamp(16px, 3vw, 32px) 24px" }}>
@@ -152,11 +158,17 @@ export default async function SynagentProfilePage({ params }: { params: Promise<
             </div>
             <div style={{ padding: "12px 14px", borderRadius: "14px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.24)" }}>
               <div style={{ fontSize: "11px", color: theme.textMuted, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>Contact Methods</div>
-              <div className="wrap-safe" style={{ display: "flex", flexDirection: "column", gap: "6px", color: theme.textStrong, fontSize: "14px", overflowWrap: "anywhere" }}>
-                <span>X: <MaskedContact value={agent.contacts.x} /></span>
-                <span>Telegram: <MaskedContact value={agent.contacts.telegram} /></span>
-                <span>Email: <MaskedContact value={agent.contacts.email} type="email" /></span>
-              </div>
+              {contactLines.length > 0 ? (
+                <div className="wrap-safe" style={{ display: "flex", flexDirection: "column", gap: "6px", color: theme.textStrong, fontSize: "14px", overflowWrap: "anywhere" }}>
+                  {contactLines.map((line) => (
+                    <span key={line.label}>{line.label}: {line.value}</span>
+                  ))}
+                </div>
+              ) : (
+                <div style={{ color: theme.textMuted, fontSize: "14px", lineHeight: 1.7 }}>
+                  Direct contact is released after fit review. No verified public inbox or Telegram endpoint is stored yet.
+                </div>
+              )}
             </div>
           </div>
         </div>
