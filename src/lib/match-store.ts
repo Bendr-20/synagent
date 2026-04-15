@@ -37,3 +37,20 @@ export function appendNotifications(notifications: MatchNotification[]) {
   writeJsonFile(NOTIFICATIONS_PATH, existing);
   return notifications;
 }
+
+export function getMatchRequests() {
+  return readJsonFile<MatchRequestRecord[]>(REQUESTS_PATH, []);
+}
+
+export function getNotifications() {
+  return readJsonFile<MatchNotification[]>(NOTIFICATIONS_PATH, []);
+}
+
+export function updateNotifications(
+  updater: (notifications: MatchNotification[]) => MatchNotification[],
+) {
+  const current = getNotifications();
+  const next = updater(current);
+  writeJsonFile(NOTIFICATIONS_PATH, next);
+  return next;
+}

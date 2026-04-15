@@ -23,15 +23,24 @@ export type MatchRequestPayload = {
   };
 };
 
+export type MatchNotificationStatus = "queued" | "sent" | "failed" | "skipped";
+
 export type MatchNotification = {
   id: string;
   requestId: string;
   agentSlug: string;
   channel: "email" | "telegram";
   target: string;
-  status: "queued";
+  status: MatchNotificationStatus;
+  subject?: string | null;
+  html?: string | null;
   message: string;
   createdAt: string;
+  attempts: number;
+  lastAttemptAt?: string | null;
+  dispatchedAt?: string | null;
+  providerMessageId?: string | null;
+  lastError?: string | null;
 };
 
 export type MatchResult = {
@@ -55,3 +64,5 @@ export type MatchRequestRecord = {
   internalOwner: string;
   nextActionAt: string;
 };
+
+export type NotificationDispatchMode = "queue-only" | "review" | "live";

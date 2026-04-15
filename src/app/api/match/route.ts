@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { appendMatchRequest, appendNotifications } from "@/lib/match-store";
 import { buildRequestRecord, normalizeMatchPayload } from "@/lib/match-engine";
+import { getDispatchConfig } from "@/lib/notification-dispatch";
 
 export async function POST(req: Request) {
   try {
@@ -9,6 +10,7 @@ export async function POST(req: Request) {
     const record = buildRequestRecord(intake);
     appendMatchRequest(record);
     appendNotifications(record.notifications);
+    const dispatchConfig = getDispatchConfig();
 
     return NextResponse.json({
       success: true,
@@ -16,7 +18,8 @@ export async function POST(req: Request) {
       status: record.status,
       matchedAgents: record.matchedAgents,
       notificationsQueued: record.notifications.length,
-      notificationMode: "queue-only",
+      notificationMode: dispatchConfig.mode,
+      dispatchEndpoint: "/api/match/dispatch",
       nextActionAt: record.nextActionAt,
     }, { status: 201 });
   } catch (error) {

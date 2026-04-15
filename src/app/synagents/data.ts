@@ -20,6 +20,7 @@ export type Synagent = {
   contacts: {
     x: string;
     telegram: string;
+    telegramChatId?: string | null;
     email: string;
   };
   bio: string;
@@ -124,6 +125,7 @@ export const synagents: Synagent[] = baseAgents.map((agent, index) => ({
   contacts: {
     x: `@${agent.slug.replace(/-/g, "_")}`,
     telegram: `@${agent.slug}`,
+    telegramChatId: null,
     email: `${agent.slug}@synagent.ai`,
   },
   bio: `${agent.name} operates from ${agent.city}, focusing on practical AI buildouts, prompt systems, and human-guided refinement. Strongest when speed, trust, and clear delivery matter more than hype.`,

@@ -5,7 +5,7 @@ import { useState, type CSSProperties, type ReactNode } from "react";
 import { SiteShell } from "@/components/site-shell";
 import { solidButtonStyle, glassCardStyle, theme } from "@/lib/theme";
 import type { Synagent } from "@/app/synagents/data";
-import type { MatchResult } from "@/lib/match-types";
+import type { MatchResult, NotificationDispatchMode } from "@/lib/match-types";
 
 const inputStyle: CSSProperties = {
   width: "100%",
@@ -62,6 +62,7 @@ export function MatchClient({ selectedAgent }: { selectedAgent?: Synagent }) {
   const [error, setError] = useState<string | null>(null);
   const [requestId, setRequestId] = useState<string | null>(null);
   const [notificationsQueued, setNotificationsQueued] = useState<number>(0);
+  const [notificationMode, setNotificationMode] = useState<NotificationDispatchMode>("queue-only");
   const [matches, setMatches] = useState<MatchResult[]>([]);
 
   const sliderBackground = (value: number) => {
@@ -127,6 +128,7 @@ export function MatchClient({ selectedAgent }: { selectedAgent?: Synagent }) {
       }
       setRequestId(data.requestId || null);
       setNotificationsQueued(data.notificationsQueued || 0);
+      setNotificationMode(data.notificationMode || "queue-only");
       setMatches(Array.isArray(data.matchedAgents) ? data.matchedAgents : []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Submission failed");
@@ -158,7 +160,7 @@ export function MatchClient({ selectedAgent }: { selectedAgent?: Synagent }) {
         )}
 
         <p style={{ color: theme.textMuted, lineHeight: 1.7, fontSize: "15px" }}>
-          Tell us what you need, how urgent it is, how you want to work, and how to reach you. This now creates a real request record and queues provider notifications.
+          Tell us what you need, how urgent it is, how you want to work, and how to reach you. This now creates a real request record and prepares provider notifications for review or dispatch.
         </p>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
@@ -272,7 +274,9 @@ export function MatchClient({ selectedAgent }: { selectedAgent?: Synagent }) {
           <div style={{ padding: "14px 16px", borderRadius: "14px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.24)", color: theme.textMuted, lineHeight: 1.7 }}>
             <div style={{ ...labelStyle, marginBottom: "10px" }}>Request Created</div>
             <div style={{ color: theme.textStrong, marginBottom: "8px" }}>Request ID: {requestId}</div>
-            <div>{notificationsQueued} provider notifications queued for delivery review.</div>
+            <div>
+              {notificationsQueued} provider notifications {notificationMode === "queue-only" ? "queued" : notificationMode === "review" ? "queued for review" : "ready for live dispatch"}.
+            </div>
           </div>
         )}
 

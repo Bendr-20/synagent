@@ -1,4 +1,5 @@
 import { synagents } from "@/app/synagents/data";
+import { getDispatchConfig } from "./notification-dispatch";
 import type { MatchNotification, MatchRequestPayload, MatchRequestRecord, MatchResult } from "./match-types";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -157,6 +158,7 @@ export function buildNotifications(requestId: string, intake: MatchRequestPayloa
     const agent = synagents.find((entry) => entry.slug === match.slug);
     if (!agent) continue;
     const summary = intake.title || intake.desiredOutcome || intake.brief || "New Synagent request";
+    const requesterLine = intake.contact.email || intake.contact.telegram || "Requester contact captured in Synagent";
 
     if (agent.contacts.email) {
       notifications.push({
@@ -166,21 +168,53 @@ export function buildNotifications(requestId: string, intake: MatchRequestPayloa
         channel: "email",
         target: agent.contacts.email,
         status: "queued",
-        message: `New Synagent match request: ${summary}. Budget ${intake.budgetRange}, urgency ${intake.urgency}, requester prefers ${intake.communicationPreference}.`,
+        subject: `New Synagent request: ${summary}`,
+        html: null,
+        message: [
+          `A new Synagent request matched to ${agent.name}.`,
+          `Summary: ${summary}`,
+          `Category: ${intake.category}`,
+          `Budget: ${intake.budgetRange}`,
+          `Urgency: ${intake.urgency}`,
+          `Delivery: ${intake.deliveryType}`,
+          `Confidentiality: ${intake.confidentiality}`,
+          `Preferred channel: ${intake.communicationPreference}`,
+          `Requester: ${requesterLine}`,
+          `Request ID: ${requestId}`,
+        ].join("\n"),
         createdAt: now,
+        attempts: 0,
+        lastAttemptAt: null,
+        dispatchedAt: null,
+        providerMessageId: null,
+        lastError: null,
       });
     }
 
-    if (agent.contacts.telegram) {
+    if (agent.contacts.telegramChatId) {
       notifications.push({
         id: `${requestId}:${match.slug}:telegram`,
         requestId,
         agentSlug: match.slug,
         channel: "telegram",
-        target: agent.contacts.telegram,
+        target: agent.contacts.telegramChatId,
         status: "queued",
-        message: `New Synagent request matched to ${agent.name}: ${summary}. Budget ${intake.budgetRange}, urgency ${intake.urgency}.`,
+        subject: null,
+        html: null,
+        message: [
+          `New Synagent match for ${agent.name}`,
+          `Summary: ${summary}`,
+          `Budget: ${intake.budgetRange}`,
+          `Urgency: ${intake.urgency}`,
+          `Preferred channel: ${intake.communicationPreference}`,
+          `Request ID: ${requestId}`,
+        ].join("\n"),
         createdAt: now,
+        attempts: 0,
+        lastAttemptAt: null,
+        dispatchedAt: null,
+        providerMessageId: null,
+        lastError: null,
       });
     }
   }
@@ -192,7 +226,8 @@ export function buildRequestRecord(intake: MatchRequestPayload): MatchRequestRec
   const requestId = `req_${new Date().toISOString().replace(/[-:.TZ]/g, "").slice(0, 14)}_${crypto.randomUUID().slice(0, 8)}`;
   const matchedAgents = buildMatches(intake, 3);
   const notifications = buildNotifications(requestId, intake, matchedAgents);
-  const nextActionAt = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString();
+  const dispatchConfig = getDispatchConfig();
+  const nextActionAt = new Date(Date.now() + (dispatchConfig.mode === "queue-only" ? 2 : 1) * 60 * 60 * 1000).toISOString();
 
   return {
     id: requestId,
