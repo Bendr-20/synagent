@@ -7,6 +7,7 @@ import type {
   MatchRequestSource,
   MatchResult,
   MatchSourceCandidate,
+  MatchSourceResolution,
 } from "./match-types";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -88,6 +89,20 @@ function normalizeSourceCandidate(value: unknown): MatchSourceCandidate | null {
   };
 }
 
+function normalizeSourceResolution(value: unknown): MatchSourceResolution | null {
+  const body = value && typeof value === "object" ? (value as Record<string, unknown>) : {};
+  const providerSlug = clampText(body.providerSlug, 128) || null;
+  const providerName = clampText(body.providerName, 160) || null;
+  const confidence = clampEnum(body.confidence, ["manual-query", "explicit-map", "name-match"], "") as "manual-query" | "explicit-map" | "name-match" | "";
+
+  if (!providerSlug && !providerName && !confidence) return null;
+  return {
+    providerSlug,
+    providerName,
+    confidence: confidence || null,
+  };
+}
+
 function normalizeSource(input: Record<string, unknown>): MatchRequestSource | null {
   const nested = input.source && typeof input.source === "object" ? (input.source as Record<string, unknown>) : {};
   const source = clampText(nested.source ?? input.source, 64) || null;
@@ -100,8 +115,9 @@ function normalizeSource(input: Record<string, unknown>): MatchRequestSource | n
     type: input.candidateType,
     name: input.candidateName,
   });
+  const resolution = normalizeSourceResolution(nested.resolution);
 
-  if (!source && !requestId && !capability && !principalType && !requiredSkills.length && !candidate) return null;
+  if (!source && !requestId && !capability && !principalType && !requiredSkills.length && !candidate && !resolution) return null;
 
   return {
     source,
@@ -110,6 +126,7 @@ function normalizeSource(input: Record<string, unknown>): MatchRequestSource | n
     principalType: principalType || null,
     requiredSkills,
     candidate,
+    resolution,
   };
 }
 
@@ -276,7 +293,13 @@ function scoreAgent(agent: (typeof synagents)[number], intake: MatchRequestPaylo
 }
 
 export function buildMatches(intake: MatchRequestPayload, count = 3): MatchResult[] {
-  return synagents
+  const directedAgent = intake.selectedAgent
+    ? synagents.find((agent) => agent.slug === intake.selectedAgent)
+    : null;
+
+  const candidates = directedAgent ? [directedAgent] : synagents;
+
+  return candidates
     .map((agent) => {
       const scored = scoreAgent(agent, intake);
       const contactsAvailable: Array<"email" | "telegram"> = [];
@@ -295,7 +318,7 @@ export function buildMatches(intake: MatchRequestPayload, count = 3): MatchResul
       } satisfies MatchResult;
     })
     .sort((a, b) => b.score - a.score)
-    .slice(0, count);
+    .slice(0, directedAgent ? 1 : count);
 }
 
 export function buildNotifications(requestId: string, intake: MatchRequestPayload, matches: MatchResult[]): MatchNotification[] {
@@ -334,6 +357,8 @@ export function buildNotifications(requestId: string, intake: MatchRequestPayloa
           intake.source?.requestId ? `Source request ID: ${intake.source.requestId}` : null,
           intake.source?.capability ? `Capability hint: ${intake.source.capability}` : null,
           intake.source?.requiredSkills.length ? `Required skills: ${intake.source.requiredSkills.join(", ")}` : null,
+          intake.source?.candidate?.name ? `Upstream candidate: ${intake.source.candidate.name}` : null,
+          intake.source?.resolution?.providerName ? `Resolved provider: ${intake.source.resolution.providerName} (${intake.source.resolution.confidence || "unscored"})` : null,
           `Requester: ${requesterLine}`,
           `Request ID: ${requestId}`,
         ].filter(Boolean).join("\n"),
@@ -362,6 +387,7 @@ export function buildNotifications(requestId: string, intake: MatchRequestPayloa
           `Budget: ${intake.budgetRange}`,
           `Urgency: ${intake.urgency}`,
           intake.source?.capability ? `Capability: ${intake.source.capability}` : null,
+          intake.source?.resolution?.providerName ? `Resolved provider: ${intake.source.resolution.providerName}` : null,
           `Preferred channel: ${intake.communicationPreference}`,
           `Request ID: ${requestId}`,
         ].filter(Boolean).join("\n"),

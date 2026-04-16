@@ -4,6 +4,12 @@ export type MatchSourceCandidate = {
   name?: string | null;
 };
 
+export type MatchSourceResolution = {
+  providerSlug?: string | null;
+  providerName?: string | null;
+  confidence?: "manual-query" | "explicit-map" | "name-match" | null;
+};
+
 export type MatchRequestSource = {
   source?: string | null;
   requestId?: string | null;
@@ -11,6 +17,7 @@ export type MatchRequestSource = {
   principalType?: "all" | "agent" | "human" | null;
   requiredSkills: string[];
   candidate?: MatchSourceCandidate | null;
+  resolution?: MatchSourceResolution | null;
 };
 
 export type MatchHandoffPrefill = {
@@ -27,6 +34,7 @@ export type MatchHandoffPrefill = {
   principalType?: "all" | "agent" | "human" | null;
   requiredSkills: string[];
   candidate?: MatchSourceCandidate | null;
+  resolution?: MatchSourceResolution | null;
 };
 
 export type MatchRequestPayload = {

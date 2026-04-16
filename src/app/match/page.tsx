@@ -1,6 +1,6 @@
 import { MatchClient } from "./match-client";
-import { getSynagentBySlug } from "@/app/synagents/data";
-import type { MatchHandoffPrefill } from "@/lib/match-types";
+import type { MatchHandoffPrefill, MatchSourceCandidate } from "@/lib/match-types";
+import { resolveSynagentProvider } from "@/lib/provider-resolution";
 
 function getSingle(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
@@ -39,6 +39,19 @@ function buildHandoffPrefill(params: Record<string, string | string[] | undefine
     return null;
   }
 
+  const candidate: MatchSourceCandidate | null = candidateId || candidateType || candidateName
+    ? {
+        id: candidateId,
+        type: candidateType,
+        name: candidateName,
+      }
+    : null;
+
+  const { resolution } = resolveSynagentProvider({
+    providerSlug: getSingle(params.agent)?.trim() || null,
+    candidate,
+  });
+
   return {
     source,
     requestId,
@@ -52,13 +65,8 @@ function buildHandoffPrefill(params: Record<string, string | string[] | undefine
     capability,
     principalType,
     requiredSkills,
-    candidate: candidateId || candidateType || candidateName
-      ? {
-          id: candidateId,
-          type: candidateType,
-          name: candidateName,
-        }
-      : null,
+    candidate,
+    resolution,
   };
 }
 
@@ -68,9 +76,11 @@ export default async function MatchPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const params = await searchParams;
-  const agent = getSingle(params.agent);
-  const selectedAgent = agent ? getSynagentBySlug(agent) : undefined;
   const handoff = buildHandoffPrefill(params);
+  const { provider: selectedAgent } = resolveSynagentProvider({
+    providerSlug: getSingle(params.agent)?.trim() || handoff?.resolution?.providerSlug || null,
+    candidate: handoff?.candidate || null,
+  });
 
-  return <MatchClient selectedAgent={selectedAgent} handoff={handoff} />;
+  return <MatchClient selectedAgent={selectedAgent || undefined} handoff={handoff} />;
 }

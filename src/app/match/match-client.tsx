@@ -217,6 +217,7 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
       principalType: handoff.principalType || null,
       requiredSkills: handoff.requiredSkills || [],
       candidate: handoff.candidate || null,
+      resolution: handoff.resolution || null,
     } : null,
     contact: {
       email: prefs.email || null,
@@ -280,14 +281,16 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
               {handoff.requestId ? `Source request ${handoff.requestId}. ` : ""}
               {handoff.capability ? `Capability hint: ${handoff.capability}. ` : ""}
               {handoff.requiredSkills.length ? `Required skills: ${handoff.requiredSkills.join(", ")}. ` : ""}
-              {handoff.candidate?.name ? `Suggested candidate: ${handoff.candidate.name}.` : ""}
+              {handoff.candidate?.name ? `Suggested candidate: ${handoff.candidate.name}. ` : ""}
+              {handoff.resolution?.providerName ? `Resolved provider: ${handoff.resolution.providerName} (${handoff.resolution.confidence}).` : ""}
             </div>
           </div>
         )}
 
         {selectedAgent && (
           <div style={{ padding: "14px 16px", borderRadius: "14px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.24)", color: theme.textMuted, lineHeight: 1.7 }}>
-            You are submitting a proposal to <span style={{ color: theme.textStrong, fontWeight: 600 }}>{selectedAgent.name}</span>.
+            <span style={{ color: theme.textStrong, fontWeight: 600 }}>{selectedAgent.name}</span> is selected as the target provider.
+            {handoff?.resolution?.confidence ? ` This came through a ${handoff.resolution.confidence} provider resolution.` : ""}
           </div>
         )}
 
