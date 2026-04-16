@@ -1,8 +1,41 @@
+export type MatchSourceCandidate = {
+  id?: string | null;
+  type?: "agent" | "human" | null;
+  name?: string | null;
+};
+
+export type MatchRequestSource = {
+  source?: string | null;
+  requestId?: string | null;
+  capability?: string | null;
+  principalType?: "all" | "agent" | "human" | null;
+  requiredSkills: string[];
+  candidate?: MatchSourceCandidate | null;
+};
+
+export type MatchHandoffPrefill = {
+  source?: string | null;
+  requestId?: string | null;
+  title?: string | null;
+  brief?: string | null;
+  requester?: string | null;
+  contact?: string | null;
+  budget?: string | null;
+  urgency?: string | null;
+  category?: string | null;
+  capability?: string | null;
+  principalType?: "all" | "agent" | "human" | null;
+  requiredSkills: string[];
+  candidate?: MatchSourceCandidate | null;
+};
+
 export type MatchRequestPayload = {
   selectedAgent?: string | null;
   title?: string | null;
+  requester?: string | null;
   category: string;
   budgetRange: string;
+  budgetNote?: string | null;
   urgency: string;
   deliveryType: string;
   communicationPreference: string;
@@ -11,9 +44,11 @@ export type MatchRequestPayload = {
   paymentPreference: string;
   desiredOutcome?: string | null;
   brief?: string | null;
+  source?: MatchRequestSource | null;
   contact: {
     email?: string | null;
     telegram?: string | null;
+    note?: string | null;
   };
   priorities: {
     cost: number;
@@ -47,6 +82,7 @@ export type MatchResult = {
   slug: string;
   name: string;
   score: number;
+  summaryReason: string;
   reasons: string[];
   payment: string;
   timezone: string;

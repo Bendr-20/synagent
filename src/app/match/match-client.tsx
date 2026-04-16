@@ -5,7 +5,7 @@ import { useState, type CSSProperties, type ReactNode } from "react";
 import { SiteShell } from "@/components/site-shell";
 import { solidButtonStyle, glassCardStyle, theme } from "@/lib/theme";
 import type { Synagent } from "@/app/synagents/data";
-import type { MatchResult, NotificationDispatchMode } from "@/lib/match-types";
+import type { MatchHandoffPrefill, MatchResult, NotificationDispatchMode } from "@/lib/match-types";
 
 const inputStyle: CSSProperties = {
   width: "100%",
@@ -29,6 +29,39 @@ const labelStyle: CSSProperties = {
   marginBottom: "8px",
 };
 
+const categoryKeywordMap: Record<string, string[]> = {
+  "mvp-build": ["mvp", "prototype", "build", "frontend", "product", "landing", "website", "app"],
+  "operator-support": ["operator", "ops", "support", "assistant", "execution"],
+  "ai-consulting": ["ai", "agent", "prompt", "llm", "strategy", "consulting"],
+  automation: ["automation", "integration", "workflow", "orchestration", "n8n", "zapier"],
+  design: ["design", "ui", "ux", "brand", "copy", "copywriting"],
+  growth: ["growth", "launch", "marketing", "distribution", "audience", "sales"],
+  research: ["research", "analysis", "intel", "discovery", "investigation"],
+};
+
+type PrefState = {
+  cost: number;
+  time: number;
+  quality: number;
+  credibility: number;
+  requester: string;
+  title: string;
+  category: string;
+  budgetRange: string;
+  budgetNote: string;
+  urgency: string;
+  deliveryType: "human-only" | "agent-only" | "hybrid" | "unsure";
+  communicationPreference: string;
+  timezone: string;
+  confidentiality: string;
+  paymentPreference: string;
+  email: string;
+  telegram: string;
+  contactNote: string;
+  desiredOutcome: string;
+  needs: string;
+};
+
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label style={{ display: "flex", flexDirection: "column", gap: "0px" }}>
@@ -38,26 +71,101 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
-export function MatchClient({ selectedAgent }: { selectedAgent?: Synagent }) {
-  const [prefs, setPrefs] = useState({
+function normalizeText(value?: string | null) {
+  return (value || "").trim().toLowerCase();
+}
+
+function inferCategoryFromHandoff(selectedAgent: Synagent | undefined, handoff?: MatchHandoffPrefill | null) {
+  if (selectedAgent?.serviceCategories?.[0]) return selectedAgent.serviceCategories[0];
+
+  const explicit = normalizeText(handoff?.category);
+  const allowed = ["mvp-build", "operator-support", "ai-consulting", "automation", "design", "growth", "research", "other"];
+  if (allowed.includes(explicit)) return explicit;
+
+  const haystack = normalizeText([
+    handoff?.category,
+    handoff?.capability,
+    handoff?.title,
+    handoff?.brief,
+    ...(handoff?.requiredSkills || []),
+  ].filter(Boolean).join(" "));
+
+  for (const [category, keywords] of Object.entries(categoryKeywordMap)) {
+    if (keywords.some((keyword) => haystack.includes(keyword))) return category;
+  }
+
+  return selectedAgent ? "operator-support" : "mvp-build";
+}
+
+function mapBudgetRange(value?: string | null) {
+  const budget = normalizeText(value);
+  if (!budget) return "unknown";
+  if (budget.includes("under") || budget.includes("<") || budget.includes("500") || budget.includes("1k")) return "under-1k";
+  if (budget.includes("1k") || budget.includes("2k") || budget.includes("3k")) return "1k-3k";
+  if (budget.includes("5k") || budget.includes("10k")) return "3k-10k";
+  if (budget.includes("15k") || budget.includes("20k") || budget.includes("25k")) return "10k-25k";
+  if (budget.includes("25k") || budget.includes("50k") || budget.includes("100k") || budget.includes("plus")) return "25k-plus";
+  return "unknown";
+}
+
+function mapUrgency(value?: string | null) {
+  const urgency = normalizeText(value);
+  if (!urgency) return "this-month";
+  if (urgency === "urgent" || urgency === "high" || urgency.includes("asap") || urgency.includes("today")) return "asap";
+  if (urgency.includes("week")) return "this-week";
+  if (urgency === "medium" || urgency.includes("month")) return "this-month";
+  return "flexible";
+}
+
+function mapDeliveryType(selectedAgent: Synagent | undefined, handoff?: MatchHandoffPrefill | null) {
+  if (selectedAgent) return selectedAgent.operatorModel;
+  if (handoff?.principalType === "human") return "human-only";
+  if (handoff?.principalType === "agent") return "agent-only";
+  if (handoff?.principalType === "all") return "hybrid";
+  return "hybrid";
+}
+
+function parseImportedContact(value?: string | null) {
+  const contact = (value || "").trim();
+  if (!contact) return { email: "", telegram: "", note: "" };
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact)) {
+    return { email: contact, telegram: "", note: "" };
+  }
+  if (contact.startsWith("@") || contact.toLowerCase().includes("telegram")) {
+    return { email: "", telegram: contact, note: "" };
+  }
+  return { email: "", telegram: "", note: contact };
+}
+
+function buildInitialPrefs(selectedAgent: Synagent | undefined, handoff?: MatchHandoffPrefill | null): PrefState {
+  const importedContact = parseImportedContact(handoff?.contact);
+
+  return {
     cost: 5,
-    time: 5,
-    quality: 5,
-    credibility: 5,
-    title: "",
-    category: selectedAgent ? "operator-support" : "mvp-build",
-    budgetRange: "1k-3k",
-    urgency: "this-month",
-    deliveryType: selectedAgent ? "human-only" : "hybrid",
+    time: handoff?.urgency === "urgent" || handoff?.urgency === "high" ? 8 : 5,
+    quality: 6,
+    credibility: 7,
+    requester: handoff?.requester || "",
+    title: handoff?.title || "",
+    category: inferCategoryFromHandoff(selectedAgent, handoff),
+    budgetRange: mapBudgetRange(handoff?.budget),
+    budgetNote: handoff?.budget || "",
+    urgency: mapUrgency(handoff?.urgency),
+    deliveryType: mapDeliveryType(selectedAgent, handoff),
     communicationPreference: "either",
     timezone: "",
     confidentiality: "private",
     paymentPreference: "usdc",
-    email: "",
-    telegram: "",
-    desiredOutcome: "",
-    needs: "",
-  });
+    email: importedContact.email,
+    telegram: importedContact.telegram,
+    contactNote: importedContact.note,
+    desiredOutcome: handoff?.capability ? `Need strong delivery around ${handoff.capability}.` : "",
+    needs: handoff?.brief || "",
+  };
+}
+
+export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synagent; handoff?: MatchHandoffPrefill | null }) {
+  const [prefs, setPrefs] = useState<PrefState>(() => buildInitialPrefs(selectedAgent, handoff));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [requestId, setRequestId] = useState<string | null>(null);
@@ -89,9 +197,11 @@ export function MatchClient({ selectedAgent }: { selectedAgent?: Synagent }) {
 
   const intakePayload = {
     selectedAgent: selectedAgent?.slug || null,
+    requester: prefs.requester || null,
     title: prefs.title || null,
     category: prefs.category,
     budgetRange: prefs.budgetRange,
+    budgetNote: prefs.budgetNote || null,
     urgency: prefs.urgency,
     deliveryType: prefs.deliveryType,
     communicationPreference: prefs.communicationPreference,
@@ -100,9 +210,18 @@ export function MatchClient({ selectedAgent }: { selectedAgent?: Synagent }) {
     paymentPreference: prefs.paymentPreference,
     desiredOutcome: prefs.desiredOutcome || null,
     brief: prefs.needs || null,
+    source: handoff ? {
+      source: handoff.source || null,
+      requestId: handoff.requestId || null,
+      capability: handoff.capability || null,
+      principalType: handoff.principalType || null,
+      requiredSkills: handoff.requiredSkills || [],
+      candidate: handoff.candidate || null,
+    } : null,
     contact: {
       email: prefs.email || null,
       telegram: prefs.telegram || null,
+      note: prefs.contactNote || null,
     },
     priorities: {
       cost: prefs.cost,
@@ -153,6 +272,19 @@ export function MatchClient({ selectedAgent }: { selectedAgent?: Synagent }) {
           </Link>
         </div>
 
+        {handoff?.source && (
+          <div style={{ padding: "14px 16px", borderRadius: "14px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.24)", color: theme.textMuted, lineHeight: 1.7 }}>
+            <div style={{ ...labelStyle, marginBottom: "10px" }}>Imported Context</div>
+            <div style={{ color: theme.textStrong, fontWeight: 600, marginBottom: "6px" }}>Imported from {handoff.source === "helixa-mcp" ? "Helixa MCP" : handoff.source}</div>
+            <div>
+              {handoff.requestId ? `Source request ${handoff.requestId}. ` : ""}
+              {handoff.capability ? `Capability hint: ${handoff.capability}. ` : ""}
+              {handoff.requiredSkills.length ? `Required skills: ${handoff.requiredSkills.join(", ")}. ` : ""}
+              {handoff.candidate?.name ? `Suggested candidate: ${handoff.candidate.name}.` : ""}
+            </div>
+          </div>
+        )}
+
         {selectedAgent && (
           <div style={{ padding: "14px 16px", borderRadius: "14px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.24)", color: theme.textMuted, lineHeight: 1.7 }}>
             You are submitting a proposal to <span style={{ color: theme.textStrong, fontWeight: 600 }}>{selectedAgent.name}</span>.
@@ -160,10 +292,13 @@ export function MatchClient({ selectedAgent }: { selectedAgent?: Synagent }) {
         )}
 
         <p style={{ color: theme.textMuted, lineHeight: 1.7, fontSize: "15px" }}>
-          Tell us what you need, how urgent it is, how you want to work, and how to reach you. This now creates a real request record and prepares provider notifications for review or dispatch.
+          Tell us what you need, how urgent it is, how you want to work, and how to reach you. This creates a real request record, keeps imported Helixa context intact, and prepares provider notifications for review or dispatch.
         </p>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+          <Field label="Requester">
+            <input value={prefs.requester} onChange={(e) => setPrefs((prev) => ({ ...prev, requester: e.target.value }))} placeholder="Your name or team" style={inputStyle} />
+          </Field>
           <Field label="Project Title">
             <input value={prefs.title} onChange={(e) => setPrefs((prev) => ({ ...prev, title: e.target.value }))} placeholder="AI intake MVP, launch strategy, operator support..." style={inputStyle} />
           </Field>
@@ -189,6 +324,9 @@ export function MatchClient({ selectedAgent }: { selectedAgent?: Synagent }) {
               <option value="unknown">Not Sure Yet</option>
             </select>
           </Field>
+          <Field label="Budget Note">
+            <input value={prefs.budgetNote} onChange={(e) => setPrefs((prev) => ({ ...prev, budgetNote: e.target.value }))} placeholder="Budget context, pricing notes, constraints" style={inputStyle} />
+          </Field>
           <Field label="Urgency">
             <select value={prefs.urgency} onChange={(e) => setPrefs((prev) => ({ ...prev, urgency: e.target.value }))} style={inputStyle}>
               <option value="asap">ASAP</option>
@@ -198,7 +336,7 @@ export function MatchClient({ selectedAgent }: { selectedAgent?: Synagent }) {
             </select>
           </Field>
           <Field label="Delivery Type">
-            <select value={prefs.deliveryType} onChange={(e) => setPrefs((prev) => ({ ...prev, deliveryType: e.target.value }))} style={inputStyle}>
+            <select value={prefs.deliveryType} onChange={(e) => setPrefs((prev) => ({ ...prev, deliveryType: e.target.value as PrefState["deliveryType"] }))} style={inputStyle}>
               <option value="human-only">Human Only</option>
               <option value="agent-only">Agent Only</option>
               <option value="hybrid">Hybrid</option>
@@ -237,6 +375,9 @@ export function MatchClient({ selectedAgent }: { selectedAgent?: Synagent }) {
           <Field label="Telegram">
             <input value={prefs.telegram} onChange={(e) => setPrefs((prev) => ({ ...prev, telegram: e.target.value }))} placeholder="@handle" style={inputStyle} />
           </Field>
+          <Field label="Contact Note">
+            <input value={prefs.contactNote} onChange={(e) => setPrefs((prev) => ({ ...prev, contactNote: e.target.value }))} placeholder="Optional contact context or fallback note" style={inputStyle} />
+          </Field>
         </div>
 
         <Field label="Desired Outcome">
@@ -244,7 +385,7 @@ export function MatchClient({ selectedAgent }: { selectedAgent?: Synagent }) {
         </Field>
 
         <Field label="Project Brief">
-          <textarea rows={4} value={prefs.needs} onChange={(e) => setPrefs((prev) => ({ ...prev, needs: e.target.value }))} placeholder="Tell us what you're building, what is blocked, what kind of help you want, and any constraints that matter...." style={{ ...inputStyle, minHeight: "120px", resize: "vertical" }} />
+          <textarea rows={4} value={prefs.needs} onChange={(e) => setPrefs((prev) => ({ ...prev, needs: e.target.value }))} placeholder="Tell us what you're building, what is blocked, what kind of help you want, and any constraints that matter..." style={{ ...inputStyle, minHeight: "120px", resize: "vertical" }} />
         </Field>
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "11px", color: theme.textMuted, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.08em", textTransform: "uppercase", marginTop: "2px", marginBottom: "2px" }}>
@@ -290,6 +431,7 @@ export function MatchClient({ selectedAgent }: { selectedAgent?: Synagent }) {
                   <div style={{ color: theme.accent, fontFamily: "JetBrains Mono, monospace" }}>Score {match.score}</div>
                 </div>
                 <div style={{ fontSize: "13px", marginBottom: "8px" }}>Timezone {match.timezone} • Payment {match.payment}</div>
+                <div style={{ color: theme.textStrong, marginBottom: "8px" }}>{match.summaryReason}</div>
                 <ul style={{ margin: 0, paddingLeft: "18px" }}>
                   {match.reasons.map((reason) => (
                     <li key={reason}>{reason}</li>
