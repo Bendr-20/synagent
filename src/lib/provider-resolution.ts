@@ -9,14 +9,12 @@ type ExplicitHelixaProviderMapping = {
 };
 
 const EXPLICIT_HELIXA_PROVIDER_MAPPINGS: ExplicitHelixaProviderMapping[] = [
-  // Populate with curated Helixa principal -> Synagent provider links as they become real.
-  // Example:
-  // {
-  //   providerSlug: "builder-core",
-  //   candidateIds: ["1"],
-  //   candidateNames: ["Bendr 2.0"],
-  //   candidateTypes: ["agent"],
-  // },
+  {
+    providerSlug: "degeneer",
+    candidateIds: ["user:did:privy:cmo4eylo600lc0cl50r2we0zg"],
+    candidateNames: ["Degeneer", "degeneer03"],
+    candidateTypes: ["human"],
+  },
 ];
 
 function normalizeText(value?: string | null) {
