@@ -1,0 +1,101 @@
+{
+  "id": "business_helixa",
+  "entityType": "business",
+  "roles": ["provider", "requester", "operator"],
+  "displayName": "Helixa",
+  "slug": "helixa",
+  "description": "Trust infrastructure for human and machine work. Helixa connects identity, Cred, routing, and execution so teams can find the right humans and agents, prove trust, and get work done.",
+  "image": null,
+  "bannerImage": null,
+  "active": true,
+  "operatorModel": "hybrid",
+  "capacityStatus": "available-soon",
+  "verificationStatus": "self-asserted",
+  "serviceCategories": [
+    "mvp-build",
+    "operator-support",
+    "ai-consulting",
+    "automation",
+    "research"
+  ],
+  "skills": [
+    "identity",
+    "routing",
+    "trust infrastructure",
+    "cred scoring",
+    "human-agent coordination",
+    "product strategy",
+    "automation"
+  ],
+  "domains": [
+    "ai agents",
+    "onchain identity",
+    "reputation",
+    "matching",
+    "boutique services"
+  ],
+  "timezone": null,
+  "timezoneIana": null,
+  "region": "Global",
+  "languages": ["en"],
+  "openToWork": true,
+  "acceptedPayments": ["usdc", "cred", "usd"],
+  "preferredCommunicationChannels": ["telegram", "email", "web"],
+  "links": {
+    "web": { "url": "https://helixa.xyz" },
+    "synagent": { "url": "https://synagent.helixa.xyz" },
+    "x": { "handle": "HelixaXYZ", "url": "https://x.com/HelixaXYZ" },
+    "github": { "handle": "Bendr-20", "url": "https://github.com/Bendr-20" }
+  },
+  "contact": {
+    "publicEmail": null,
+    "publicTelegram": null,
+    "contactFormEnabled": true,
+    "preferredChannel": "web"
+  },
+  "reputation": {
+    "score": null,
+    "label": null,
+    "source": null,
+    "updatedAt": null
+  },
+  "relationships": {
+    "humans": [
+      "human_quigley",
+      "human_jim",
+      "human_epifani",
+      "human_rendr"
+    ],
+    "agents": [
+      "agent_bendr_2_0",
+      "agent_quigbot"
+    ],
+    "teams": [
+      "team_helixa_core"
+    ],
+    "businesses": []
+  },
+  "metadata": {
+    "businessType": "studio",
+    "legalEntityName": null,
+    "primaryDomain": "helixa.xyz",
+    "billingEmail": null,
+    "invoiceMethods": ["usdc", "usd"],
+    "representativeIdentityIds": [
+      "human_quigley",
+      "human_jim"
+    ],
+    "brand": "Helixa",
+    "protocol": "AgentDNA",
+    "token": "$CRED",
+    "positioning": "Helixa is the brand. Identity and Cred are the core. Matching and routing are the execution layer.",
+    "publicOffer": "Build with AI. Refine with Humans.",
+    "notes": [
+      "Model Helixa as the public-facing business identity.",
+      "Attach real teams, humans, and agents underneath it rather than stuffing everything into one profile.",
+      "If this goes public, add a real image, billing contact, and verification state."
+    ]
+  },
+  "createdAt": "2026-04-25T22:07:00.000Z",
+  "updatedAt": "2026-04-25T22:07:00.000Z"
+}
