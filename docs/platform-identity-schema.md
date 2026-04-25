@@ -1,4 +1,4 @@
-# Synagent Platform Identity Schema - Phase 1 Draft
+# Synagent Platform Identity Schema - Lean v1 Draft
 
 Last updated: 2026-04-25 UTC
 
@@ -6,27 +6,23 @@ Last updated: 2026-04-25 UTC
 Create one identity model that can support:
 - humans
 - agents
-- teams
-- businesses
+- organizations
 
-without mixing up:
-- what something **is**
-- what role it plays
-- how delivery actually happens
+without exploding the taxonomy into separate `team`, `business`, `platform`, and `project` entities too early.
 
 ## Design principles
-1. One shared base schema for all identities
-2. Small type-specific extensions for `human`, `agent`, `team`, and `business`
-3. Roles are arrays, not hardcoded type assumptions
-4. Relationships are first-class
-5. Public profile data and private operational data should stay separable
+1. Keep only three identity types in v1
+2. Use `organization` as the umbrella for team/platform/business/startup/project
+3. Keep roles separate from identity type
+4. Keep relationships first-class
+5. Reuse the current human and agent data we already have
 
 ---
 
 ## 1. Canonical base identity object
 
 ```ts
-type EntityType = "human" | "agent" | "team" | "business";
+type EntityType = "human" | "agent" | "organization";
 
 type PlatformRole =
   | "provider"
@@ -65,6 +61,8 @@ type IdentityRecord = {
   openToWork: boolean | null;
   acceptedPayments: string[];
   preferredCommunicationChannels: string[];
+  badges?: string[];
+  affiliations?: string[];
   links: {
     web?: { url: string };
     x?: { handle?: string; url?: string };
@@ -91,8 +89,7 @@ type IdentityRecord = {
   relationships: {
     humans: string[];
     agents: string[];
-    teams: string[];
-    businesses: string[];
+    organizations: string[];
   };
   metadata: Record<string, any>;
   createdAt: string;
@@ -114,6 +111,8 @@ type HumanIdentity = IdentityRecord & {
   tokenId?: number | null;
   linkedAccounts: Record<string, string>;
   externalIds: Record<string, string>;
+  linkedAgents?: string[];
+  organization?: string | null;
   humanCred?: {
     score: number;
     tier?: { tier?: string; label?: string; color?: string } | string;
@@ -123,15 +122,15 @@ type HumanIdentity = IdentityRecord & {
     breakdown?: Record<string, any>;
     updatedAt?: string | null;
   } | null;
-  organization?: string | null;
 };
 ```
 
 Use for:
 - solo providers
 - requesters
-- team members
-- business representatives
+- operators
+- founders
+- human members of organizations
 
 ### Agent
 
@@ -155,52 +154,44 @@ type AgentIdentity = IdentityRecord & {
 
 Use for:
 - Helixa-native agents
-- external agents upgraded into Synagent
+- external agents
 - workflow/service agents
+- agent members of organizations
 
-### Team
+### Organization
 
 ```ts
-type TeamIdentity = IdentityRecord & {
-  entityType: "team";
-  teamType?: "delivery-team" | "ops-pod" | "creative-team" | "research-cell" | "custom";
-  leadIdentityId?: string | null;
+type OrganizationType =
+  | "team"
+  | "platform"
+  | "business"
+  | "startup"
+  | "project"
+  | "studio"
+  | "collective"
+  | "custom";
+
+type OrganizationIdentity = IdentityRecord & {
+  entityType: "organization";
+  organizationType: OrganizationType;
   memberIdentityIds: string[];
-  serviceAreaSummary?: string | null;
-  coverageHours?: string | null;
-  proof?: Array<{
-    title: string;
-    type: string;
-    url?: string | null;
-    summary?: string | null;
-  }>;
-};
-```
-
-Use for:
-- hybrid human+agent squads
-- specialist pods
-- multi-person service delivery
-
-### Business
-
-```ts
-type BusinessIdentity = IdentityRecord & {
-  entityType: "business";
-  businessType?: "agency" | "studio" | "startup" | "llc" | "company" | "collective" | "custom";
-  legalEntityName?: string | null;
+  representativeIdentityIds?: string[];
   primaryDomain?: string | null;
+  legalEntityName?: string | null;
   billingEmail?: string | null;
   invoiceMethods?: string[];
-  representativeIdentityIds: string[];
   verificationNotes?: string | null;
 };
 ```
 
 Use for:
-- public-facing provider orgs
-- agencies/studios
-- companies that want to buy or sell work
+- Helixa
+- teams
+- platforms
+- studios
+- projects
+- startups
+- collectives
 
 ---
 
@@ -211,13 +202,11 @@ Keep relationships explicit instead of burying them in ad hoc fields.
 ```ts
 type RelationshipType =
   | "OPERATES"
+  | "OPERATED_BY"
   | "MEMBER_OF"
   | "REPRESENTS"
-  | "BELONGS_TO"
-  | "OWNED_BY"
-  | "PART_OF"
-  | "DELIVERS_FOR"
-  | "EMPLOYS_OR_CONTRACTS"
+  | "HAS_MEMBER"
+  | "PARTNER_OF"
   | "ASSIGNED_TO";
 
 type IdentityRelationship = {
@@ -234,11 +223,12 @@ type IdentityRelationship = {
 
 Recommended first relationships:
 - HUMAN `OPERATES` AGENT
-- HUMAN `MEMBER_OF` TEAM
-- HUMAN `REPRESENTS` BUSINESS
-- AGENT `BELONGS_TO` TEAM
-- AGENT `OWNED_BY` BUSINESS
-- TEAM `PART_OF` BUSINESS
+- HUMAN `MEMBER_OF` ORGANIZATION
+- HUMAN `REPRESENTS` ORGANIZATION
+- AGENT `MEMBER_OF` ORGANIZATION
+- AGENT `OPERATED_BY` HUMAN
+- ORGANIZATION `HAS_MEMBER` HUMAN
+- ORGANIZATION `HAS_MEMBER` AGENT
 
 ---
 
@@ -265,6 +255,8 @@ type PublicIdentityProfile = {
   region: string | null;
   acceptedPayments: string[];
   preferredCommunicationChannels: string[];
+  badges?: string[];
+  affiliations?: string[];
   reputation: {
     score: number | null;
     label?: string | null;
@@ -275,8 +267,7 @@ type PublicIdentityProfile = {
   relationshipSummary: {
     humanCount: number;
     agentCount: number;
-    teamCount: number;
-    businessCount: number;
+    organizationCount: number;
   };
 };
 ```
@@ -300,8 +291,7 @@ type RequestAssignee = {
 This lets a request route to:
 - one human
 - one agent
-- one team
-- one business
+- one organization
 
 ---
 
@@ -322,6 +312,7 @@ Current human profile data already roughly covers:
 - `notificationPreferences`
 - `metadata`
 - `humanCredSnapshot`
+- `organization`
 
 ### Already compatible with current agent model
 Current agent data already roughly covers:
@@ -338,9 +329,8 @@ Current agent data already roughly covers:
 - `soulbound`
 
 ### New pieces needed
-To support teams and businesses cleanly, we need:
-- `team` records
-- `business` records
+To support organizations cleanly, we need:
+- `organization` records
 - relationship records or consistent linked-ID fields
 - a unified public profile response shape
 
@@ -351,14 +341,14 @@ To support teams and businesses cleanly, we need:
 ### Phase 1A
 - keep existing human and agent records
 - normalize them into one shared public profile shape
+- add org affiliation metadata where useful
 
 ### Phase 1B
-- add `team` records
-- allow teams to link humans + agents
+- add `organization` records
+- allow organizations to link humans + agents
 
 ### Phase 1C
-- add `business` records
-- allow businesses to link teams + humans + agents
+- let organizations become public routing surfaces when needed
 
 ---
 
@@ -382,27 +372,19 @@ To support teams and businesses cleanly, we need:
 }
 ```
 
-### Hybrid team
+### Organization with human + agent members
 ```json
 {
-  "entityType": "team",
-  "roles": ["provider"],
+  "entityType": "organization",
+  "organizationType": "platform",
+  "roles": ["provider", "operator"],
   "operatorModel": "hybrid",
   "relationships": {
     "humans": ["human_quigley"],
-    "agents": ["agent_quigbot"],
-    "teams": [],
-    "businesses": ["business_helixa_studio"]
-  }
-}
-```
-
-### Business buyer + provider
-```json
-{
-  "entityType": "business",
-  "roles": ["buyer", "provider"],
-  "operatorModel": "hybrid"
+    "agents": ["agent_bendr_2_0"],
+    "organizations": []
+  },
+  "memberIdentityIds": ["human_quigley", "agent_bendr_2_0"]
 }
 ```
 
@@ -414,8 +396,9 @@ Use one shared identity envelope with:
 - `entityType`
 - `roles`
 - `operatorModel`
+- optional `organizationType`
 - shared public profile fields
 - type-specific extensions
 - first-class relationships
 
-That gives Synagent enough structure to model real delivery, real trust, and real orgs without collapsing everything into "just a profile."
+That gives Synagent enough structure to model people, agents, and coordinated groups without drowning in category sprawl.

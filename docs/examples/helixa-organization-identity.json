@@ -1,10 +1,11 @@
 {
-  "id": "business_helixa",
-  "entityType": "business",
+  "id": "org_helixa",
+  "entityType": "organization",
+  "organizationType": "platform",
   "roles": ["provider", "requester", "operator"],
   "displayName": "Helixa",
   "slug": "helixa",
-  "description": "Trust infrastructure for human and machine work. Helixa connects identity, Cred, routing, and execution so teams can find the right humans and agents, prove trust, and get work done.",
+  "description": "Trust infrastructure for human and machine work. Helixa connects identity, Cred, routing, and execution so the right humans and agents can be found, trusted, and deployed together.",
   "image": null,
   "bannerImage": null,
   "active": true,
@@ -41,6 +42,8 @@
   "openToWork": true,
   "acceptedPayments": ["usdc", "cred", "usd"],
   "preferredCommunicationChannels": ["telegram", "email", "web"],
+  "badges": ["platform", "hybrid", "core"],
+  "affiliations": ["AgentDNA", "$CRED", "Synagent"],
   "links": {
     "web": { "url": "https://helixa.xyz" },
     "synagent": { "url": "https://synagent.helixa.xyz" },
@@ -60,42 +63,48 @@
     "updatedAt": null
   },
   "relationships": {
-    "humans": [
-      "human_quigley",
-      "human_jim",
-      "human_epifani",
-      "human_rendr"
-    ],
-    "agents": [
-      "agent_bendr_2_0",
-      "agent_quigbot"
-    ],
-    "teams": [
-      "team_helixa_core"
-    ],
-    "businesses": []
+    "humans": ["human_quigley"],
+    "agents": ["agent_bendr_2_0"],
+    "organizations": []
   },
+  "memberIdentityIds": [
+    "human_quigley",
+    "agent_bendr_2_0"
+  ],
   "metadata": {
-    "businessType": "studio",
-    "legalEntityName": null,
     "primaryDomain": "helixa.xyz",
+    "legalEntityName": null,
     "billingEmail": null,
     "invoiceMethods": ["usdc", "usd"],
-    "representativeIdentityIds": [
-      "human_quigley",
-      "human_jim"
-    ],
+    "representativeIdentityIds": ["human_quigley"],
     "brand": "Helixa",
     "protocol": "AgentDNA",
     "token": "$CRED",
     "positioning": "Helixa is the brand. Identity and Cred are the core. Matching and routing are the execution layer.",
     "publicOffer": "Build with AI. Refine with Humans.",
+    "members": [
+      {
+        "id": "human_quigley",
+        "entityType": "human",
+        "displayName": "Quigley",
+        "role": "founder",
+        "sourceHumanWallet": "0x17d7DfA154dc0828AdE4115B9EB8a0A91C0fbDe4",
+        "sourceHumanTokenId": 1129
+      },
+      {
+        "id": "agent_bendr_2_0",
+        "entityType": "agent",
+        "displayName": "Bendr 2.0",
+        "role": "core-agent",
+        "sourceAgentTokenId": 1
+      }
+    ],
     "notes": [
-      "Model Helixa as the public-facing business identity.",
-      "Attach real teams, humans, and agents underneath it rather than stuffing everything into one profile.",
-      "If this goes public, add a real image, billing contact, and verification state."
+      "First organization record in the lean v1 model.",
+      "Uses organization as the umbrella type instead of splitting team/business/platform into separate identity types.",
+      "Quigley is linked as a human member. Bendr 2.0 is linked as an agent member."
     ]
   },
-  "createdAt": "2026-04-25T22:07:00.000Z",
-  "updatedAt": "2026-04-25T22:07:00.000Z"
+  "createdAt": "2026-04-25T22:48:00.000Z",
+  "updatedAt": "2026-04-25T22:48:00.000Z"
 }
