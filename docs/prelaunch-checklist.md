@@ -108,6 +108,11 @@ Build result:
 - [ ] YELLOW - Prepare launch post/thread
 - [ ] YELLOW - Prepare first outreach list
 - [ ] YELLOW - Decide manual concierge flow for first users
+- [ ] YELLOW - Queue x402 payment support as the first post-soft-launch payments milestone
+
+Notes:
+- Recommendation: do not block soft launch on x402, but treat it as the first serious payments upgrade right after launch.
+- Priority scope: intake deposits or service checkout in USDC first, then optional CRED-denominated paths once the operator flow is stable.
 
 ## 10. Success metrics
 - [ ] YELLOW - Define first-2-week success criteria
