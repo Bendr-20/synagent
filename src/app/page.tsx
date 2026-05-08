@@ -2,19 +2,13 @@ import Link from "next/link";
 import { SiteShell } from "@/components/site-shell";
 import { glassCardStyle, outlineButtonStyle, theme } from "@/lib/theme";
 
-type FeaturedProfile = {
-  name: string;
-  cred: number;
-  slug?: string;
-};
-
 type ServiceCard = {
   number: string;
   title: string;
   description: string;
   titleColor: string;
-  featuredLabel?: string;
-  featuredProfiles?: FeaturedProfile[];
+  calloutLabel?: string;
+  calloutItems?: string[];
   buttonText?: string;
   buttonHref?: string;
 };
@@ -25,12 +19,11 @@ const serviceCards: ServiceCard[] = [
     title: "Hire A Human",
     description: "Hire a prompt engineer to design, refine, and optimize AI outputs for fast, reliable execution.",
     titleColor: "#9ff9ff",
-    featuredLabel: "Featured Synagents",
-    featuredProfiles: [
-      { name: "Synagent Atlas", cred: 94, slug: "synagent-atlas" },
-      { name: "Promptsmith One", cred: 92, slug: "promptsmith-one" },
-      { name: "Signal Forge", cred: 90, slug: "signal-forge" },
-      { name: "Builder Core", cred: 89, slug: "builder-core" },
+    calloutLabel: "Curated beta intake",
+    calloutItems: [
+      "Reviewed operator roster only — no placeholder talent.",
+      "Match requests are routed after availability is confirmed.",
+      "Profile links appear only when a real operator is ready.",
     ],
     buttonText: "Make Your Match",
     buttonHref: "/match",
@@ -48,19 +41,18 @@ const serviceCards: ServiceCard[] = [
     title: "Human AI Consultants",
     description: "Get strategic guidance on agents, workflows, tooling, and how to actually make the system useful.",
     titleColor: theme.accentDark,
-    featuredLabel: "Synagents",
-    featuredProfiles: [
-      { name: "Synagent Alpha", cred: 91 },
-      { name: "Synagent Beta", cred: 88 },
-      { name: "Synagent Gamma", cred: 85 },
-      { name: "Synagent Delta", cred: 83 },
+    calloutLabel: "Consulting access",
+    calloutItems: [
+      "Start with a scoped brief and fit check.",
+      "Work is assigned to available launch operators only.",
+      "Browse the directory for the current live roster.",
     ],
     buttonText: "Engage With Synagent",
     buttonHref: "/synagents",
   },
 ];
 
-function FeaturedProfiles({ label, profiles }: { label: string; profiles: FeaturedProfile[] }) {
+function ProcessCallout({ label, items }: { label: string; items: string[] }) {
   return (
     <div
       style={{
@@ -86,40 +78,32 @@ function FeaturedProfiles({ label, profiles }: { label: string; profiles: Featur
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-        {profiles.map((profile, index) => {
-          const row = (
-            <div
+        {items.map((item, index) => (
+          <div
+            key={item}
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              gap: "10px",
+              paddingBottom: index === items.length - 1 ? "0" : "10px",
+              borderBottom: index === items.length - 1 ? "none" : "1px solid rgba(0,229,255,0.08)",
+            }}
+          >
+            <span
               style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                paddingBottom: index === profiles.length - 1 ? "0" : "10px",
-                borderBottom: index === profiles.length - 1 ? "none" : "1px solid rgba(0,229,255,0.08)",
+                fontSize: "12px",
+                fontFamily: "JetBrains Mono, monospace",
+                color: theme.accent,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                lineHeight: 1.6,
               }}
             >
-              <span style={{ fontSize: "14px", color: theme.textStrong, fontWeight: 500 }}>{profile.name}</span>
-              <span
-                style={{
-                  fontSize: "12px",
-                  fontFamily: "JetBrains Mono, monospace",
-                  color: theme.accent,
-                  letterSpacing: "0.08em",
-                  textTransform: "uppercase",
-                }}
-              >
-                Cred {profile.cred}
-              </span>
-            </div>
-          );
-
-          if (!profile.slug) return <div key={profile.name}>{row}</div>;
-
-          return (
-            <Link key={profile.name} href={`/synagents/${profile.slug}`} style={{ textDecoration: "none" }}>
-              {row}
-            </Link>
-          );
-        })}
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <span style={{ fontSize: "14px", color: theme.textStrong, fontWeight: 500, lineHeight: 1.5 }}>{item}</span>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -216,7 +200,7 @@ export default function HomePage() {
             <p style={{ fontSize: "15px", lineHeight: 1.7, color: theme.textMuted, margin: 0 }}>{card.description}</p>
 
             {card.number === "02" && <MvpFlow />}
-            {card.featuredProfiles && card.featuredLabel && <FeaturedProfiles label={card.featuredLabel} profiles={card.featuredProfiles} />}
+            {card.calloutItems && card.calloutLabel && <ProcessCallout label={card.calloutLabel} items={card.calloutItems} />}
 
             <div style={{ flex: 1 }} />
 
