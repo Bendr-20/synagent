@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { SiteShell } from "@/components/site-shell";
-import { glassCardStyle, outlineButtonStyle, theme } from "@/lib/theme";
+import { glassCardStyle, outlineButtonStyle, solidButtonStyle, theme } from "@/lib/theme";
 
 type ServiceCard = {
   number: string;
@@ -186,8 +186,10 @@ export default function HomePage() {
           {betaPositioning}
         </p>
 
-        <div style={{ width: "100%", maxWidth: "860px", marginBottom: "20px" }}>
+        <form action="/match" method="get" style={{ width: "100%", maxWidth: "860px", marginBottom: "20px", display: "flex", flexDirection: "column", gap: "12px" }}>
           <textarea
+            aria-label="Project brief"
+            name="brief"
             rows={2}
             placeholder="Tell us what you're building, the workflow fix you need, or the delivery team you want..."
             style={{
@@ -206,7 +208,10 @@ export default function HomePage() {
               overflowY: "auto",
             }}
           />
-        </div>
+          <button type="submit" style={{ ...solidButtonStyle, alignSelf: "center", width: "auto", minWidth: "220px" }}>
+            Start match
+          </button>
+        </form>
 
         <div style={{ fontSize: "16px", color: theme.textMuted, marginBottom: "7px", letterSpacing: "0.08em", textTransform: "uppercase" }}>or</div>
       </section>
@@ -253,7 +258,7 @@ export default function HomePage() {
           <div style={{ fontSize: "12px", fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.16em", color: theme.textMuted, textTransform: "uppercase", marginBottom: "18px" }}>
             How it works
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: "14px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "14px" }}>
             {howItWorksSteps.map((step, index) => (
               <div key={step} style={{ padding: "16px", borderRadius: "14px", border: "1px solid rgba(0,229,255,0.16)", background: "rgba(5,10,14,0.26)", minHeight: "112px" }}>
                 <div style={{ fontSize: "12px", fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.14em", color: theme.accent, textTransform: "uppercase", marginBottom: "14px" }}>
