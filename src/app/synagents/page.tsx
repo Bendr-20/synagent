@@ -27,7 +27,16 @@ export default function SynagentsPage() {
           <h1 className="directory-title wrap-safe" style={{ fontSize: "34px", color: theme.textStrong, fontFamily: "Space Grotesk, sans-serif" }}>
             Synagent Directory
           </h1>
+          <p style={{ maxWidth: "680px", margin: "10px 0 0", color: theme.textMuted, fontSize: "15px", lineHeight: 1.7 }}>
+            Curated beta directory. We are showing only real launch operators while the network is being filled out.
+          </p>
         </div>
+
+        {synagents.length < 3 && (
+          <div style={{ ...glassCardStyle, borderRadius: "18px", padding: "14px 16px", marginBottom: "18px", color: theme.textMuted, fontSize: "14px", lineHeight: 1.7 }}>
+            Early access supply is intentionally limited. Submit a request and we will route it manually if the public list is thin.
+          </div>
+        )}
 
         <div className="directory-table" style={{ ...glassCardStyle, borderRadius: "20px", padding: 0, overflow: "hidden" }}>
           <div

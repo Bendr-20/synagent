@@ -17,6 +17,8 @@ const EXPLICIT_HELIXA_PROVIDER_MAPPINGS: ExplicitHelixaProviderMapping[] = [
   },
 ];
 
+const PUBLIC_PROVIDER_SLUGS = new Set(synagents.map((provider) => provider.slug));
+
 function normalizeText(value?: string | null) {
   return (value || "").trim().toLowerCase();
 }
@@ -57,6 +59,8 @@ export function resolveSynagentProvider(options: {
   }
 
   for (const mapping of EXPLICIT_HELIXA_PROVIDER_MAPPINGS) {
+    if (!PUBLIC_PROVIDER_SLUGS.has(mapping.providerSlug)) continue;
+
     const provider = getSynagentBySlug(mapping.providerSlug);
     if (!provider) continue;
 
