@@ -80,6 +80,7 @@ function inferCategoryFromHandoff(selectedAgent: Synagent | undefined, handoff?:
 
   const explicit = normalizeText(handoff?.category);
   const allowed = ["mvp-build", "operator-support", "ai-consulting", "automation", "design", "growth", "research", "other"];
+  if (explicit.includes("mvp-build")) return "mvp-build";
   if (allowed.includes(explicit)) return explicit;
 
   const haystack = normalizeText([
@@ -94,7 +95,7 @@ function inferCategoryFromHandoff(selectedAgent: Synagent | undefined, handoff?:
     if (keywords.some((keyword) => haystack.includes(keyword))) return category;
   }
 
-  return selectedAgent ? "operator-support" : "mvp-build";
+  return "mvp-build";
 }
 
 function mapBudgetRange(value?: string | null) {
@@ -382,6 +383,10 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
             <input value={prefs.contactNote} onChange={(e) => setPrefs((prev) => ({ ...prev, contactNote: e.target.value }))} placeholder="Optional contact context or fallback note" style={inputStyle} />
           </Field>
         </div>
+
+        <p style={{ color: theme.textMuted, lineHeight: 1.6, fontSize: "13px", margin: "-4px 0 0" }}>
+          We use your contact info only to review the request and coordinate the intro. Raw contact details are not shown on public profiles.
+        </p>
 
         <Field label="Desired Outcome">
           <textarea rows={2} value={prefs.desiredOutcome} onChange={(e) => setPrefs((prev) => ({ ...prev, desiredOutcome: e.target.value }))} placeholder="What does success look like for this project?" style={{ ...inputStyle, minHeight: "84px", resize: "vertical" }} />

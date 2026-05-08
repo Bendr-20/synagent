@@ -7,49 +7,66 @@ type ServiceCard = {
   title: string;
   description: string;
   titleColor: string;
+  isPrimary?: boolean;
   calloutLabel?: string;
   calloutItems?: string[];
   buttonText?: string;
   buttonHref?: string;
 };
 
+const betaPositioning = "Synagent is a curated beta for MVP builds, AI workflow fixes, and human-agent delivery teams powered by Helixa identity and Cred.";
+
 const serviceCards: ServiceCard[] = [
   {
     number: "01",
-    title: "Hire A Human",
-    description: "Hire a prompt engineer to design, refine, and optimize AI outputs for fast, reliable execution.",
-    titleColor: "#9ff9ff",
-    calloutLabel: "Curated beta intake",
+    title: "Create An MVP",
+    description: "Submit the MVP you need built. We review the brief, shape the scope, and route fit-matched requests to trusted humans and agents.",
+    titleColor: theme.accent,
+    isPrimary: true,
+    calloutLabel: "Primary beta offer",
     calloutItems: [
-      "Reviewed operator roster only — no placeholder talent.",
-      "Match requests are routed after availability is confirmed.",
-      "Profile links appear only when a real operator is ready.",
+      "Built around real MVP, workflow, and launch-support requests.",
+      "Scope is reviewed before any operator intro is made.",
+      "You get a clear next step instead of a generic marketplace result.",
     ],
-    buttonText: "Make Your Match",
-    buttonHref: "/match",
+    buttonText: "Create An MVP",
+    buttonHref: "/match?category=mvp-build",
   },
   {
     number: "02",
-    title: "Create An MVP",
-    description: "Submit your idea and our AI swarm builds it, humans refine it, and you own everything - code, IP, all of it. Delivered in 7-10 days.",
-    titleColor: theme.accent,
-    buttonText: "Start Building Now",
-    buttonHref: "/match",
+    title: "Hire A Human",
+    description: "A support lane for requests that need human execution, review, or operator judgment alongside the MVP build path.",
+    titleColor: "#9ff9ff",
+    calloutLabel: "Support lane",
+    calloutItems: [
+      "Available when a request needs human-only expertise.",
+      "Routed only after fit and availability are checked.",
+      "Profiles are shown only for real operators who are available.",
+    ],
+    buttonText: "Request Human Support",
+    buttonHref: "/match?category=operator-support",
   },
   {
     number: "03",
     title: "Human AI Consultants",
-    description: "Get strategic guidance on agents, workflows, tooling, and how to actually make the system useful.",
+    description: "A support lane for teams that need agent strategy, workflow diagnosis, or AI implementation guidance before a build starts.",
     titleColor: theme.accentDark,
-    calloutLabel: "Consulting access",
+    calloutLabel: "Support lane",
     calloutItems: [
-      "Start with a scoped brief and fit check.",
-      "Work is assigned to available launch operators only.",
-      "Browse the directory for the current live roster.",
+      "Best for AI workflow fixes and implementation planning.",
+      "Recommendations stay tied to the brief you submit.",
+      "We coordinate intros only when the fit is real.",
     ],
-    buttonText: "Engage With Synagent",
-    buttonHref: "/synagents",
+    buttonText: "Request AI Guidance",
+    buttonHref: "/match?category=ai-consulting",
   },
+];
+
+const howItWorksSteps = [
+  "Submit a brief",
+  "We review fit",
+  "We route to real operators",
+  "You get a human-readable next step",
 ];
 
 function ProcessCallout({ label, items }: { label: string; items: string[] }) {
@@ -123,11 +140,11 @@ function MvpFlow() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px", marginTop: "20px" }}>
-      <div style={{ ...boxStyle, padding: "12px 14px", color: theme.textStrong, fontSize: "12px", letterSpacing: "0.08em" }}>Your Idea</div>
+      <div style={{ ...boxStyle, padding: "12px 14px", color: theme.textStrong, fontSize: "12px", letterSpacing: "0.08em" }}>Your Brief</div>
       <div style={{ color: theme.textMuted, fontSize: "18px", fontFamily: "JetBrains Mono, monospace", lineHeight: 1 }}>↓</div>
-      <div style={{ ...boxStyle, color: theme.accent, fontSize: "11px", letterSpacing: "0.06em" }}>Agent Swarm &gt; Human Refinement</div>
+      <div style={{ ...boxStyle, color: theme.accent, fontSize: "11px", letterSpacing: "0.06em" }}>Fit Review &gt; Trusted Routing</div>
       <div style={{ color: theme.textMuted, fontSize: "18px", fontFamily: "JetBrains Mono, monospace", lineHeight: 1 }}>↓</div>
-      <div style={{ ...boxStyle, color: theme.textStrong, fontSize: "11px", letterSpacing: "0.08em" }}>MVP / Beta</div>
+      <div style={{ ...boxStyle, color: theme.textStrong, fontSize: "11px", letterSpacing: "0.08em" }}>Next Step</div>
     </div>
   );
 }
@@ -160,15 +177,19 @@ export default function HomePage() {
           }}
         />
 
-        <h1 className="hero-title" style={{ fontSize: "56px", fontWeight: 700, fontFamily: "Space Grotesk, sans-serif", lineHeight: 1.1, marginBottom: "32px", maxWidth: "760px" }}>
-          <span style={{ color: theme.textStrong }}>Build with AI.</span>{" "}
-          <span style={{ color: theme.accent }}>Refine with Humans.</span>
+        <h1 className="hero-title" style={{ fontSize: "56px", fontWeight: 700, fontFamily: "Space Grotesk, sans-serif", lineHeight: 1.1, marginBottom: "22px", maxWidth: "780px" }}>
+          <span style={{ color: theme.textStrong }}>Tell us what you need built.</span>{" "}
+          <span style={{ color: theme.accent }}>We route it to trusted humans and agents.</span>
         </h1>
+
+        <p style={{ maxWidth: "760px", color: theme.textMuted, fontSize: "17px", lineHeight: 1.7, margin: "0 0 30px" }}>
+          {betaPositioning}
+        </p>
 
         <div style={{ width: "100%", maxWidth: "860px", marginBottom: "20px" }}>
           <input
             type="text"
-            placeholder="Tell us what you're building or how we can help...."
+            placeholder="Describe the MVP, workflow fix, or delivery team you need..."
             style={{
               width: "100%",
               height: "60px",
@@ -188,9 +209,20 @@ export default function HomePage() {
         <div style={{ fontSize: "16px", color: theme.textMuted, marginBottom: "7px", letterSpacing: "0.08em", textTransform: "uppercase" }}>or</div>
       </section>
 
-      <section className="cards-grid" style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px 88px", display: "flex", gap: "16px", alignItems: "stretch" }}>
+      <section className="cards-grid" style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px 34px", display: "flex", gap: "16px", alignItems: "stretch" }}>
         {serviceCards.map((card) => (
-          <div key={card.title} style={{ ...glassCardStyle, display: "flex", flexDirection: "column", alignSelf: "stretch", flex: "1 1 0" }}>
+          <div
+            key={card.title}
+            style={{
+              ...glassCardStyle,
+              display: "flex",
+              flexDirection: "column",
+              alignSelf: "stretch",
+              flex: card.isPrimary ? "1.15 1 0" : "1 1 0",
+              borderColor: card.isPrimary ? "rgba(0,229,255,0.42)" : glassCardStyle.borderColor,
+              boxShadow: card.isPrimary ? "0 18px 44px rgba(0,229,255,0.08), inset 0 0 0 1px rgba(0,229,255,0.06)" : glassCardStyle.boxShadow,
+            }}
+          >
             <div style={{ fontSize: "12px", fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.18em", color: theme.textMuted, marginBottom: "18px", textTransform: "uppercase" }}>
               {card.number}
             </div>
@@ -199,7 +231,7 @@ export default function HomePage() {
             </h2>
             <p style={{ fontSize: "15px", lineHeight: 1.7, color: theme.textMuted, margin: 0 }}>{card.description}</p>
 
-            {card.number === "02" && <MvpFlow />}
+            {card.isPrimary && <MvpFlow />}
             {card.calloutItems && card.calloutLabel && <ProcessCallout label={card.calloutLabel} items={card.calloutItems} />}
 
             <div style={{ flex: 1 }} />
@@ -212,6 +244,24 @@ export default function HomePage() {
             )}
           </div>
         ))}
+      </section>
+
+      <section style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px 96px" }}>
+        <div style={{ ...glassCardStyle, borderRadius: "20px" }}>
+          <div style={{ fontSize: "12px", fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.16em", color: theme.textMuted, textTransform: "uppercase", marginBottom: "18px" }}>
+            How it works
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: "14px" }}>
+            {howItWorksSteps.map((step, index) => (
+              <div key={step} style={{ padding: "16px", borderRadius: "14px", border: "1px solid rgba(0,229,255,0.16)", background: "rgba(5,10,14,0.26)", minHeight: "112px" }}>
+                <div style={{ fontSize: "12px", fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.14em", color: theme.accent, textTransform: "uppercase", marginBottom: "14px" }}>
+                  {String(index + 1).padStart(2, "0")}
+                </div>
+                <div style={{ color: theme.textStrong, fontSize: "16px", fontWeight: 700, lineHeight: 1.5 }}>{step}</div>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
     </SiteShell>
   );
