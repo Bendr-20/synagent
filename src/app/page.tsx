@@ -187,21 +187,23 @@ export default function HomePage() {
         </p>
 
         <div style={{ width: "100%", maxWidth: "860px", marginBottom: "20px" }}>
-          <input
-            type="text"
-            placeholder="Describe the MVP, workflow fix, or delivery team you need..."
+          <textarea
+            rows={2}
+            placeholder="Tell us what you're building, the workflow fix you need, or the delivery team you want..."
             style={{
               width: "100%",
-              height: "60px",
-              padding: "0 22px",
+              minHeight: "70px",
+              padding: "16px 22px",
               fontSize: "16px",
-              lineHeight: 1,
+              lineHeight: 1.45,
               borderRadius: "16px",
               background: "linear-gradient(145deg, rgba(10,18,24,0.92), rgba(8,14,18,0.84))",
               border: `1px solid ${theme.border}`,
               color: theme.text,
               boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
               outline: "none",
+              resize: "vertical",
+              overflowY: "auto",
             }}
           />
         </div>
