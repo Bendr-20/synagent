@@ -5,7 +5,7 @@ import { useState, type CSSProperties, type ReactNode } from "react";
 import { SiteShell } from "@/components/site-shell";
 import { solidButtonStyle, glassCardStyle, theme } from "@/lib/theme";
 import type { Synagent } from "@/app/synagents/data";
-import type { MatchHandoffPrefill, MatchResult, NotificationDispatchMode } from "@/lib/match-types";
+import type { MatchApiResponse, MatchHandoffPrefill, MatchRequestStatus, MatchResult, MatchReviewMetadata, NotificationDispatchMode } from "@/lib/match-types";
 
 const inputStyle: CSSProperties = {
   width: "100%",
@@ -172,6 +172,8 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
   const [requestId, setRequestId] = useState<string | null>(null);
   const [notificationsQueued, setNotificationsQueued] = useState<number>(0);
   const [notificationMode, setNotificationMode] = useState<NotificationDispatchMode>("queue-only");
+  const [requestStatus, setRequestStatus] = useState<MatchRequestStatus | null>(null);
+  const [review, setReview] = useState<MatchReviewMetadata | null>(null);
   const [matches, setMatches] = useState<MatchResult[]>([]);
 
   const sliderBackground = (value: number) => {
@@ -236,6 +238,9 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
   async function handleSubmit() {
     setIsSubmitting(true);
     setError(null);
+    setRequestStatus(null);
+    setReview(null);
+    setMatches([]);
 
     try {
       const res = await fetch("/api/match", {
@@ -243,13 +248,18 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(intakePayload),
       });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
+      const data = await res.json() as MatchApiResponse;
+      if (!data.success) {
         throw new Error(data.error || "Submission failed");
+      }
+      if (!res.ok) {
+        throw new Error("Submission failed");
       }
       setRequestId(data.requestId || null);
       setNotificationsQueued(data.notificationsQueued || 0);
       setNotificationMode(data.notificationMode || "queue-only");
+      setRequestStatus(data.status || null);
+      setReview(data.review || null);
       setMatches(Array.isArray(data.matchedAgents) ? data.matchedAgents : []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Submission failed");
@@ -429,7 +439,18 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
           </div>
         )}
 
-        {matches.length > 0 && (
+        {requestId && (requestStatus === "needs-review" || matches.length === 0) && (
+          <div style={{ padding: "14px 16px", borderRadius: "14px", border: "1px solid rgba(255,209,102,0.35)", background: "rgba(80,54,8,0.18)", color: theme.textMuted, lineHeight: 1.7 }}>
+            <div style={{ ...labelStyle, marginBottom: "10px" }}>Manual Review Needed</div>
+            <div style={{ color: theme.textStrong, marginBottom: "8px" }}>
+              We received the request, but no curated beta provider met the automatic match threshold. A reviewer should handle this manually instead of pushing it to the wrong operator.
+            </div>
+            {review?.fallbackReason && <div>Reason: {review.fallbackReason}</div>}
+            {typeof review?.strongestScore === "number" && <div>Strongest automatic score: {review.strongestScore}</div>}
+          </div>
+        )}
+
+        {requestId && requestStatus !== "needs-review" && matches.length > 0 && (
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             <div style={labelStyle}>Top Matches</div>
             {matches.map((match) => (

@@ -22,6 +22,9 @@ const CATEGORY_KEYWORDS: Record<string, string[]> = {
   research: ["research", "analysis", "intel", "discovery", "thesis", "investigation"],
 };
 
+const STRONG_MATCH_SCORE = 55;
+const NO_STRONG_MATCH_FALLBACK_REASON = "No strong curated-provider match met the launch threshold.";
+
 function clampText(value: unknown, max = 512) {
   return typeof value === "string" ? value.trim().slice(0, max) : "";
 }
@@ -149,6 +152,25 @@ function inferDesiredCategories(intake: MatchRequestPayload) {
   }
 
   return [...desired];
+}
+
+function getExplicitDesiredCategories(intake: MatchRequestPayload) {
+  const explicit = new Set<string>();
+  if (intake.category && intake.category !== "other") explicit.add(intake.category);
+
+  for (const skill of intake.source?.requiredSkills || []) {
+    const normalized = skill.toLowerCase().trim();
+    for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
+      if (keywords.includes(normalized) || normalized === category) explicit.add(category);
+    }
+  }
+
+  return [...explicit];
+}
+
+function getDirectedAgent(intake: MatchRequestPayload) {
+  const directedSlug = intake.selectedAgent || intake.source?.resolution?.providerSlug || null;
+  return directedSlug ? synagents.find((agent) => agent.slug === directedSlug) || null : null;
 }
 
 function buildSummaryReason(agent: (typeof synagents)[number], categoryFit: string[], reasons: string[], intake: MatchRequestPayload) {
@@ -292,14 +314,12 @@ function scoreAgent(agent: (typeof synagents)[number], intake: MatchRequestPaylo
   };
 }
 
-export function buildMatches(intake: MatchRequestPayload, count = 3): MatchResult[] {
-  const directedAgent = intake.selectedAgent
-    ? synagents.find((agent) => agent.slug === intake.selectedAgent)
-    : null;
-
+function buildMatchEvaluation(intake: MatchRequestPayload, count = 3): { matchedAgents: MatchResult[]; strongestScore: number | null } {
+  const directedAgent = getDirectedAgent(intake);
   const candidates = directedAgent ? [directedAgent] : synagents;
+  const explicitDesiredCategories = getExplicitDesiredCategories(intake);
 
-  return candidates
+  const ranked = candidates
     .map((agent) => {
       const scored = scoreAgent(agent, intake);
       const contactsAvailable: Array<"email" | "telegram"> = [];
@@ -315,10 +335,25 @@ export function buildMatches(intake: MatchRequestPayload, count = 3): MatchResul
         timezone: agent.timezoneIana,
         categoryFit: scored.categoryFit,
         contactsAvailable,
-      } satisfies MatchResult;
+        explicitCategoryFit: agent.serviceCategories.filter((category) => explicitDesiredCategories.includes(category)),
+      };
     })
-    .sort((a, b) => b.score - a.score)
-    .slice(0, directedAgent ? 1 : count);
+    .sort((a, b) => b.score - a.score);
+
+  const eligible = directedAgent
+    ? ranked.slice(0, 1)
+    : ranked
+        .filter((match) => match.score >= STRONG_MATCH_SCORE && match.explicitCategoryFit.length > 0)
+        .slice(0, count);
+
+  return {
+    matchedAgents: eligible.map(({ explicitCategoryFit: _explicitCategoryFit, ...match }) => match),
+    strongestScore: ranked[0]?.score ?? null,
+  };
+}
+
+export function buildMatches(intake: MatchRequestPayload, count = 3): MatchResult[] {
+  return buildMatchEvaluation(intake, count).matchedAgents;
 }
 
 export function buildNotifications(requestId: string, intake: MatchRequestPayload, matches: MatchResult[]): MatchNotification[] {
@@ -406,15 +441,21 @@ export function buildNotifications(requestId: string, intake: MatchRequestPayloa
 
 export function buildRequestRecord(intake: MatchRequestPayload): MatchRequestRecord {
   const requestId = `req_${new Date().toISOString().replace(/[-:.TZ]/g, "").slice(0, 14)}_${crypto.randomUUID().slice(0, 8)}`;
-  const matchedAgents = buildMatches(intake, 3);
+  const { matchedAgents, strongestScore } = buildMatchEvaluation(intake, 3);
   const notifications = buildNotifications(requestId, intake, matchedAgents);
   const dispatchConfig = getDispatchConfig();
   const nextActionAt = new Date(Date.now() + (dispatchConfig.mode === "queue-only" ? 2 : 1) * 60 * 60 * 1000).toISOString();
+  const needsManualReview = matchedAgents.length === 0;
 
   return {
     id: requestId,
     createdAt: new Date().toISOString(),
-    status: matchedAgents.length ? "matched" : "new",
+    status: matchedAgents.length ? "matched" : "needs-review",
+    review: {
+      needsManualReview,
+      fallbackReason: needsManualReview ? NO_STRONG_MATCH_FALLBACK_REASON : null,
+      strongestScore,
+    },
     intake,
     matchedAgents,
     notifications,

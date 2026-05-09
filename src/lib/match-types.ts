@@ -68,6 +68,14 @@ export type MatchRequestPayload = {
 
 export type MatchNotificationStatus = "queued" | "sent" | "failed" | "skipped";
 
+export type MatchRequestStatus = "new" | "matched" | "needs-review";
+
+export type MatchReviewMetadata = {
+  needsManualReview: boolean;
+  fallbackReason?: string | null;
+  strongestScore?: number | null;
+};
+
 export type MatchNotification = {
   id: string;
   requestId: string;
@@ -101,7 +109,8 @@ export type MatchResult = {
 export type MatchRequestRecord = {
   id: string;
   createdAt: string;
-  status: "new" | "matched";
+  status: MatchRequestStatus;
+  review: MatchReviewMetadata;
   intake: MatchRequestPayload;
   matchedAgents: MatchResult[];
   notifications: MatchNotification[];
@@ -110,3 +119,20 @@ export type MatchRequestRecord = {
 };
 
 export type NotificationDispatchMode = "queue-only" | "review" | "live";
+
+export type MatchApiResponse =
+  | {
+      success: true;
+      requestId: string;
+      status: MatchRequestStatus;
+      review: MatchReviewMetadata;
+      matchedAgents: MatchResult[];
+      notificationsQueued: number;
+      notificationMode: NotificationDispatchMode;
+      dispatchEndpoint: string;
+      nextActionAt: string;
+    }
+  | {
+      success: false;
+      error: string;
+    };
