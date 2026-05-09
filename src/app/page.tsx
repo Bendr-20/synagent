@@ -188,6 +188,7 @@ export default function HomePage() {
         </p>
 
         <form className="hero-intake-form" action="/match" method="get" style={{ width: "100%", maxWidth: "860px", marginBottom: "20px", display: "flex", flexDirection: "column", gap: "12px" }}>
+          <input type="hidden" name="category" value="mvp-build" />
           <textarea
             className="hero-intake-textarea"
             aria-label="Project brief"

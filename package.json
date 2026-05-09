@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test src/lib/review-auth.test.ts"
+    "test": "next build && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test src/lib/review-auth.test.ts src/lib/match-api.test.ts"
   },
   "keywords": [],
   "author": "",

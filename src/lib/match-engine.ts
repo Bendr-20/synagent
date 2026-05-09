@@ -206,13 +206,17 @@ export function normalizeMatchPayload(input: unknown): MatchRequestPayload {
   const priorities = body.priorities && typeof body.priorities === "object" ? (body.priorities as Record<string, unknown>) : {};
   const parsedContactNote = parseContactNote(clampText(contact.note ?? body.contactNote, 256) || null);
   const source = normalizeSource(body);
+  const category = clampEnum(body.category, ["mvp-build", "operator-support", "ai-consulting", "automation", "design", "growth", "research", "other"], "other");
+  const providedCategorySource = clampEnum(body.categorySource, ["default", "user", "handoff"], "") as MatchCategorySource | "";
+  const categorySource = providedCategorySource
+    || (Object.prototype.hasOwnProperty.call(body, "category") && category !== "other" ? "user" : "default");
 
   const normalized: MatchRequestPayload = {
     selectedAgent: clampText(body.selectedAgent, 128) || null,
     title: clampText(body.title, 160) || null,
     requester: clampText(body.requester, 160) || null,
-    category: clampEnum(body.category, ["mvp-build", "operator-support", "ai-consulting", "automation", "design", "growth", "research", "other"], "other"),
-    categorySource: clampEnum(body.categorySource, ["default", "user", "handoff"], "default") as MatchCategorySource,
+    category,
+    categorySource,
     budgetRange: clampEnum(body.budgetRange, ["under-1k", "1k-3k", "3k-10k", "10k-25k", "25k-plus", "unknown"], "unknown"),
     budgetNote: clampText(body.budgetNote ?? body.budget, 128) || null,
     urgency: clampEnum(body.urgency, ["asap", "this-week", "this-month", "flexible"], "flexible"),
