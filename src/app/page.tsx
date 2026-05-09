@@ -165,6 +165,7 @@ export default function HomePage() {
         }}
       >
         <div
+          className="hero-glow"
           style={{
             position: "absolute",
             top: "50%",
@@ -186,8 +187,9 @@ export default function HomePage() {
           {betaPositioning}
         </p>
 
-        <form action="/match" method="get" style={{ width: "100%", maxWidth: "860px", marginBottom: "20px", display: "flex", flexDirection: "column", gap: "12px" }}>
+        <form className="hero-intake-form" action="/match" method="get" style={{ width: "100%", maxWidth: "860px", marginBottom: "20px", display: "flex", flexDirection: "column", gap: "12px" }}>
           <textarea
+            className="hero-intake-textarea"
             aria-label="Project brief"
             name="brief"
             rows={2}

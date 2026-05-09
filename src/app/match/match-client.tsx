@@ -297,9 +297,9 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
   }
 
   return (
-    <SiteShell mainStyle={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "32px" }}>
-      <div style={{ width: "100%", maxWidth: "860px", ...glassCardStyle, borderRadius: "20px", display: "flex", flexDirection: "column", gap: "18px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
+    <SiteShell mainClassName="match-page-main" mainStyle={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "32px" }}>
+      <div className="match-card" style={{ width: "100%", maxWidth: "860px", ...glassCardStyle, borderRadius: "20px", display: "flex", flexDirection: "column", gap: "18px" }}>
+        <div className="match-card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
           <div>
             <div style={{ fontSize: "12px", color: theme.textMuted, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "8px" }}>Match Intake</div>
             <h1 style={{ fontSize: "28px", color: theme.textStrong, fontFamily: "Space Grotesk, sans-serif" }}>Make Your Match</h1>
@@ -307,7 +307,7 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
               (<Link href="/synagents" style={{ color: theme.accent, textDecoration: "none" }}>or Browse Synagents</Link>)
             </div>
           </div>
-          <Link href="/" style={{ padding: "10px 14px", borderRadius: "12px", border: "1px solid rgba(0,229,255,0.26)", background: "rgba(5,10,14,0.18)", color: theme.accent, fontSize: "12px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none" }}>
+          <Link className="match-back-link" href="/" style={{ padding: "10px 14px", borderRadius: "12px", border: "1px solid rgba(0,229,255,0.26)", background: "rgba(5,10,14,0.18)", color: theme.accent, fontSize: "12px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none" }}>
             Back
           </Link>
         </div>
@@ -337,7 +337,7 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
           Tell us what you need, how urgent it is, how you want to work, and how to reach you. This creates a real request record, keeps imported Helixa context intact, and prepares provider notifications for review or dispatch.
         </p>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+        <div className="match-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
           <Field label="Requester">
             <input value={prefs.requester} onChange={(e) => setPrefs((prev) => ({ ...prev, requester: e.target.value }))} placeholder="Your name or team" style={inputStyle} />
           </Field>
