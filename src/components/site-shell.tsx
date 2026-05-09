@@ -216,8 +216,8 @@ export function SiteShell({ children, mainClassName, mainStyle, showFooter = tru
             <Link href="#" style={{ fontSize: "14px", color: theme.textMuted, textDecoration: "none", letterSpacing: "0.05em" }}>
               DOCS
             </Link>
-            <button
-              type="button"
+            <Link
+              href="/match?category=mvp-build"
               className="site-connect-button"
               style={{
                 background: `linear-gradient(135deg, ${theme.accent}, ${theme.accentDark})`,
@@ -228,10 +228,11 @@ export function SiteShell({ children, mainClassName, mainStyle, showFooter = tru
                 border: "none",
                 cursor: "pointer",
                 fontSize: "13px",
+                textDecoration: "none",
               }}
             >
               CONNECT
-            </button>
+            </Link>
           </div>
 
           {mobileMenuOpen && (
@@ -284,8 +285,8 @@ export function SiteShell({ children, mainClassName, mainStyle, showFooter = tru
               >
                 DOCS
               </Link>
-              <button
-                type="button"
+              <Link
+                href="/match?category=mvp-build"
                 className="site-mobile-connect"
                 onClick={closeMobileMenu}
                 style={{
@@ -299,10 +300,11 @@ export function SiteShell({ children, mainClassName, mainStyle, showFooter = tru
                   fontSize: "13px",
                   letterSpacing: "0.08em",
                   textTransform: "uppercase",
+                  textDecoration: "none",
                 }}
               >
                 Connect
-              </button>
+              </Link>
             </div>
           )}
         </header>
