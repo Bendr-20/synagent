@@ -6,11 +6,9 @@ import { checkRateLimit } from "@/lib/rate-limit";
 import type { MatchApiResponse } from "@/lib/match-types";
 
 function getClientKey(req: Request) {
-  const forwardedFor = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
-  if (forwardedFor) return forwardedFor;
-
-  const realIp = req.headers.get("x-real-ip")?.trim();
-  return realIp || "unknown";
+  // Soft-launch limiter: the hosting edge is expected to set x-forwarded-for.
+  // Production should move this to an edge/shared limiter instead of this per-process Map.
+  return req.headers.get("x-forwarded-for") || "unknown";
 }
 
 export async function POST(req: Request) {

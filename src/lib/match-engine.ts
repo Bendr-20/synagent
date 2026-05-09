@@ -1,6 +1,7 @@
 import { synagents } from "@/app/synagents/data";
 import { getDispatchConfig } from "./notification-dispatch";
 import type {
+  MatchCategorySource,
   MatchNotification,
   MatchRequestPayload,
   MatchRequestRecord,
@@ -156,7 +157,8 @@ function inferDesiredCategories(intake: MatchRequestPayload) {
 
 function getExplicitDesiredCategories(intake: MatchRequestPayload) {
   const explicit = new Set<string>();
-  if (intake.category && intake.category !== "other") explicit.add(intake.category);
+  const categoryIsExplicit = intake.categorySource === "user" || intake.categorySource === "handoff";
+  if (categoryIsExplicit && intake.category && intake.category !== "other") explicit.add(intake.category);
 
   for (const skill of intake.source?.requiredSkills || []) {
     const normalized = skill.toLowerCase().trim();
@@ -169,7 +171,7 @@ function getExplicitDesiredCategories(intake: MatchRequestPayload) {
 }
 
 function getDirectedAgent(intake: MatchRequestPayload) {
-  const directedSlug = intake.selectedAgent || intake.source?.resolution?.providerSlug || null;
+  const directedSlug = intake.selectedAgent || null;
   return directedSlug ? synagents.find((agent) => agent.slug === directedSlug) || null : null;
 }
 
@@ -210,6 +212,7 @@ export function normalizeMatchPayload(input: unknown): MatchRequestPayload {
     title: clampText(body.title, 160) || null,
     requester: clampText(body.requester, 160) || null,
     category: clampEnum(body.category, ["mvp-build", "operator-support", "ai-consulting", "automation", "design", "growth", "research", "other"], "other"),
+    categorySource: clampEnum(body.categorySource, ["default", "user", "handoff"], "default") as MatchCategorySource,
     budgetRange: clampEnum(body.budgetRange, ["under-1k", "1k-3k", "3k-10k", "10k-25k", "25k-plus", "unknown"], "unknown"),
     budgetNote: clampText(body.budgetNote ?? body.budget, 128) || null,
     urgency: clampEnum(body.urgency, ["asap", "this-week", "this-month", "flexible"], "flexible"),

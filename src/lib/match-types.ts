@@ -37,11 +37,14 @@ export type MatchHandoffPrefill = {
   resolution?: MatchSourceResolution | null;
 };
 
+export type MatchCategorySource = "default" | "user" | "handoff";
+
 export type MatchRequestPayload = {
   selectedAgent?: string | null;
   title?: string | null;
   requester?: string | null;
   category: string;
+  categorySource?: MatchCategorySource;
   budgetRange: string;
   budgetNote?: string | null;
   urgency: string;

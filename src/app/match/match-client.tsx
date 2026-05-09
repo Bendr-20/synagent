@@ -5,7 +5,7 @@ import { useState, type CSSProperties, type ReactNode } from "react";
 import { SiteShell } from "@/components/site-shell";
 import { solidButtonStyle, glassCardStyle, theme } from "@/lib/theme";
 import type { Synagent } from "@/app/synagents/data";
-import type { MatchApiResponse, MatchHandoffPrefill, MatchRequestStatus, MatchResult, MatchReviewMetadata, NotificationDispatchMode } from "@/lib/match-types";
+import type { MatchApiResponse, MatchCategorySource, MatchHandoffPrefill, MatchRequestStatus, MatchResult, MatchReviewMetadata, NotificationDispatchMode } from "@/lib/match-types";
 
 const inputStyle: CSSProperties = {
   width: "100%",
@@ -47,6 +47,7 @@ type PrefState = {
   requester: string;
   title: string;
   category: string;
+  categorySource: MatchCategorySource;
   budgetRange: string;
   budgetNote: string;
   urgency: string;
@@ -75,13 +76,28 @@ function normalizeText(value?: string | null) {
   return (value || "").trim().toLowerCase();
 }
 
-function inferCategoryFromHandoff(selectedAgent: Synagent | undefined, handoff?: MatchHandoffPrefill | null) {
-  if (selectedAgent?.serviceCategories?.[0]) return selectedAgent.serviceCategories[0];
+const allowedCategories = ["mvp-build", "operator-support", "ai-consulting", "automation", "design", "growth", "research", "other"];
+
+function hasTrustedHandoffCategorySignal(handoff?: MatchHandoffPrefill | null) {
+  return Boolean(
+    handoff?.source
+    || handoff?.requestId
+    || handoff?.capability
+    || handoff?.principalType
+    || handoff?.requiredSkills?.length
+    || handoff?.candidate
+    || handoff?.resolution,
+  );
+}
+
+function resolveInitialCategory(selectedAgent: Synagent | undefined, handoff?: MatchHandoffPrefill | null): { category: string; categorySource: MatchCategorySource } {
+  if (selectedAgent?.serviceCategories?.[0]) {
+    return { category: selectedAgent.serviceCategories[0], categorySource: "handoff" };
+  }
 
   const explicit = normalizeText(handoff?.category);
-  const allowed = ["mvp-build", "operator-support", "ai-consulting", "automation", "design", "growth", "research", "other"];
-  if (explicit.includes("mvp-build")) return "mvp-build";
-  if (allowed.includes(explicit)) return explicit;
+  if (explicit.includes("mvp-build")) return { category: "mvp-build", categorySource: "handoff" };
+  if (allowedCategories.includes(explicit)) return { category: explicit, categorySource: "handoff" };
 
   const haystack = normalizeText([
     handoff?.category,
@@ -90,12 +106,13 @@ function inferCategoryFromHandoff(selectedAgent: Synagent | undefined, handoff?:
     handoff?.brief,
     ...(handoff?.requiredSkills || []),
   ].filter(Boolean).join(" "));
+  const inferredSource: MatchCategorySource = hasTrustedHandoffCategorySignal(handoff) ? "handoff" : "default";
 
   for (const [category, keywords] of Object.entries(categoryKeywordMap)) {
-    if (keywords.some((keyword) => haystack.includes(keyword))) return category;
+    if (keywords.some((keyword) => haystack.includes(keyword))) return { category, categorySource: inferredSource };
   }
 
-  return "mvp-build";
+  return { category: "mvp-build", categorySource: "default" };
 }
 
 function mapBudgetRange(value?: string | null) {
@@ -140,6 +157,7 @@ function parseImportedContact(value?: string | null) {
 
 function buildInitialPrefs(selectedAgent: Synagent | undefined, handoff?: MatchHandoffPrefill | null): PrefState {
   const importedContact = parseImportedContact(handoff?.contact);
+  const initialCategory = resolveInitialCategory(selectedAgent, handoff);
 
   return {
     cost: 5,
@@ -148,7 +166,8 @@ function buildInitialPrefs(selectedAgent: Synagent | undefined, handoff?: MatchH
     credibility: 7,
     requester: handoff?.requester || "",
     title: handoff?.title || "",
-    category: inferCategoryFromHandoff(selectedAgent, handoff),
+    category: initialCategory.category,
+    categorySource: initialCategory.categorySource,
     budgetRange: mapBudgetRange(handoff?.budget),
     budgetNote: handoff?.budget || "",
     urgency: mapUrgency(handoff?.urgency),
@@ -203,6 +222,7 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
     requester: prefs.requester || null,
     title: prefs.title || null,
     category: prefs.category,
+    categorySource: prefs.categorySource,
     budgetRange: prefs.budgetRange,
     budgetNote: prefs.budgetNote || null,
     urgency: prefs.urgency,
@@ -235,12 +255,19 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
     },
   };
 
-  async function handleSubmit() {
-    setIsSubmitting(true);
+  function clearResponseState() {
     setError(null);
+    setRequestId(null);
+    setNotificationsQueued(0);
+    setNotificationMode("queue-only");
     setRequestStatus(null);
     setReview(null);
     setMatches([]);
+  }
+
+  async function handleSubmit() {
+    setIsSubmitting(true);
+    clearResponseState();
 
     try {
       const res = await fetch("/api/match", {
@@ -262,6 +289,7 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
       setReview(data.review || null);
       setMatches(Array.isArray(data.matchedAgents) ? data.matchedAgents : []);
     } catch (err) {
+      clearResponseState();
       setError(err instanceof Error ? err.message : "Submission failed");
     } finally {
       setIsSubmitting(false);
@@ -317,7 +345,7 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
             <input value={prefs.title} onChange={(e) => setPrefs((prev) => ({ ...prev, title: e.target.value }))} placeholder="AI intake MVP, launch strategy, operator support..." style={inputStyle} />
           </Field>
           <Field label="Category">
-            <select value={prefs.category} onChange={(e) => setPrefs((prev) => ({ ...prev, category: e.target.value }))} style={inputStyle}>
+            <select value={prefs.category} onChange={(e) => setPrefs((prev) => ({ ...prev, category: e.target.value, categorySource: "user" }))} style={inputStyle}>
               <option value="mvp-build">MVP Build</option>
               <option value="operator-support">Operator Support</option>
               <option value="ai-consulting">AI Consulting</option>
