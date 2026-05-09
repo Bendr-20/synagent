@@ -14,7 +14,7 @@ type ServiceCard = {
   buttonHref?: string;
 };
 
-const betaPositioning = "Synagent is a curated beta for MVP builds, AI workflow fixes, and human-agent delivery teams powered by Helixa identity and Cred.";
+const betaPositioning = "Synagent is a curated platform for MVP builds, AI workflow fixes, and human-agent delivery teams powered by Helixa and Cred.";
 
 const serviceCards: ServiceCard[] = [
   {
