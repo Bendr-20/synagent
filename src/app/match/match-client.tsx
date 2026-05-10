@@ -462,33 +462,39 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
             <div style={{ ...labelStyle, marginBottom: "10px" }}>Request Created</div>
             <div style={{ color: theme.textStrong, marginBottom: "8px" }}>Request ID: {requestId}</div>
             <div>
-              {notificationsQueued} provider notifications {notificationMode === "queue-only" ? "queued" : notificationMode === "review" ? "queued for review" : "ready for live dispatch"}.
+              {requestStatus === "needs-review"
+                ? "No provider intro was sent automatically. This request is queued for a human fit review."
+                : `${notificationsQueued} provider notifications ${notificationMode === "queue-only" ? "queued" : notificationMode === "review" ? "queued for review" : "ready for live dispatch"}.`}
             </div>
           </div>
         )}
 
         {requestId && (requestStatus === "needs-review" || matches.length === 0) && (
           <div style={{ padding: "14px 16px", borderRadius: "14px", border: "1px solid rgba(255,209,102,0.35)", background: "rgba(80,54,8,0.18)", color: theme.textMuted, lineHeight: 1.7 }}>
-            <div style={{ ...labelStyle, marginBottom: "10px" }}>Manual Review Needed</div>
+            <div style={{ ...labelStyle, marginBottom: "10px" }}>Manual Fit Review</div>
             <div style={{ color: theme.textStrong, marginBottom: "8px" }}>
-              We received the request, but no curated beta provider met the automatic match threshold. A reviewer should handle this manually instead of pushing it to the wrong operator.
+              We received the request, but the matcher did not find a high-confidence provider fit. We will review it manually instead of forcing a weak intro.
             </div>
             {review?.fallbackReason && <div>Reason: {review.fallbackReason}</div>}
             {typeof review?.strongestScore === "number" && <div>Strongest automatic score: {review.strongestScore}</div>}
+            {typeof review?.recommendationThreshold === "number" && <div>Recommendation threshold: {review.recommendationThreshold}</div>}
           </div>
         )}
 
         {requestId && requestStatus !== "needs-review" && matches.length > 0 && (
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            <div style={labelStyle}>Top Matches</div>
+            <div style={labelStyle}>Recommended Match</div>
             {matches.map((match) => (
               <div key={match.slug} style={{ padding: "14px 16px", borderRadius: "14px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.24)", color: theme.textMuted, lineHeight: 1.7 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", alignItems: "center", marginBottom: "8px" }}>
                   <div style={{ color: theme.textStrong, fontWeight: 600 }}>{match.name}</div>
-                  <div style={{ color: theme.accent, fontFamily: "JetBrains Mono, monospace" }}>Score {match.score}</div>
+                  <div style={{ color: theme.accent, fontFamily: "JetBrains Mono, monospace" }}>{match.confidence === "high" ? "High Confidence" : "Review"} • Score {match.score}</div>
                 </div>
                 <div style={{ fontSize: "13px", marginBottom: "8px" }}>Timezone {match.timezone} • Payment {match.payment}</div>
                 <div style={{ color: theme.textStrong, marginBottom: "8px" }}>{match.summaryReason}</div>
+                <div style={{ fontSize: "13px", marginBottom: "8px" }}>
+                  This recommendation is shown only because the provider cleared Synagent's high-confidence threshold. Lower-confidence requests stay in manual review.
+                </div>
                 <ul style={{ margin: 0, paddingLeft: "18px" }}>
                   {match.reasons.map((reason) => (
                     <li key={reason}>{reason}</li>

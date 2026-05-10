@@ -6,6 +6,7 @@ import type {
   MatchRequestPayload,
   MatchRequestRecord,
   MatchRequestSource,
+  MatchCandidateEvaluation,
   MatchResult,
   MatchSourceCandidate,
   MatchSourceResolution,
@@ -24,7 +25,8 @@ const CATEGORY_KEYWORDS: Record<string, string[]> = {
 };
 
 const STRONG_MATCH_SCORE = 55;
-const NO_STRONG_MATCH_FALLBACK_REASON = "No strong curated-provider match met the launch threshold.";
+const HIGH_RECOMMENDATION_SCORE = 80;
+const NO_STRONG_MATCH_FALLBACK_REASON = "No high-confidence curated-provider match met the recommendation threshold.";
 
 function clampText(value: unknown, max = 512) {
   return typeof value === "string" ? value.trim().slice(0, max) : "";
@@ -321,7 +323,7 @@ function scoreAgent(agent: (typeof synagents)[number], intake: MatchRequestPaylo
   };
 }
 
-function buildMatchEvaluation(intake: MatchRequestPayload, count = 3): { matchedAgents: MatchResult[]; strongestScore: number | null } {
+function buildMatchEvaluation(intake: MatchRequestPayload, count = 1): { matchedAgents: MatchResult[]; strongestScore: number | null; rankedCandidates: MatchCandidateEvaluation[] } {
   const directedAgent = getDirectedAgent(intake);
   const candidates = directedAgent ? [directedAgent] : synagents;
   const explicitDesiredCategories = getExplicitDesiredCategories(intake);
@@ -332,30 +334,43 @@ function buildMatchEvaluation(intake: MatchRequestPayload, count = 3): { matched
       const contactsAvailable: Array<"email" | "telegram"> = [];
       if (agent.contacts.email || agent.contacts.agentmailInbox) contactsAvailable.push("email");
       if (agent.contacts.telegramChatId) contactsAvailable.push("telegram");
+      const explicitCategoryFit = agent.serviceCategories.filter((category) => explicitDesiredCategories.includes(category));
+      const eligibleForRecommendation = scored.score >= HIGH_RECOMMENDATION_SCORE && explicitCategoryFit.length > 0;
+      const confidence = eligibleForRecommendation ? "high" as const : "review" as const;
       return {
         slug: agent.slug,
         name: agent.name,
         score: scored.score,
+        confidence,
         summaryReason: buildSummaryReason(agent, scored.categoryFit, scored.reasons, intake),
         reasons: scored.reasons,
         payment: agent.payment,
         timezone: agent.timezoneIana,
         categoryFit: scored.categoryFit,
         contactsAvailable,
-        explicitCategoryFit: agent.serviceCategories.filter((category) => explicitDesiredCategories.includes(category)),
+        explicitCategoryFit,
+        eligibleForRecommendation,
       };
     })
     .sort((a, b) => b.score - a.score);
 
-  const eligible = directedAgent
-    ? ranked.slice(0, 1)
-    : ranked
-        .filter((match) => match.score >= STRONG_MATCH_SCORE && match.explicitCategoryFit.length > 0)
-        .slice(0, count);
+  const eligible = ranked
+    .filter((match) => match.eligibleForRecommendation)
+    .slice(0, count);
 
   return {
-    matchedAgents: eligible.map(({ explicitCategoryFit: _explicitCategoryFit, ...match }) => match),
+    matchedAgents: eligible.map(({ explicitCategoryFit: _explicitCategoryFit, eligibleForRecommendation: _eligibleForRecommendation, ...match }) => match),
     strongestScore: ranked[0]?.score ?? null,
+    rankedCandidates: ranked.map((match) => ({
+      slug: match.slug,
+      name: match.name,
+      score: match.score,
+      confidence: match.confidence,
+      categoryFit: match.categoryFit,
+      explicitCategoryFit: match.explicitCategoryFit,
+      reasons: match.reasons,
+      eligibleForRecommendation: match.eligibleForRecommendation,
+    })),
   };
 }
 
@@ -448,11 +463,12 @@ export function buildNotifications(requestId: string, intake: MatchRequestPayloa
 
 export function buildRequestRecord(intake: MatchRequestPayload): MatchRequestRecord {
   const requestId = `req_${new Date().toISOString().replace(/[-:.TZ]/g, "").slice(0, 14)}_${crypto.randomUUID().slice(0, 8)}`;
-  const { matchedAgents, strongestScore } = buildMatchEvaluation(intake, 3);
+  const { matchedAgents, strongestScore, rankedCandidates } = buildMatchEvaluation(intake, 1);
   const notifications = buildNotifications(requestId, intake, matchedAgents);
   const dispatchConfig = getDispatchConfig();
   const nextActionAt = new Date(Date.now() + (dispatchConfig.mode === "queue-only" ? 2 : 1) * 60 * 60 * 1000).toISOString();
   const needsManualReview = matchedAgents.length === 0;
+  const recommendedMatchSlug = matchedAgents[0]?.slug || null;
 
   return {
     id: requestId,
@@ -460,12 +476,19 @@ export function buildRequestRecord(intake: MatchRequestPayload): MatchRequestRec
     status: matchedAgents.length ? "matched" : "needs-review",
     review: {
       needsManualReview,
+      confidence: needsManualReview ? "review" : "high",
+      publicDecision: needsManualReview ? "manual-review" : "recommended-match",
+      recommendedMatchSlug,
       fallbackReason: needsManualReview ? NO_STRONG_MATCH_FALLBACK_REASON : null,
       strongestScore,
+      recommendationThreshold: HIGH_RECOMMENDATION_SCORE,
     },
     intake,
     matchedAgents,
     notifications,
+    matchEvaluation: {
+      rankedCandidates,
+    },
     internalOwner: "bendr",
     nextActionAt,
   };

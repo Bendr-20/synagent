@@ -73,10 +73,29 @@ export type MatchNotificationStatus = "queued" | "sent" | "failed" | "skipped";
 
 export type MatchRequestStatus = "new" | "matched" | "needs-review";
 
+export type MatchConfidence = "high" | "review";
+
+export type MatchPublicDecision = "recommended-match" | "manual-review";
+
 export type MatchReviewMetadata = {
   needsManualReview: boolean;
+  confidence: MatchConfidence;
+  publicDecision: MatchPublicDecision;
+  recommendedMatchSlug?: string | null;
   fallbackReason?: string | null;
   strongestScore?: number | null;
+  recommendationThreshold?: number | null;
+};
+
+export type MatchCandidateEvaluation = {
+  slug: string;
+  name: string;
+  score: number;
+  confidence: MatchConfidence;
+  categoryFit: string[];
+  explicitCategoryFit: string[];
+  reasons: string[];
+  eligibleForRecommendation: boolean;
 };
 
 export type MatchNotification = {
@@ -101,6 +120,7 @@ export type MatchResult = {
   slug: string;
   name: string;
   score: number;
+  confidence: MatchConfidence;
   summaryReason: string;
   reasons: string[];
   payment: string;
@@ -117,6 +137,9 @@ export type MatchRequestRecord = {
   intake: MatchRequestPayload;
   matchedAgents: MatchResult[];
   notifications: MatchNotification[];
+  matchEvaluation: {
+    rankedCandidates: MatchCandidateEvaluation[];
+  };
   internalOwner: string;
   nextActionAt: string;
 };

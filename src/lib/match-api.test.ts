@@ -127,6 +127,17 @@ test("match API treats an API-provided MVP category as explicit user intent", { 
     assert.equal(explicitMvp.status, 201);
     assert.equal(explicitMvp.body.status, "matched");
     assert.equal((explicitMvp.body.matchedAgents as unknown[]).length, 1);
+    assert.equal((explicitMvp.body.review as Record<string, unknown>).confidence, "high");
+    assert.equal((explicitMvp.body.review as Record<string, unknown>).publicDecision, "recommended-match");
+    assert.equal((explicitMvp.body.review as Record<string, unknown>).recommendedMatchSlug, "degeneer");
+    assert.equal((explicitMvp.body.matchedAgents as Array<Record<string, unknown>>)[0].confidence, "high");
+
+    const storedRequests = JSON.parse(fs.readFileSync(path.join(process.cwd(), "data", "match-requests.json"), "utf8")) as Array<Record<string, any>>;
+    const storedMvpRequest = storedRequests.find((request) => request?.intake?.contact?.email === "synagent-api-mvp@example.com");
+    assert.ok(storedMvpRequest, "expected MVP request to be stored for internal review");
+    assert.equal(storedMvpRequest.review.confidence, "high");
+    assert.equal(storedMvpRequest.matchEvaluation?.rankedCandidates?.[0]?.slug, "degeneer");
+    assert.equal(storedMvpRequest.matchEvaluation?.rankedCandidates?.[0]?.eligibleForRecommendation, true);
 
     const defaultCategory = await postMatch(port, {
       title: "Need tax accounting for a restaurant",
@@ -145,6 +156,8 @@ test("match API treats an API-provided MVP category as explicit user intent", { 
 
     assert.equal(defaultCategory.status, 201);
     assert.equal(defaultCategory.body.status, "needs-review");
+    assert.equal((defaultCategory.body.review as Record<string, unknown>).confidence, "review");
+    assert.equal((defaultCategory.body.review as Record<string, unknown>).publicDecision, "manual-review");
     assert.equal((defaultCategory.body.matchedAgents as unknown[]).length, 0);
 
     const urgentUnrelated = await postMatch(port, {
@@ -163,6 +176,8 @@ test("match API treats an API-provided MVP category as explicit user intent", { 
 
     assert.equal(urgentUnrelated.status, 201);
     assert.equal(urgentUnrelated.body.status, "needs-review");
+    assert.equal((urgentUnrelated.body.review as Record<string, unknown>).confidence, "review");
+    assert.equal((urgentUnrelated.body.review as Record<string, unknown>).publicDecision, "manual-review");
     assert.equal((urgentUnrelated.body.matchedAgents as unknown[]).length, 0);
   } catch (error) {
     throw new Error(`${error instanceof Error ? error.message : String(error)}\nServer logs:\n${logs}`);
