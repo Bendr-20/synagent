@@ -444,12 +444,12 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
         {renderSlider("quality", "Quality")}
         {renderSlider("credibility", "Credibility")}
 
-        <div style={{ padding: "14px 16px", borderRadius: "14px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.24)", color: theme.textMuted, lineHeight: 1.7 }}>
-          <div style={{ ...labelStyle, marginBottom: "10px" }}>Structured Intake Preview</div>
-          <pre style={{ margin: 0, whiteSpace: "pre-wrap", overflowWrap: "anywhere", color: theme.textStrong, fontSize: "12px", lineHeight: 1.7, fontFamily: "JetBrains Mono, monospace" }}>
+        <details className="structured-intake-preview" style={{ padding: "12px 14px", borderRadius: "14px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.18)", color: theme.textMuted, lineHeight: 1.7 }}>
+          <summary style={{ ...labelStyle, marginBottom: 0, cursor: "pointer", listStyle: "none" }}>Advanced intake preview</summary>
+          <pre style={{ margin: "12px 0 0", whiteSpace: "pre-wrap", overflowWrap: "anywhere", color: theme.textStrong, fontSize: "12px", lineHeight: 1.7, fontFamily: "JetBrains Mono, monospace" }}>
             {JSON.stringify(intakePayload, null, 2)}
           </pre>
-        </div>
+        </details>
 
         {error && (
           <div style={{ padding: "14px 16px", borderRadius: "14px", border: "1px solid rgba(255,120,120,0.35)", background: "rgba(60,10,10,0.18)", color: "#ffb3b3", lineHeight: 1.7 }}>
@@ -485,8 +485,8 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             <div style={labelStyle}>Recommended Match</div>
             {matches.map((match) => (
-              <div key={match.slug} style={{ padding: "14px 16px", borderRadius: "14px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.24)", color: theme.textMuted, lineHeight: 1.7 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", alignItems: "center", marginBottom: "8px" }}>
+              <div className="match-result-card" key={match.slug} style={{ padding: "14px 16px", borderRadius: "14px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.24)", color: theme.textMuted, lineHeight: 1.7 }}>
+                <div className="match-result-head" style={{ display: "flex", justifyContent: "space-between", gap: "12px", alignItems: "center", marginBottom: "8px" }}>
                   <div style={{ color: theme.textStrong, fontWeight: 600 }}>{match.name}</div>
                   <div style={{ color: theme.accent, fontFamily: "JetBrains Mono, monospace" }}>{match.confidence === "high" ? "High Confidence" : "Review"} • Score {match.score}</div>
                 </div>
@@ -505,7 +505,7 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
           </div>
         )}
 
-        <button style={{ ...solidButtonStyle, opacity: isSubmitting ? 0.7 : 1, cursor: isSubmitting ? "progress" : "pointer" }} onClick={handleSubmit} disabled={isSubmitting}>
+        <button className="match-submit-button" style={{ ...solidButtonStyle, opacity: isSubmitting ? 0.7 : 1, cursor: isSubmitting ? "progress" : "pointer" }} onClick={handleSubmit} disabled={isSubmitting}>
           {isSubmitting ? "Submitting..." : "Find Your Matches"}
         </button>
       </div>

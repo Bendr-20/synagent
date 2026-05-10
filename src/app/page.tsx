@@ -72,6 +72,7 @@ const howItWorksSteps = [
 function ProcessCallout({ label, items }: { label: string; items: string[] }) {
   return (
     <div
+      className="process-callout"
       style={{
         marginTop: "22px",
         padding: "18px",
@@ -139,7 +140,7 @@ function MvpFlow() {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px", marginTop: "20px" }}>
+    <div className="mvp-flow" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px", marginTop: "20px" }}>
       <div style={{ ...boxStyle, padding: "12px 14px", color: theme.textStrong, fontSize: "12px", letterSpacing: "0.08em" }}>Your Brief</div>
       <div style={{ color: theme.textMuted, fontSize: "18px", fontFamily: "JetBrains Mono, monospace", lineHeight: 1 }}>↓</div>
       <div style={{ ...boxStyle, color: theme.accent, fontSize: "11px", letterSpacing: "0.06em" }}>Fit Review &gt; Trusted Routing</div>
