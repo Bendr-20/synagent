@@ -8,6 +8,7 @@ import type {
   MatchRequestSource,
   MatchCandidateEvaluation,
   MatchResult,
+  MatchScoreComponent,
   MatchSourceCandidate,
   MatchSourceResolution,
 } from "./match-types";
@@ -24,9 +25,23 @@ const CATEGORY_KEYWORDS: Record<string, string[]> = {
   research: ["research", "analysis", "intel", "discovery", "thesis", "investigation"],
 };
 
-const STRONG_MATCH_SCORE = 55;
 const HIGH_RECOMMENDATION_SCORE = 80;
 const NO_STRONG_MATCH_FALLBACK_REASON = "No high-confidence curated-provider match met the recommendation threshold.";
+
+const CATEGORY_LABELS: Record<string, string> = {
+  "mvp-build": "MVP build",
+  "operator-support": "operator support",
+  "ai-consulting": "AI consulting",
+  automation: "automation",
+  design: "design",
+  growth: "growth",
+  research: "research",
+  other: "other",
+};
+
+function formatCategories(categories: string[]) {
+  return categories.map((category) => CATEGORY_LABELS[category] || category).join(", ");
+}
 
 function clampText(value: unknown, max = 512) {
   return typeof value === "string" ? value.trim().slice(0, max) : "";
@@ -254,72 +269,88 @@ export function normalizeMatchPayload(input: unknown): MatchRequestPayload {
 }
 
 function scoreAgent(agent: (typeof synagents)[number], intake: MatchRequestPayload) {
-  let score = Math.round(agent.cred * 0.4);
+  let score = 0;
   const reasons: string[] = [];
+  const scoreComponents: MatchScoreComponent[] = [];
   const desiredCategories = inferDesiredCategories(intake);
 
+  const addScore = (label: string, points: number, reason: string, publicReason?: string) => {
+    if (points <= 0) return;
+    score += points;
+    scoreComponents.push({ label, points, reason });
+    if (publicReason) reasons.push(publicReason);
+  };
+
+  addScore("Cred score", Math.round(agent.cred * 0.4), `Cred ${agent.cred}/100 baseline`);
+
   if (intake.selectedAgent && intake.selectedAgent === agent.slug) {
-    score += 45;
-    reasons.push("explicitly selected by requester");
+    addScore("Requester selection", 45, "Requester explicitly selected this provider", "explicitly selected by requester");
   }
 
   const categoryFit = agent.serviceCategories.filter((category) => desiredCategories.includes(category));
   if (categoryFit.length) {
-    score += 25 + Math.max(0, categoryFit.length - 1) * 4;
-    reasons.push(`strong category fit: ${categoryFit.join(", ")}`);
+    addScore(
+      "Category fit",
+      25 + Math.max(0, categoryFit.length - 1) * 4,
+      `Provider categories overlap request categories: ${formatCategories(categoryFit)}`,
+      `matches ${formatCategories(categoryFit)} work`,
+    );
   }
 
   const normalizedPaymentPreference = intake.paymentPreference === "cred" || intake.paymentPreference === "usdc"
     ? intake.paymentPreference
     : null;
   if (intake.paymentPreference === "open") {
-    score += 5;
+    addScore("Payment flexibility", 5, "Requester is open on payment method");
   } else if (normalizedPaymentPreference && agent.acceptedPayments.includes(normalizedPaymentPreference)) {
-    score += 10;
-    reasons.push(`accepts ${normalizedPaymentPreference.toUpperCase()}`);
+    addScore(
+      "Payment fit",
+      10,
+      `Provider accepts requested ${normalizedPaymentPreference.toUpperCase()} payment`,
+      `accepts ${normalizedPaymentPreference.toUpperCase()}`,
+    );
   }
 
   if (intake.communicationPreference === "either") {
-    score += 4;
+    addScore("Communication flexibility", 4, "Requester is flexible on communication channel");
   } else if (agent.preferredCommunicationChannels.includes(intake.communicationPreference as "email" | "telegram")) {
-    score += 8;
-    reasons.push(`supports ${intake.communicationPreference}`);
+    addScore(
+      "Communication fit",
+      8,
+      `Provider supports requested ${intake.communicationPreference} communication`,
+      `supports ${intake.communicationPreference}`,
+    );
   }
 
   if (intake.deliveryType === "unsure" || intake.deliveryType === "hybrid") {
-    score += 5;
+    addScore("Delivery flexibility", 5, "Hybrid or unsure delivery is compatible with curated routing");
   } else if (intake.deliveryType === "human-only" && agent.operatorModel !== "agent-only") {
-    score += 6;
-    reasons.push("human delivery compatible");
+    addScore("Delivery fit", 6, "Provider can support human-led delivery", "human delivery compatible");
   } else if (intake.deliveryType === "agent-only" && agent.operatorModel !== "human-only") {
-    score += 6;
-    reasons.push("agent delivery compatible");
+    addScore("Delivery fit", 6, "Provider can support agent-led delivery", "agent delivery compatible");
   }
 
   if (intake.timezone && intake.timezone === agent.timezoneIana) {
-    score += 8;
-    reasons.push("exact timezone match");
+    addScore("Timezone fit", 8, "Requester timezone exactly matches provider timezone", "exact timezone match");
   }
 
   if (agent.capacityStatus === "available-now") {
-    score += 10;
-    reasons.push("available now");
+    addScore("Capacity", 10, "Provider is available now", "available now");
   } else if (agent.capacityStatus === "available-soon") {
-    score += 6;
-    reasons.push("available soon");
+    addScore("Capacity", 6, "Provider is available soon", "available soon");
   } else if (agent.capacityStatus === "limited") {
-    score += 2;
+    addScore("Capacity", 2, "Provider has limited capacity");
   }
 
   if (intake.urgency === "asap" && agent.capacityStatus === "available-now") {
-    score += 8;
-    reasons.push("fits urgent timeline");
+    addScore("Urgency fit", 8, "ASAP request fits provider's immediate availability", "fits urgent timeline");
   }
 
   return {
     score,
     reasons,
     categoryFit,
+    scoreComponents,
   };
 }
 
@@ -344,6 +375,7 @@ function buildMatchEvaluation(intake: MatchRequestPayload, count = 1): { matched
         confidence,
         summaryReason: buildSummaryReason(agent, scored.categoryFit, scored.reasons, intake),
         reasons: scored.reasons,
+        scoreComponents: scored.scoreComponents,
         payment: agent.payment,
         timezone: agent.timezoneIana,
         categoryFit: scored.categoryFit,
@@ -359,7 +391,7 @@ function buildMatchEvaluation(intake: MatchRequestPayload, count = 1): { matched
     .slice(0, count);
 
   return {
-    matchedAgents: eligible.map(({ explicitCategoryFit: _explicitCategoryFit, eligibleForRecommendation: _eligibleForRecommendation, ...match }) => match),
+    matchedAgents: eligible.map(({ explicitCategoryFit: _explicitCategoryFit, eligibleForRecommendation: _eligibleForRecommendation, scoreComponents: _scoreComponents, ...match }) => match),
     strongestScore: ranked[0]?.score ?? null,
     rankedCandidates: ranked.map((match) => ({
       slug: match.slug,
@@ -369,6 +401,7 @@ function buildMatchEvaluation(intake: MatchRequestPayload, count = 1): { matched
       categoryFit: match.categoryFit,
       explicitCategoryFit: match.explicitCategoryFit,
       reasons: match.reasons,
+      scoreComponents: match.scoreComponents,
       eligibleForRecommendation: match.eligibleForRecommendation,
     })),
   };

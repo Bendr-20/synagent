@@ -87,6 +87,12 @@ export type MatchReviewMetadata = {
   recommendationThreshold?: number | null;
 };
 
+export type MatchScoreComponent = {
+  label: string;
+  points: number;
+  reason: string;
+};
+
 export type MatchCandidateEvaluation = {
   slug: string;
   name: string;
@@ -95,6 +101,7 @@ export type MatchCandidateEvaluation = {
   categoryFit: string[];
   explicitCategoryFit: string[];
   reasons: string[];
+  scoreComponents: MatchScoreComponent[];
   eligibleForRecommendation: boolean;
 };
 

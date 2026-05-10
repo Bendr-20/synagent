@@ -9,6 +9,7 @@ const TEST_CONTACTS = new Set([
   "synagent-api-mvp@example.com",
   "synagent-api-default@example.com",
   "synagent-api-urgent@example.com",
+  "synagent-api-explicit-low@example.com",
 ]);
 
 function getFreePort() {
@@ -138,6 +139,7 @@ test("match API treats an API-provided MVP category as explicit user intent", { 
     assert.equal(storedMvpRequest.review.confidence, "high");
     assert.equal(storedMvpRequest.matchEvaluation?.rankedCandidates?.[0]?.slug, "degeneer");
     assert.equal(storedMvpRequest.matchEvaluation?.rankedCandidates?.[0]?.eligibleForRecommendation, true);
+    assert.ok(storedMvpRequest.matchEvaluation?.rankedCandidates?.[0]?.scoreComponents?.some((component: Record<string, unknown>) => component.label === "Cred score"));
 
     const defaultCategory = await postMatch(port, {
       title: "Need tax accounting for a restaurant",
@@ -179,6 +181,34 @@ test("match API treats an API-provided MVP category as explicit user intent", { 
     assert.equal((urgentUnrelated.body.review as Record<string, unknown>).confidence, "review");
     assert.equal((urgentUnrelated.body.review as Record<string, unknown>).publicDecision, "manual-review");
     assert.equal((urgentUnrelated.body.matchedAgents as unknown[]).length, 0);
+
+    const explicitButBelowThreshold = await postMatch(port, {
+      title: "Need MVP build but prefer Telegram and USD",
+      category: "mvp-build",
+      categorySource: "user",
+      budgetRange: "under-1k",
+      urgency: "flexible",
+      deliveryType: "human-only",
+      communicationPreference: "telegram",
+      confidentiality: "private",
+      paymentPreference: "usd",
+      brief: "Need a small MVP build request, but the fit should stay below high confidence.",
+      contact: { email: "synagent-api-explicit-low@example.com" },
+      priorities: { cost: 9, time: 2, quality: 4, credibility: 4 },
+    }, "203.0.113.104");
+
+    assert.equal(explicitButBelowThreshold.status, 201);
+    assert.equal(explicitButBelowThreshold.body.status, "needs-review");
+    assert.equal((explicitButBelowThreshold.body.review as Record<string, unknown>).confidence, "review");
+    assert.equal((explicitButBelowThreshold.body.review as Record<string, unknown>).publicDecision, "manual-review");
+    assert.equal((explicitButBelowThreshold.body.matchedAgents as unknown[]).length, 0);
+
+    const storedRequestsAfterLowFit = JSON.parse(fs.readFileSync(path.join(process.cwd(), "data", "match-requests.json"), "utf8")) as Array<Record<string, any>>;
+    const storedLowFitRequest = storedRequestsAfterLowFit.find((request) => request?.intake?.contact?.email === "synagent-api-explicit-low@example.com");
+    assert.ok(storedLowFitRequest, "expected explicit low-fit request to be stored");
+    assert.equal(storedLowFitRequest.matchEvaluation?.rankedCandidates?.[0]?.eligibleForRecommendation, false);
+    assert.ok(storedLowFitRequest.matchEvaluation?.rankedCandidates?.[0]?.scoreComponents?.length >= 3);
+    assert.equal(typeof storedLowFitRequest.matchEvaluation?.rankedCandidates?.[0]?.scoreComponents?.[0]?.points, "number");
   } catch (error) {
     throw new Error(`${error instanceof Error ? error.message : String(error)}\nServer logs:\n${logs}`);
   } finally {
