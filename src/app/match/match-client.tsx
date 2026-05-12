@@ -5,7 +5,7 @@ import { useState, type CSSProperties, type ReactNode } from "react";
 import { SiteShell } from "@/components/site-shell";
 import { solidButtonStyle, glassCardStyle, theme } from "@/lib/theme";
 import type { Synagent } from "@/app/synagents/data";
-import type { MatchHandoffPrefill, MatchResult, NotificationDispatchMode } from "@/lib/match-types";
+import type { MatchApiResponse, MatchCategorySource, MatchHandoffPrefill, MatchRequestStatus, MatchResult, MatchReviewMetadata, NotificationDispatchMode } from "@/lib/match-types";
 
 const inputStyle: CSSProperties = {
   width: "100%",
@@ -47,6 +47,7 @@ type PrefState = {
   requester: string;
   title: string;
   category: string;
+  categorySource: MatchCategorySource;
   budgetRange: string;
   budgetNote: string;
   urgency: string;
@@ -75,12 +76,28 @@ function normalizeText(value?: string | null) {
   return (value || "").trim().toLowerCase();
 }
 
-function inferCategoryFromHandoff(selectedAgent: Synagent | undefined, handoff?: MatchHandoffPrefill | null) {
-  if (selectedAgent?.serviceCategories?.[0]) return selectedAgent.serviceCategories[0];
+const allowedCategories = ["mvp-build", "operator-support", "ai-consulting", "automation", "design", "growth", "research", "other"];
+
+function hasTrustedHandoffCategorySignal(handoff?: MatchHandoffPrefill | null) {
+  return Boolean(
+    handoff?.source
+    || handoff?.requestId
+    || handoff?.capability
+    || handoff?.principalType
+    || handoff?.requiredSkills?.length
+    || handoff?.candidate
+    || handoff?.resolution,
+  );
+}
+
+function resolveInitialCategory(selectedAgent: Synagent | undefined, handoff?: MatchHandoffPrefill | null): { category: string; categorySource: MatchCategorySource } {
+  if (selectedAgent?.serviceCategories?.[0]) {
+    return { category: selectedAgent.serviceCategories[0], categorySource: "handoff" };
+  }
 
   const explicit = normalizeText(handoff?.category);
-  const allowed = ["mvp-build", "operator-support", "ai-consulting", "automation", "design", "growth", "research", "other"];
-  if (allowed.includes(explicit)) return explicit;
+  if (explicit.includes("mvp-build")) return { category: "mvp-build", categorySource: "handoff" };
+  if (allowedCategories.includes(explicit)) return { category: explicit, categorySource: "handoff" };
 
   const haystack = normalizeText([
     handoff?.category,
@@ -89,12 +106,13 @@ function inferCategoryFromHandoff(selectedAgent: Synagent | undefined, handoff?:
     handoff?.brief,
     ...(handoff?.requiredSkills || []),
   ].filter(Boolean).join(" "));
+  const inferredSource: MatchCategorySource = hasTrustedHandoffCategorySignal(handoff) ? "handoff" : "default";
 
   for (const [category, keywords] of Object.entries(categoryKeywordMap)) {
-    if (keywords.some((keyword) => haystack.includes(keyword))) return category;
+    if (keywords.some((keyword) => haystack.includes(keyword))) return { category, categorySource: inferredSource };
   }
 
-  return selectedAgent ? "operator-support" : "mvp-build";
+  return { category: "mvp-build", categorySource: "default" };
 }
 
 function mapBudgetRange(value?: string | null) {
@@ -139,6 +157,7 @@ function parseImportedContact(value?: string | null) {
 
 function buildInitialPrefs(selectedAgent: Synagent | undefined, handoff?: MatchHandoffPrefill | null): PrefState {
   const importedContact = parseImportedContact(handoff?.contact);
+  const initialCategory = resolveInitialCategory(selectedAgent, handoff);
 
   return {
     cost: 5,
@@ -147,7 +166,8 @@ function buildInitialPrefs(selectedAgent: Synagent | undefined, handoff?: MatchH
     credibility: 7,
     requester: handoff?.requester || "",
     title: handoff?.title || "",
-    category: inferCategoryFromHandoff(selectedAgent, handoff),
+    category: initialCategory.category,
+    categorySource: initialCategory.categorySource,
     budgetRange: mapBudgetRange(handoff?.budget),
     budgetNote: handoff?.budget || "",
     urgency: mapUrgency(handoff?.urgency),
@@ -171,6 +191,8 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
   const [requestId, setRequestId] = useState<string | null>(null);
   const [notificationsQueued, setNotificationsQueued] = useState<number>(0);
   const [notificationMode, setNotificationMode] = useState<NotificationDispatchMode>("queue-only");
+  const [requestStatus, setRequestStatus] = useState<MatchRequestStatus | null>(null);
+  const [review, setReview] = useState<MatchReviewMetadata | null>(null);
   const [matches, setMatches] = useState<MatchResult[]>([]);
 
   const sliderBackground = (value: number) => {
@@ -200,6 +222,7 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
     requester: prefs.requester || null,
     title: prefs.title || null,
     category: prefs.category,
+    categorySource: prefs.categorySource,
     budgetRange: prefs.budgetRange,
     budgetNote: prefs.budgetNote || null,
     urgency: prefs.urgency,
@@ -232,9 +255,19 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
     },
   };
 
+  function clearResponseState() {
+    setError(null);
+    setRequestId(null);
+    setNotificationsQueued(0);
+    setNotificationMode("queue-only");
+    setRequestStatus(null);
+    setReview(null);
+    setMatches([]);
+  }
+
   async function handleSubmit() {
     setIsSubmitting(true);
-    setError(null);
+    clearResponseState();
 
     try {
       const res = await fetch("/api/match", {
@@ -242,15 +275,21 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(intakePayload),
       });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
+      const data = await res.json() as MatchApiResponse;
+      if (!data.success) {
         throw new Error(data.error || "Submission failed");
+      }
+      if (!res.ok) {
+        throw new Error("Submission failed");
       }
       setRequestId(data.requestId || null);
       setNotificationsQueued(data.notificationsQueued || 0);
       setNotificationMode(data.notificationMode || "queue-only");
+      setRequestStatus(data.status || null);
+      setReview(data.review || null);
       setMatches(Array.isArray(data.matchedAgents) ? data.matchedAgents : []);
     } catch (err) {
+      clearResponseState();
       setError(err instanceof Error ? err.message : "Submission failed");
     } finally {
       setIsSubmitting(false);
@@ -258,9 +297,9 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
   }
 
   return (
-    <SiteShell mainStyle={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "32px" }}>
-      <div style={{ width: "100%", maxWidth: "860px", ...glassCardStyle, borderRadius: "20px", display: "flex", flexDirection: "column", gap: "18px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
+    <SiteShell mainClassName="match-page-main" mainStyle={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "32px" }}>
+      <div className="match-card" style={{ width: "100%", maxWidth: "860px", ...glassCardStyle, borderRadius: "20px", display: "flex", flexDirection: "column", gap: "18px" }}>
+        <div className="match-card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
           <div>
             <div style={{ fontSize: "12px", color: theme.textMuted, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "8px" }}>Match Intake</div>
             <h1 style={{ fontSize: "28px", color: theme.textStrong, fontFamily: "Space Grotesk, sans-serif" }}>Make Your Match</h1>
@@ -268,7 +307,7 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
               (<Link href="/synagents" style={{ color: theme.accent, textDecoration: "none" }}>or Browse Synagents</Link>)
             </div>
           </div>
-          <Link href="/" style={{ padding: "10px 14px", borderRadius: "12px", border: "1px solid rgba(0,229,255,0.26)", background: "rgba(5,10,14,0.18)", color: theme.accent, fontSize: "12px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none" }}>
+          <Link className="match-back-link" href="/" style={{ padding: "10px 14px", borderRadius: "12px", border: "1px solid rgba(0,229,255,0.26)", background: "rgba(5,10,14,0.18)", color: theme.accent, fontSize: "12px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none" }}>
             Back
           </Link>
         </div>
@@ -298,7 +337,7 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
           Tell us what you need, how urgent it is, how you want to work, and how to reach you. This creates a real request record, keeps imported Helixa context intact, and prepares provider notifications for review or dispatch.
         </p>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+        <div className="match-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
           <Field label="Requester">
             <input value={prefs.requester} onChange={(e) => setPrefs((prev) => ({ ...prev, requester: e.target.value }))} placeholder="Your name or team" style={inputStyle} />
           </Field>
@@ -306,7 +345,7 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
             <input value={prefs.title} onChange={(e) => setPrefs((prev) => ({ ...prev, title: e.target.value }))} placeholder="AI intake MVP, launch strategy, operator support..." style={inputStyle} />
           </Field>
           <Field label="Category">
-            <select value={prefs.category} onChange={(e) => setPrefs((prev) => ({ ...prev, category: e.target.value }))} style={inputStyle}>
+            <select value={prefs.category} onChange={(e) => setPrefs((prev) => ({ ...prev, category: e.target.value, categorySource: "user" }))} style={inputStyle}>
               <option value="mvp-build">MVP Build</option>
               <option value="operator-support">Operator Support</option>
               <option value="ai-consulting">AI Consulting</option>
@@ -383,6 +422,10 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
           </Field>
         </div>
 
+        <p style={{ color: theme.textMuted, lineHeight: 1.6, fontSize: "13px", margin: "-4px 0 0" }}>
+          We use your contact info only to review the request and coordinate the intro. Raw contact details are not shown on public profiles.
+        </p>
+
         <Field label="Desired Outcome">
           <textarea rows={2} value={prefs.desiredOutcome} onChange={(e) => setPrefs((prev) => ({ ...prev, desiredOutcome: e.target.value }))} placeholder="What does success look like for this project?" style={{ ...inputStyle, minHeight: "84px", resize: "vertical" }} />
         </Field>
@@ -401,12 +444,12 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
         {renderSlider("quality", "Quality")}
         {renderSlider("credibility", "Credibility")}
 
-        <div style={{ padding: "14px 16px", borderRadius: "14px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.24)", color: theme.textMuted, lineHeight: 1.7 }}>
-          <div style={{ ...labelStyle, marginBottom: "10px" }}>Structured Intake Preview</div>
-          <pre style={{ margin: 0, whiteSpace: "pre-wrap", overflowWrap: "anywhere", color: theme.textStrong, fontSize: "12px", lineHeight: 1.7, fontFamily: "JetBrains Mono, monospace" }}>
+        <details className="structured-intake-preview" style={{ padding: "12px 14px", borderRadius: "14px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.18)", color: theme.textMuted, lineHeight: 1.7 }}>
+          <summary style={{ ...labelStyle, marginBottom: 0, cursor: "pointer", listStyle: "none" }}>Advanced intake preview</summary>
+          <pre style={{ margin: "12px 0 0", whiteSpace: "pre-wrap", overflowWrap: "anywhere", color: theme.textStrong, fontSize: "12px", lineHeight: 1.7, fontFamily: "JetBrains Mono, monospace" }}>
             {JSON.stringify(intakePayload, null, 2)}
           </pre>
-        </div>
+        </details>
 
         {error && (
           <div style={{ padding: "14px 16px", borderRadius: "14px", border: "1px solid rgba(255,120,120,0.35)", background: "rgba(60,10,10,0.18)", color: "#ffb3b3", lineHeight: 1.7 }}>
@@ -419,22 +462,39 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
             <div style={{ ...labelStyle, marginBottom: "10px" }}>Request Created</div>
             <div style={{ color: theme.textStrong, marginBottom: "8px" }}>Request ID: {requestId}</div>
             <div>
-              {notificationsQueued} provider notifications {notificationMode === "queue-only" ? "queued" : notificationMode === "review" ? "queued for review" : "ready for live dispatch"}.
+              {requestStatus === "needs-review"
+                ? "No provider intro was sent automatically. This request is queued for a human fit review."
+                : `${notificationsQueued} provider notifications ${notificationMode === "queue-only" ? "queued" : notificationMode === "review" ? "queued for review" : "ready for live dispatch"}.`}
             </div>
           </div>
         )}
 
-        {matches.length > 0 && (
+        {requestId && (requestStatus === "needs-review" || matches.length === 0) && (
+          <div style={{ padding: "14px 16px", borderRadius: "14px", border: "1px solid rgba(255,209,102,0.35)", background: "rgba(80,54,8,0.18)", color: theme.textMuted, lineHeight: 1.7 }}>
+            <div style={{ ...labelStyle, marginBottom: "10px" }}>Manual Fit Review</div>
+            <div style={{ color: theme.textStrong, marginBottom: "8px" }}>
+              We received the request, but the matcher did not find a high-confidence provider fit. We will review it manually instead of forcing a weak intro.
+            </div>
+            {review?.fallbackReason && <div>Reason: {review.fallbackReason}</div>}
+            {typeof review?.strongestScore === "number" && <div>Strongest automatic score: {review.strongestScore}</div>}
+            {typeof review?.recommendationThreshold === "number" && <div>Recommendation threshold: {review.recommendationThreshold}</div>}
+          </div>
+        )}
+
+        {requestId && requestStatus !== "needs-review" && matches.length > 0 && (
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            <div style={labelStyle}>Top Matches</div>
+            <div style={labelStyle}>Recommended Match</div>
             {matches.map((match) => (
-              <div key={match.slug} style={{ padding: "14px 16px", borderRadius: "14px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.24)", color: theme.textMuted, lineHeight: 1.7 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", alignItems: "center", marginBottom: "8px" }}>
+              <div className="match-result-card" key={match.slug} style={{ padding: "14px 16px", borderRadius: "14px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.24)", color: theme.textMuted, lineHeight: 1.7 }}>
+                <div className="match-result-head" style={{ display: "flex", justifyContent: "space-between", gap: "12px", alignItems: "center", marginBottom: "8px" }}>
                   <div style={{ color: theme.textStrong, fontWeight: 600 }}>{match.name}</div>
-                  <div style={{ color: theme.accent, fontFamily: "JetBrains Mono, monospace" }}>Score {match.score}</div>
+                  <div style={{ color: theme.accent, fontFamily: "JetBrains Mono, monospace" }}>{match.confidence === "high" ? "High Confidence" : "Review"} • Score {match.score}</div>
                 </div>
                 <div style={{ fontSize: "13px", marginBottom: "8px" }}>Timezone {match.timezone} • Payment {match.payment}</div>
                 <div style={{ color: theme.textStrong, marginBottom: "8px" }}>{match.summaryReason}</div>
+                <div style={{ fontSize: "13px", marginBottom: "8px" }}>
+                  This recommendation is shown only because the provider cleared Synagent's high-confidence threshold. Lower-confidence requests stay in manual review.
+                </div>
                 <ul style={{ margin: 0, paddingLeft: "18px" }}>
                   {match.reasons.map((reason) => (
                     <li key={reason}>{reason}</li>
@@ -445,7 +505,7 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
           </div>
         )}
 
-        <button style={{ ...solidButtonStyle, opacity: isSubmitting ? 0.7 : 1, cursor: isSubmitting ? "progress" : "pointer" }} onClick={handleSubmit} disabled={isSubmitting}>
+        <button className="match-submit-button" style={{ ...solidButtonStyle, opacity: isSubmitting ? 0.7 : 1, cursor: isSubmitting ? "progress" : "pointer" }} onClick={handleSubmit} disabled={isSubmitting}>
           {isSubmitting ? "Submitting..." : "Find Your Matches"}
         </button>
       </div>

@@ -166,7 +166,27 @@ export default async function SynagentProfilePage({ params }: { params: Promise<
                 </div>
               ) : (
                 <div style={{ color: theme.textMuted, fontSize: "14px", lineHeight: 1.7 }}>
-                  Direct contact is released after fit review. No verified public inbox or Telegram endpoint is stored yet.
+                  Direct contact is released after fit review. Synagent keeps raw contact details private until an intro is approved.
+                </div>
+              )}
+            </div>
+            <div style={{ padding: "12px 14px", borderRadius: "14px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.24)" }}>
+              <div style={{ fontSize: "11px", color: theme.textMuted, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>Helixa Provenance</div>
+              {agent.helixaProfile ? (
+                <div className="wrap-safe" style={{ display: "flex", flexDirection: "column", gap: "7px", color: theme.textStrong, fontSize: "14px", overflowWrap: "anywhere" }}>
+                  <Link href={agent.helixaProfile.url} target="_blank" rel="noreferrer" style={{ color: theme.accent, textDecoration: "none" }}>
+                    View Helixa Profile
+                  </Link>
+                  <span>Entity: {agent.helixaProfile.entityType}</span>
+                  <span>ID: {agent.helixaProfile.id}</span>
+                  {(agent.helixaProfile.credLabel || agent.helixaProfile.credScore != null) && (
+                    <span>Cred: {agent.helixaProfile.credLabel ?? agent.helixaProfile.credScore}</span>
+                  )}
+                </div>
+              ) : (
+                <div style={{ color: theme.textMuted, fontSize: "14px", lineHeight: 1.7 }}>
+                  <div style={{ color: theme.textStrong, marginBottom: "4px" }}>Helixa profile pending</div>
+                  This operator is manually curated for beta while the Helixa profile is being completed.
                 </div>
               )}
             </div>

@@ -37,11 +37,14 @@ export type MatchHandoffPrefill = {
   resolution?: MatchSourceResolution | null;
 };
 
+export type MatchCategorySource = "default" | "user" | "handoff";
+
 export type MatchRequestPayload = {
   selectedAgent?: string | null;
   title?: string | null;
   requester?: string | null;
   category: string;
+  categorySource?: MatchCategorySource;
   budgetRange: string;
   budgetNote?: string | null;
   urgency: string;
@@ -68,6 +71,40 @@ export type MatchRequestPayload = {
 
 export type MatchNotificationStatus = "queued" | "sent" | "failed" | "skipped";
 
+export type MatchRequestStatus = "new" | "matched" | "needs-review";
+
+export type MatchConfidence = "high" | "review";
+
+export type MatchPublicDecision = "recommended-match" | "manual-review";
+
+export type MatchReviewMetadata = {
+  needsManualReview: boolean;
+  confidence: MatchConfidence;
+  publicDecision: MatchPublicDecision;
+  recommendedMatchSlug?: string | null;
+  fallbackReason?: string | null;
+  strongestScore?: number | null;
+  recommendationThreshold?: number | null;
+};
+
+export type MatchScoreComponent = {
+  label: string;
+  points: number;
+  reason: string;
+};
+
+export type MatchCandidateEvaluation = {
+  slug: string;
+  name: string;
+  score: number;
+  confidence: MatchConfidence;
+  categoryFit: string[];
+  explicitCategoryFit: string[];
+  reasons: string[];
+  scoreComponents: MatchScoreComponent[];
+  eligibleForRecommendation: boolean;
+};
+
 export type MatchNotification = {
   id: string;
   requestId: string;
@@ -90,6 +127,7 @@ export type MatchResult = {
   slug: string;
   name: string;
   score: number;
+  confidence: MatchConfidence;
   summaryReason: string;
   reasons: string[];
   payment: string;
@@ -101,12 +139,33 @@ export type MatchResult = {
 export type MatchRequestRecord = {
   id: string;
   createdAt: string;
-  status: "new" | "matched";
+  status: MatchRequestStatus;
+  review: MatchReviewMetadata;
   intake: MatchRequestPayload;
   matchedAgents: MatchResult[];
   notifications: MatchNotification[];
+  matchEvaluation: {
+    rankedCandidates: MatchCandidateEvaluation[];
+  };
   internalOwner: string;
   nextActionAt: string;
 };
 
 export type NotificationDispatchMode = "queue-only" | "review" | "live";
+
+export type MatchApiResponse =
+  | {
+      success: true;
+      requestId: string;
+      status: MatchRequestStatus;
+      review: MatchReviewMetadata;
+      matchedAgents: MatchResult[];
+      notificationsQueued: number;
+      notificationMode: NotificationDispatchMode;
+      dispatchEndpoint: string;
+      nextActionAt: string;
+    }
+  | {
+      success: false;
+      error: string;
+    };

@@ -6,11 +6,12 @@ import { theme } from "@/lib/theme";
 
 type SiteShellProps = {
   children: ReactNode;
+  mainClassName?: string;
   mainStyle?: CSSProperties;
   showFooter?: boolean;
 };
 
-export function SiteShell({ children, mainStyle, showFooter = true }: SiteShellProps) {
+export function SiteShell({ children, mainClassName, mainStyle, showFooter = true }: SiteShellProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -75,6 +76,7 @@ export function SiteShell({ children, mainStyle, showFooter = true }: SiteShellP
 
   return (
     <div
+      className="site-shell-root"
       style={{
         minHeight: "100vh",
         background: theme.bg,
@@ -100,7 +102,7 @@ export function SiteShell({ children, mainStyle, showFooter = true }: SiteShellP
         }}
       />
 
-      <div style={{ position: "relative", zIndex: 2, display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      <div className="site-shell-frame" style={{ position: "relative", zIndex: 2, display: "flex", flexDirection: "column", minHeight: "100vh" }}>
         <header
           className="site-header"
           style={{
@@ -214,8 +216,8 @@ export function SiteShell({ children, mainStyle, showFooter = true }: SiteShellP
             <Link href="#" style={{ fontSize: "14px", color: theme.textMuted, textDecoration: "none", letterSpacing: "0.05em" }}>
               DOCS
             </Link>
-            <button
-              type="button"
+            <Link
+              href="/match?category=mvp-build"
               className="site-connect-button"
               style={{
                 background: `linear-gradient(135deg, ${theme.accent}, ${theme.accentDark})`,
@@ -226,10 +228,11 @@ export function SiteShell({ children, mainStyle, showFooter = true }: SiteShellP
                 border: "none",
                 cursor: "pointer",
                 fontSize: "13px",
+                textDecoration: "none",
               }}
             >
               CONNECT
-            </button>
+            </Link>
           </div>
 
           {mobileMenuOpen && (
@@ -282,8 +285,8 @@ export function SiteShell({ children, mainStyle, showFooter = true }: SiteShellP
               >
                 DOCS
               </Link>
-              <button
-                type="button"
+              <Link
+                href="/match?category=mvp-build"
                 className="site-mobile-connect"
                 onClick={closeMobileMenu}
                 style={{
@@ -297,18 +300,19 @@ export function SiteShell({ children, mainStyle, showFooter = true }: SiteShellP
                   fontSize: "13px",
                   letterSpacing: "0.08em",
                   textTransform: "uppercase",
+                  textDecoration: "none",
                 }}
               >
                 Connect
-              </button>
+              </Link>
             </div>
           )}
         </header>
 
-        <main style={{ flex: 1, ...mainStyle }}>{children}</main>
+        <main className={mainClassName} style={{ flex: 1, ...mainStyle }}>{children}</main>
 
         {showFooter && (
-          <footer style={{ textAlign: "center", padding: "32px", borderTop: `1px solid ${theme.border}` }}>
+          <footer className="site-footer" style={{ textAlign: "center", padding: "32px", borderTop: `1px solid ${theme.border}` }}>
             <p style={{ fontSize: "14px", color: theme.textMuted }}>
               Powered by <span style={{ color: theme.text, fontWeight: 600 }}>Helixa</span> on Base
             </p>
