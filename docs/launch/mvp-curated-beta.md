@@ -1,6 +1,6 @@
 # Synagent MVP Curated Beta Runbook
 
-Last updated: 2026-05-09 UTC
+Last updated: 2026-05-13 UTC
 
 ## Launch mode
 
@@ -28,16 +28,16 @@ Current supply is intentionally thin. If public providers remain below 3 real op
 
 ## Owner and SLA fields
 
-Fill these before external launch:
+Cred Bureau closed beta:
 
-- Review owner: TBD
-- Backup reviewer: TBD
-- Response SLA: TBD, recommended same business day for soft launch
-- Dispatch channels enabled: TBD
-- Escalation path: TBD
+- Review owner: Quigley
+- Backup reviewer: Jim
+- Response SLA: same business day; late-day submissions roll to next morning
+- Manual group adds: Jim
+- Escalation path: flag in Fool Spectrum without posting the review key
 - Provider availability check cadence: TBD
 
-Do not run a public launch until the review owner and response SLA are explicit.
+Before broad public launch, confirm whether the same owner/SLA model also applies to general MVP/build requests.
 
 ## Required ops secrets
 
@@ -45,13 +45,15 @@ Set these in the deployment environment, never in git:
 
 ```bash
 SYNAGENT_NOTIFICATION_MODE=review
-SYNAGENT_REVIEW_API_KEY=<strong shared review key>
+SYNAGENT_REVIEW_API_KEY=<strong shared review key; private to Jim, Quigley, Epifani during closed beta>
 SYNAGENT_AGENTMAIL_API_KEY=<agentmail api key, if email dispatch is enabled>
 SYNAGENT_AGENTMAIL_INBOX_ID=<agentmail inbox id, if email dispatch is enabled>
 SYNAGENT_AGENTMAIL_BASE_URL=https://api.agentmail.to
 SYNAGENT_TELEGRAM_BOT_TOKEN=<telegram bot token, if telegram dispatch is enabled>
 SYNAGENT_TELEGRAM_BASE_URL=https://api.telegram.org
 ```
+
+Review queue security is documented in `docs/review-queue-security.md`. Do not paste the key in group chat; rotate it before wider beta if distribution is uncertain.
 
 Recommended MVP mode:
 - `queue-only` until the reviewer has checked request quality manually

@@ -55,13 +55,17 @@ Notes:
 - [x] GREEN - Review/dispatch endpoint exists: `/api/match/dispatch`
 - [x] GREEN - Protected request queue endpoint exists: `/api/match/requests`
 - [x] GREEN - Protected notification queue endpoint exists: `/api/match/notifications`
-- [ ] RED - Replace placeholder review auth and delivery config with real deployment values
+- [x] GREEN - Cred Bureau review key configured and server-side security audit passed
+- [x] GREEN - Cred Bureau authorized reviewer roster restricted to Jim, Quigley, and Epifani
+- [ ] YELLOW - Rotate review key before wider beta if private distribution cannot be confirmed
+- [ ] RED - Replace placeholder delivery config with real deployment values
 - [ ] YELLOW - Test AgentMail delivery with a real request
 - [ ] YELLOW - Test Telegram delivery with a real request if Telegram alerts are enabled
 - [x] GREEN - Cred Bureau review owner, backup reviewer, manual add owner, and SLA locked
 
 Notes:
 - Review endpoints require `SYNAGENT_REVIEW_API_KEY`.
+- Review queue security is documented in `docs/review-queue-security.md`: authorized holders are Jim, Quigley, and Epifani; key must not be posted in group; rotate before wider beta if distribution is uncertain.
 - Cred Bureau closed beta ops are locked in `docs/cred-bureau-closed-beta-ops.md`: Quigley owns review, Jim backs up and manually adds approved applicants, same-business-day SLA.
 - Notification mode remains operationally safe when provider secrets are missing, but that is not launch-complete.
 
@@ -129,11 +133,12 @@ Notes:
 
 ## Current overall launch call
 - RED - Not ready for broad public launch
-- YELLOW - Close to curated beta once real ops secrets, provider availability, backups, and final applicant rules are locked
+- YELLOW - Close to curated beta once delivery secrets, provider availability, backups, and final applicant rules are locked
 
 ## Fastest path to soft launch
-1. Set `SYNAGENT_REVIEW_API_KEY` and notification secrets in deployment.
-2. Test one real request end to end in preview.
-3. Confirm Degeneer availability and add 2-3 more real providers if possible.
-4. Lock applicant qualification/rejection rules.
-5. Launch as concierge beta, not marketplace.
+1. Set notification secrets in deployment if alerts are enabled.
+2. Privately confirm only Jim, Quigley, and Epifani have the review key, or rotate it before wider beta.
+3. Test one real request end to end in preview.
+4. Confirm Degeneer availability and add 2-3 more real providers if possible.
+5. Lock applicant qualification/rejection rules.
+6. Launch as concierge beta, not marketplace.

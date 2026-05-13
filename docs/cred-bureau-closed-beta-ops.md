@@ -36,4 +36,5 @@ Status: locked for closed beta
 - Do not auto-invite applicants.
 - Do not approve incomplete Helixa human profiles unless Quigley explicitly wants to park or make an exception.
 - Do not share the review key in the group chat.
+- Follow `docs/review-queue-security.md` for authorized reviewer roster, key handling, and rotation.
 - Keep reviewer notes concrete enough that the Decision Log is useful later.
