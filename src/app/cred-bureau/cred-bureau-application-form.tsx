@@ -50,6 +50,8 @@ export function CredBureauApplicationForm() {
           telegram: String(data.get("telegram") || ""),
           email: String(data.get("email") || ""),
           role: String(data.get("role") || ""),
+          linkedinUrl: String(data.get("linkedinUrl") || ""),
+          websiteUrl: String(data.get("websiteUrl") || ""),
         },
         humanProfile: {
           url: String(data.get("humanProfileUrl") || ""),
@@ -78,7 +80,7 @@ export function CredBureauApplicationForm() {
         <div style={{ ...fieldLabelStyle, color: theme.accent }}>Apply to Cred Bureau</div>
         <h2 style={{ margin: "0 0 10px", color: theme.textStrong, fontFamily: "Space Grotesk, sans-serif", fontSize: "28px" }}>Submit for manual review</h2>
         <p style={{ margin: 0, color: theme.textMuted, lineHeight: 1.7 }}>
-          Helixa profile is optional for the first pass. Link one if you have it; if approved, the team may ask you to mint or update one before the manual Telegram group add.
+          Helixa human profile is required for Cred Bureau applications. Create or update your profile first, then submit it with any supporting LinkedIn or website links you want reviewers to see.
         </p>
       </div>
 
@@ -114,9 +116,20 @@ export function CredBureauApplicationForm() {
       </div>
 
       <label>
-        <div style={fieldLabelStyle}>Helixa Human Profile URL (optional)</div>
-        <input name="humanProfileUrl" placeholder="https://helixa.xyz/h/your-profile-id" style={inputStyle} />
+        <div style={fieldLabelStyle}>Helixa Human Profile URL (required)</div>
+        <input name="humanProfileUrl" required placeholder="https://helixa.xyz/h/your-profile-id" style={inputStyle} />
       </label>
+
+      <div className="cred-bureau-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+        <label>
+          <div style={fieldLabelStyle}>LinkedIn (optional)</div>
+          <input name="linkedinUrl" type="url" placeholder="https://www.linkedin.com/in/yourname" style={inputStyle} />
+        </label>
+        <label>
+          <div style={fieldLabelStyle}>Website / Portfolio (optional)</div>
+          <input name="websiteUrl" type="url" placeholder="https://your-site.com" style={inputStyle} />
+        </label>
+      </div>
 
       <label>
         <div style={fieldLabelStyle}>Why should this profile be reviewed for Cred Bureau?</div>

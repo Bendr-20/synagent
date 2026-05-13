@@ -28,9 +28,7 @@ export async function POST(req: Request) {
       success: true,
       applicationId: record.id,
       status: record.status,
-      nextStep: record.review.profileMissing
-        ? "Application received for manual review. A Helixa human profile was not linked yet, so the Synagent team may ask you to mint or link one before approval, then manually contact approved applicants before anyone is added to the group chat."
-        : "Application received for manual review. The Synagent team will review the attached Helixa human profile and Cred context, then manually contact approved applicants before anyone is added to the group chat.",
+      nextStep: "Application received for manual review. The Synagent team will review the attached Helixa human profile, Cred context, and supporting links, then manually contact approved applicants before anyone is added to the group chat.",
       groupInviteUrl: null,
     } satisfies CredBureauApplicationResponse, { status: 201 });
   } catch (error) {

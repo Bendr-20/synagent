@@ -31,6 +31,15 @@ function cleanOptionalString(value: unknown) {
   return cleaned || null;
 }
 
+function cleanOptionalUrl(value: unknown, label: string) {
+  const cleaned = cleanOptionalString(value);
+  if (!cleaned) return null;
+  if (!/^https?:\/\//i.test(cleaned)) {
+    throw new Error(`${label} must start with http:// or https://.`);
+  }
+  return cleaned;
+}
+
 function makeApplicationId() {
   return `cba_${Date.now().toString(36)}_${Math.random().toString(16).slice(2, 8)}`;
 }
@@ -54,6 +63,10 @@ function buildHumanProfileRef(profile: CredBureauApplicationPayload["humanProfil
   const wallet = cleanOptionalString(profile?.wallet);
   const handle = cleanOptionalString(profile?.handle);
 
+  if (!url && !id && !wallet && !handle) {
+    throw new Error("A Helixa human profile URL is required before Cred Bureau review.");
+  }
+
   if (url && !/^https:\/\/helixa\.xyz\/h\/[A-Za-z0-9._:-]+\/?$/i.test(url)) {
     throw new Error("Use a Helixa human profile URL like https://helixa.xyz/h/your-profile-id.");
   }
@@ -66,18 +79,19 @@ function buildApplicant(payload: CredBureauApplicationPayload) {
   const telegram = normalizeTelegram(payload.applicant?.telegram);
   const email = cleanOptionalString(payload.applicant?.email);
   const role = cleanOptionalString(payload.applicant?.role);
+  const linkedinUrl = cleanOptionalUrl(payload.applicant?.linkedinUrl, "LinkedIn URL");
+  const websiteUrl = cleanOptionalUrl(payload.applicant?.websiteUrl, "Website URL");
 
   if (!name) throw new Error("Applicant name is required for Cred Bureau review.");
   if (!telegram && !email) throw new Error("Telegram handle or email is required so approved applicants can be contacted manually.");
 
-  return { name, telegram, email, role };
+  return { name, telegram, email, role, linkedinUrl, websiteUrl };
 }
 
 export function buildCredBureauApplicationRecord(payload: CredBureauApplicationPayload): CredBureauApplicationRecord {
   const applicant = buildApplicant(payload);
   const humanProfile = buildHumanProfileRef(payload.humanProfile);
   const whyJoin = cleanString(payload.reviewAddendum?.whyJoin);
-  const profileMissing = !humanProfile.url && !humanProfile.id && !humanProfile.wallet && !humanProfile.handle;
 
   if (!whyJoin) throw new Error("Tell us why you want Cred Bureau review.");
 
@@ -93,8 +107,8 @@ export function buildCredBureauApplicationRecord(payload: CredBureauApplicationP
       disclosure: cleanOptionalString(payload.reviewAddendum?.disclosure),
     },
     review: {
-      profileRequired: !profileMissing,
-      profileMissing,
+      profileRequired: true,
+      profileMissing: false,
       profileMustBeUpdated: true,
       manualReviewRequired: true,
       manualGroupAddRequired: true,

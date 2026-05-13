@@ -12,6 +12,8 @@ export type CredBureauApplicant = {
   telegram: string;
   email?: string | null;
   role?: string | null;
+  linkedinUrl?: string | null;
+  websiteUrl?: string | null;
 };
 
 export type CredBureauApplicationPayload = {

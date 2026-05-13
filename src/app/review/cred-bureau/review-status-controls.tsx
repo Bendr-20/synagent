@@ -57,7 +57,9 @@ export function ReviewStatusControls({ application, reviewKey }: Props) {
     application.applicant.name,
     application.applicant.telegram,
     application.applicant.email,
-    application.humanProfile.url || "Profile missing",
+    application.applicant.linkedinUrl,
+    application.applicant.websiteUrl,
+    application.humanProfile.url || "Helixa profile required",
     application.reviewAddendum.whyJoin,
   ].filter(Boolean).join(" | ");
 

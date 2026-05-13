@@ -77,7 +77,7 @@ function cleanupTestApplications() {
   );
 }
 
-test("Cred Bureau application page, API, and review queue support optional profile applications", { timeout: 60_000 }, async () => {
+test("Cred Bureau application page, API, and review queue require Helixa profile while supporting optional links", { timeout: 60_000 }, async () => {
   cleanupTestApplications();
   const port = await getFreePort();
   const server = spawn("./node_modules/.bin/next", ["start", "--port", String(port)], {
@@ -97,14 +97,17 @@ test("Cred Bureau application page, API, and review queue support optional profi
     assert.equal(page.status, 200);
     assert.match(html, /Apply Now/i);
     assert.match(html, /Apply to Cred Bureau/i);
-    assert.match(html, /Helixa profile is optional/i);
+    assert.match(html, /Helixa human profile is required/i);
+    assert.match(html, /LinkedIn/i);
+    assert.match(html, /Website/i);
+    assert.doesNotMatch(html, /optional for the first pass|Profile missing/i);
     assert.match(html, /https:\/\/helixa\.xyz\/join\/human/i);
     assert.match(html, /https:\/\/helixa\.xyz\/manage\/human/i);
     assert.match(html, /manual review/i);
     assert.match(html, /manually added to the group chat/i);
     assert.doesNotMatch(html, /source=cred-bureau|First create|do not create separate profiles|Skills and Cred Signals/i);
 
-    const submit = await fetch(`http://127.0.0.1:${port}/api/cred-bureau/applications`, {
+    const missingProfileSubmit = await fetch(`http://127.0.0.1:${port}/api/cred-bureau/applications`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -115,6 +118,29 @@ test("Cred Bureau application page, API, and review queue support optional profi
           role: "Operator / reviewer",
         },
         humanProfile: { url: "" },
+        reviewAddendum: {
+          whyJoin: "I want to help review early Synagent requests and test Cred-based routing.",
+        },
+      }),
+    });
+    const missingProfileBody = await missingProfileSubmit.json() as Record<string, any>;
+    assert.equal(missingProfileSubmit.status, 400);
+    assert.equal(missingProfileBody.success, false);
+    assert.match(missingProfileBody.error, /Helixa human profile URL/i);
+
+    const submit = await fetch(`http://127.0.0.1:${port}/api/cred-bureau/applications`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        applicant: {
+          name: "Cred Reviewer",
+          telegram: TEST_OPTIONAL_PROFILE_TELEGRAM,
+          email: "reviewer@example.com",
+          role: "Operator / reviewer",
+          linkedinUrl: "https://www.linkedin.com/in/credreviewer",
+          websiteUrl: "https://credreviewer.example.com",
+        },
+        humanProfile: { url: TEST_PROFILE_URL },
         reviewAddendum: {
           whyJoin: "I want to help review early Synagent requests and test Cred-based routing.",
           availability: "A few hours per week during closed beta.",
@@ -139,9 +165,11 @@ test("Cred Bureau application page, API, and review queue support optional profi
     assert.equal(stored.applicant.telegram, TEST_OPTIONAL_PROFILE_TELEGRAM);
     assert.equal(stored.applicant.email, "reviewer@example.com");
     assert.equal(stored.applicant.role, "Operator / reviewer");
-    assert.equal(stored.humanProfile.url, null);
-    assert.equal(stored.review.profileRequired, false);
-    assert.equal(stored.review.profileMissing, true);
+    assert.equal(stored.applicant.linkedinUrl, "https://www.linkedin.com/in/credreviewer");
+    assert.equal(stored.applicant.websiteUrl, "https://credreviewer.example.com");
+    assert.equal(stored.humanProfile.url, TEST_PROFILE_URL);
+    assert.equal(stored.review.profileRequired, true);
+    assert.equal(stored.review.profileMissing, false);
     assert.equal(stored.review.manualGroupAddRequired, true);
     assert.equal(stored.review.autoInviteSent, false);
     assert.equal(stored.profileLinks, undefined);
@@ -165,19 +193,21 @@ test("Cred Bureau application page, API, and review queue support optional profi
     assert.match(reviewHtml, /Cred Bureau Review Queue/i);
     assert.match(reviewHtml, /Cred Reviewer/i);
     assert.match(reviewHtml, /@credreviewer/i);
-    assert.match(reviewHtml, /Profile missing/i);
+    assert.match(reviewHtml, /linkedin\.com\/in\/credreviewer/i);
+    assert.match(reviewHtml, /credreviewer\.example\.com/i);
+    assert.doesNotMatch(reviewHtml, /Profile missing/i);
     assert.match(reviewHtml, /manual group add/i);
 
     const update = await fetch(`http://127.0.0.1:${port}/api/cred-bureau/applications`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", Authorization: "Bearer test-review-key" },
-      body: JSON.stringify({ id: body.applicationId, status: "approved", reviewerNotes: "Add to TG after profile mint." }),
+      body: JSON.stringify({ id: body.applicationId, status: "approved", reviewerNotes: "Add to TG after profile review." }),
     });
     const updateBody = await update.json() as Record<string, any>;
     assert.equal(update.status, 200);
     assert.equal(updateBody.success, true);
     assert.equal(updateBody.application.status, "approved");
-    assert.equal(updateBody.application.review.reviewerNotes, "Add to TG after profile mint.");
+    assert.equal(updateBody.application.review.reviewerNotes, "Add to TG after profile review.");
   } catch (error) {
     throw new Error(`${error instanceof Error ? error.message : String(error)}\nServer logs:\n${logs}`);
   } finally {

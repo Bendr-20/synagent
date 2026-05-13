@@ -41,7 +41,7 @@ export default async function CredBureauReviewPage({
               Cred Bureau Review Queue
             </h1>
             <p style={{ color: theme.textMuted, maxWidth: "760px", lineHeight: 1.7, margin: 0 }}>
-              Review applicants, copy their Telegram contact, and manually add approved profiles to the group. Profile missing means the applicant submitted without a Helixa human profile and may need the mint/update link before approval.
+              Review applicants, inspect their required Helixa human profile and supporting links, copy their Telegram contact, and manually add approved profiles to the group.
             </p>
           </div>
           <Link href="/cred-bureau" style={{ ...outlineButtonStyle, width: "auto" }}>
@@ -88,18 +88,16 @@ export default async function CredBureauReviewPage({
                   <Field label="Email" value={application.applicant.email} />
                   <Field label="Role" value={application.applicant.role} />
                   <Field label="Availability" value={application.reviewAddendum.availability} />
+                  <Field label="LinkedIn" value={application.applicant.linkedinUrl} />
+                  <Field label="Website" value={application.applicant.websiteUrl} />
                 </div>
 
                 <div style={{ display: "grid", gap: "12px" }}>
                   <Field label="Why review" value={application.reviewAddendum.whyJoin} />
                   <Field label="Disclosure" value={application.reviewAddendum.disclosure} />
-                  {application.humanProfile.url ? (
-                    <a href={application.humanProfile.url} target="_blank" rel="noreferrer" style={{ color: theme.accent, wordBreak: "break-all" }}>
-                      {application.humanProfile.url}
-                    </a>
-                  ) : (
-                    <div style={{ color: "#ffc8c8", fontFamily: "JetBrains Mono, monospace", fontSize: "12px" }}>Profile missing</div>
-                  )}
+                  <a href={application.humanProfile.url || "https://helixa.xyz/join/human"} target="_blank" rel="noreferrer" style={{ color: theme.accent, wordBreak: "break-all" }}>
+                    {application.humanProfile.url || "Helixa profile required"}
+                  </a>
                 </div>
 
                 <ReviewStatusControls application={application} reviewKey={reviewKey} />

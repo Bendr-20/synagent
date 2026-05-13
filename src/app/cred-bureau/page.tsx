@@ -6,11 +6,11 @@ import { glassCardStyle, outlineButtonStyle, solidButtonStyle, theme } from "@/l
 const flowSteps = [
   {
     label: "Apply Now",
-    body: "Submit contact details, review context, and an optional Helixa human profile."
+    body: "Submit contact details, review context, and your required Helixa human profile."
   },
   {
-    label: "Optional profile",
-    body: "Link or mint a Helixa human profile when you are ready. It helps review, but does not block submission."
+    label: "Helixa profile",
+    body: "Create or update your human profile first so reviewers can evaluate identity, skills, links, and Cred context."
   },
   {
     label: "Manual review",
@@ -24,7 +24,7 @@ const flowSteps = [
 
 const bureauSignals = [
   "Simple application with Telegram contact",
-  "Optional Helixa human profile link or mint",
+  "Required Helixa human profile link",
   "Manual review before group access",
 ];
 
@@ -51,7 +51,7 @@ export default function CredBureauPage() {
             Join the human trust layer behind Synagent beta.
           </h1>
           <p style={{ margin: "0 0 28px", color: theme.textMuted, fontSize: "17px", lineHeight: 1.72, maxWidth: "720px" }}>
-            Cred Bureau is invite-only access for Synagent beta reviewers and operators. Apply with your contact details and optional Helixa human profile. Approved applicants are manually added to the group chat.
+            Cred Bureau is invite-only access for Synagent beta reviewers and operators. Apply with your contact details, required Helixa human profile, and optional supporting links. Approved applicants are manually added to the group chat.
           </p>
           <div className="cred-bureau-actions" style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}>
             <a href="#apply" style={{ ...solidButtonStyle, width: "auto", minWidth: "190px" }}>
