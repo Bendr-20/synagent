@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useRef, useState, type CSSProperties, type FormEvent, type RefObject } from "react";
 import { glassCardStyle, outlineButtonStyle, solidButtonStyle, theme } from "@/lib/theme";
 
@@ -79,6 +80,7 @@ function externalWebsiteFromProfile(profile: any) {
 }
 
 export function CredBureauApplicationForm() {
+  const router = useRouter();
   const [submitState, setSubmitState] = useState<SubmitState>({ kind: "idle" });
   const [profileLoadState, setProfileLoadState] = useState<ProfileLoadState>({ kind: "idle" });
   const nameRef = useRef<HTMLInputElement | null>(null);
@@ -168,6 +170,7 @@ export function CredBureauApplicationForm() {
 
     form.reset();
     setSubmitState({ kind: "success", applicationId: body.applicationId, nextStep: body.nextStep });
+    router.push(`/cred-bureau/received?applicationId=${encodeURIComponent(body.applicationId)}`);
   }
 
   return (

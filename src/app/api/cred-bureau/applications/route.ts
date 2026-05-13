@@ -58,8 +58,8 @@ export async function PATCH(req: Request) {
     if (!id) throw new Error("Application ID is required");
     if (!isValidStatus(status)) throw new Error("Status must be pending-review, approved, or rejected");
 
-    const application = updateCredBureauApplicationStatus(id, status, typeof payload.reviewerNotes === "string" ? payload.reviewerNotes : null);
-    return NextResponse.json({ success: true, application } satisfies CredBureauStatusUpdateResponse);
+    const { application, reviewLogEntry } = updateCredBureauApplicationStatus(id, status, typeof payload.reviewerNotes === "string" ? payload.reviewerNotes : null);
+    return NextResponse.json({ success: true, application, reviewLogEntry } satisfies CredBureauStatusUpdateResponse);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Review update failed";
     const status = message.includes("Unauthorized") ? 401 : message.includes("not configured") ? 503 : message.includes("not found") ? 404 : 400;

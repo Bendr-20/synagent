@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { SiteShell } from "@/components/site-shell";
-import { getCredBureauApplications } from "@/lib/cred-bureau-store";
+import { getCredBureauApplications, getCredBureauReviewLog } from "@/lib/cred-bureau-store";
 import { getReviewApiKey } from "@/lib/review-auth";
 import { glassCardStyle, outlineButtonStyle, theme } from "@/lib/theme";
 import { ReviewStatusControls } from "./review-status-controls";
@@ -28,6 +28,7 @@ export default async function CredBureauReviewPage({
   const configuredKey = getReviewApiKey();
   const authorized = Boolean(configuredKey && reviewKey === configuredKey);
   const applications = authorized ? getCredBureauApplications() : [];
+  const reviewLog = authorized ? getCredBureauReviewLog().slice(0, 25) : [];
 
   return (
     <SiteShell>
@@ -104,6 +105,38 @@ export default async function CredBureauReviewPage({
               </article>
             ))}
           </div>
+        )}
+
+        {authorized && reviewLog.length > 0 && (
+          <section style={{ marginTop: "32px" }}>
+            <h2 style={{ margin: "0 0 14px", color: theme.textStrong, fontFamily: "Space Grotesk, sans-serif", fontSize: "26px" }}>
+              Decision Log
+            </h2>
+            <div style={{ display: "grid", gap: "12px" }}>
+              {reviewLog.map((entry) => (
+                <article key={entry.id} style={{ ...glassCardStyle, padding: "16px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap", marginBottom: "10px" }}>
+                    <div>
+                      <div style={{ color: theme.accent, fontFamily: "JetBrains Mono, monospace", fontSize: "12px", marginBottom: "6px" }}>{entry.applicationId}</div>
+                      <div style={{ color: theme.textStrong, fontFamily: "Space Grotesk, sans-serif", fontSize: "18px" }}>{entry.applicant.name}</div>
+                    </div>
+                    <div style={{ color: theme.textMuted, fontFamily: "JetBrains Mono, monospace", fontSize: "12px" }}>
+                      {entry.previousStatus} {'>'} {entry.status} | {new Date(entry.loggedAt).toLocaleString("en-US", { timeZone: "UTC" })} UTC
+                    </div>
+                  </div>
+                  <div className="cred-bureau-form-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: "12px", marginBottom: "10px" }}>
+                    <Field label="Telegram" value={entry.applicant.telegram} />
+                    <Field label="Email" value={entry.applicant.email} />
+                    <Field label="Status" value={entry.status} />
+                  </div>
+                  <Field label="Reviewer notes" value={entry.reviewerNotes} />
+                  <a href={entry.humanProfile.url || "https://helixa.xyz/join/human"} target="_blank" rel="noreferrer" style={{ display: "inline-block", marginTop: "10px", color: theme.accent, wordBreak: "break-all" }}>
+                    {entry.humanProfile.url || "Helixa profile required"}
+                  </a>
+                </article>
+              ))}
+            </div>
+          </section>
         )}
       </section>
     </SiteShell>

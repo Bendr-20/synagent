@@ -1,9 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { CredBureauApplicationPayload, CredBureauApplicationRecord, CredBureauApplicationStatus, CredBureauHumanProfileRef } from "./cred-bureau-types";
+import type { CredBureauApplicationPayload, CredBureauApplicationRecord, CredBureauApplicationStatus, CredBureauHumanProfileRef, CredBureauReviewLogEntry } from "./cred-bureau-types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const APPLICATIONS_PATH = path.join(DATA_DIR, "cred-bureau-applications.json");
+const REVIEW_LOG_PATH = path.join(DATA_DIR, "cred-bureau-review-log.json");
 
 function ensureDataDir() {
   fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -42,6 +43,10 @@ function cleanOptionalUrl(value: unknown, label: string) {
 
 function makeApplicationId() {
   return `cba_${Date.now().toString(36)}_${Math.random().toString(16).slice(2, 8)}`;
+}
+
+function makeReviewLogId(applicationId: string, status: CredBureauApplicationStatus) {
+  return `cbl_${applicationId}_${status}_${Date.now().toString(36)}_${Math.random().toString(16).slice(2, 8)}`;
 }
 
 function normalizeTelegram(value: unknown) {
@@ -142,21 +147,56 @@ export function getCredBureauApplications() {
   return readJsonFile<CredBureauApplicationRecord[]>(APPLICATIONS_PATH, []);
 }
 
+export function getCredBureauReviewLog() {
+  return readJsonFile<CredBureauReviewLogEntry[]>(REVIEW_LOG_PATH, []);
+}
+
+function appendCredBureauReviewLogEntry(
+  previous: CredBureauApplicationRecord,
+  updated: CredBureauApplicationRecord,
+  status: CredBureauApplicationStatus,
+  reviewerNotes?: string | null,
+) {
+  const entry: CredBureauReviewLogEntry = {
+    id: makeReviewLogId(updated.id, status),
+    applicationId: updated.id,
+    loggedAt: new Date().toISOString(),
+    previousStatus: previous.status,
+    status,
+    reviewerNotes: cleanOptionalString(reviewerNotes),
+    applicant: { ...updated.applicant },
+    humanProfile: { ...updated.humanProfile },
+    reviewAddendum: { ...updated.reviewAddendum },
+    applicationSnapshot: JSON.parse(JSON.stringify(updated)),
+  };
+
+  const reviewLog = getCredBureauReviewLog();
+  reviewLog.unshift(entry);
+  writeJsonFile(REVIEW_LOG_PATH, reviewLog);
+  return entry;
+}
+
 export function updateCredBureauApplicationStatus(id: string, status: CredBureauApplicationStatus, reviewerNotes?: string | null) {
   const applications = getCredBureauApplications();
   const index = applications.findIndex((application) => application.id === id);
   if (index === -1) throw new Error("Cred Bureau application not found");
 
+  const previous = applications[index];
   const updated: CredBureauApplicationRecord = {
-    ...applications[index],
+    ...previous,
     status,
     review: {
-      ...applications[index].review,
+      ...previous.review,
       reviewerNotes: cleanOptionalString(reviewerNotes),
     },
   };
 
   applications[index] = updated;
   writeJsonFile(APPLICATIONS_PATH, applications);
-  return updated;
+
+  const reviewLogEntry = status === "approved" || status === "rejected"
+    ? appendCredBureauReviewLogEntry(previous, updated, status, reviewerNotes)
+    : null;
+
+  return { application: updated, reviewLogEntry };
 }

@@ -48,6 +48,19 @@ export type CredBureauApplicationRecord = {
   };
 };
 
+export type CredBureauReviewLogEntry = {
+  id: string;
+  applicationId: string;
+  loggedAt: string;
+  previousStatus: CredBureauApplicationStatus;
+  status: CredBureauApplicationStatus;
+  reviewerNotes?: string | null;
+  applicant: CredBureauApplicant;
+  humanProfile: CredBureauHumanProfileRef;
+  reviewAddendum: CredBureauApplicationRecord["reviewAddendum"];
+  applicationSnapshot: CredBureauApplicationRecord;
+};
+
 export type CredBureauApplicationResponse =
   | {
       success: true;
@@ -65,6 +78,7 @@ export type CredBureauStatusUpdateResponse =
   | {
       success: true;
       application: CredBureauApplicationRecord;
+      reviewLogEntry?: CredBureauReviewLogEntry | null;
     }
   | {
       success: false;

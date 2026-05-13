@@ -92,8 +92,20 @@ function cleanupTestApplications() {
   );
 }
 
+function cleanupTestReviewLog() {
+  const reviewLogPath = path.join(process.cwd(), "data", "cred-bureau-review-log.json");
+  if (!fs.existsSync(reviewLogPath)) return;
+
+  const logEntries = JSON.parse(fs.readFileSync(reviewLogPath, "utf8")) as Array<Record<string, any>>;
+  fs.writeFileSync(
+    reviewLogPath,
+    `${JSON.stringify(logEntries.filter((entry) => ![TEST_PROFILE_URL, TEST_PRIVY_PROFILE_URL].includes(entry?.humanProfile?.url) && ![TEST_OPTIONAL_PROFILE_TELEGRAM, "@privyreviewer"].includes(entry?.applicant?.telegram)), null, 2)}\n`,
+  );
+}
+
 test("Cred Bureau application page, API, and review queue require Helixa profile while supporting optional links", { timeout: 60_000 }, async () => {
   cleanupTestApplications();
+  cleanupTestReviewLog();
   const port = await getFreePort();
   const server = spawn("./node_modules/.bin/next", ["start", "--port", String(port)], {
     cwd: process.cwd(),
@@ -193,6 +205,14 @@ test("Cred Bureau application page, API, and review queue require Helixa profile
     assert.match(body.nextStep, /manual review/i);
     assert.match(body.nextStep, /manually contact approved applicants/i);
 
+    const receivedPage = await fetch(`http://127.0.0.1:${port}/cred-bureau/received?applicationId=${encodeURIComponent(body.applicationId)}`);
+    const receivedHtml = await receivedPage.text();
+    assert.equal(receivedPage.status, 200);
+    assert.match(receivedHtml, /Application Received/i);
+    assert.match(receivedHtml, /under review/i);
+    assert.match(receivedHtml, new RegExp(body.applicationId));
+    assert.doesNotMatch(receivedHtml, /group invite/i);
+
     const applications = JSON.parse(fs.readFileSync(path.join(process.cwd(), "data", "cred-bureau-applications.json"), "utf8")) as Array<Record<string, any>>;
     const storedPrivy = applications.find((application) => application?.applicant?.telegram === "@privyreviewer");
     assert.ok(storedPrivy, "expected encoded Privy profile URL application to be persisted");
@@ -247,11 +267,36 @@ test("Cred Bureau application page, API, and review queue require Helixa profile
     assert.equal(updateBody.success, true);
     assert.equal(updateBody.application.status, "approved");
     assert.equal(updateBody.application.review.reviewerNotes, "Add to TG after profile review.");
+    assert.equal(updateBody.reviewLogEntry.status, "approved");
+    assert.equal(updateBody.reviewLogEntry.previousStatus, "pending-review");
+    assert.equal(updateBody.reviewLogEntry.applicant.telegram, TEST_OPTIONAL_PROFILE_TELEGRAM);
+    assert.equal(updateBody.reviewLogEntry.humanProfile.url, TEST_PROFILE_URL);
+    assert.equal(updateBody.reviewLogEntry.reviewerNotes, "Add to TG after profile review.");
+
+    const reviewLog = JSON.parse(fs.readFileSync(path.join(process.cwd(), "data", "cred-bureau-review-log.json"), "utf8")) as Array<Record<string, any>>;
+    const loggedDecision = reviewLog.find((entry) => entry?.applicationId === body.applicationId && entry?.status === "approved");
+    assert.ok(loggedDecision, "expected approved application decision to be persisted in the review log");
+    assert.equal(loggedDecision.previousStatus, "pending-review");
+    assert.equal(loggedDecision.applicant.name, "Cred Reviewer");
+    assert.equal(loggedDecision.applicant.telegram, TEST_OPTIONAL_PROFILE_TELEGRAM);
+    assert.equal(loggedDecision.applicant.email, "reviewer@example.com");
+    assert.equal(loggedDecision.humanProfile.url, TEST_PROFILE_URL);
+    assert.equal(loggedDecision.reviewAddendum.whyJoin, "I want to help review early Synagent requests and test Cred-based routing.");
+    assert.equal(loggedDecision.applicationSnapshot.review.manualGroupAddRequired, true);
+
+    const updatedReviewPage = await fetch(`http://127.0.0.1:${port}/review/cred-bureau?key=test-review-key`);
+    const updatedReviewHtml = await updatedReviewPage.text();
+    assert.equal(updatedReviewPage.status, 200);
+    assert.match(updatedReviewHtml, /Decision Log/i);
+    assert.match(updatedReviewHtml, /Cred Reviewer/i);
+    assert.match(updatedReviewHtml, /approved/i);
+    assert.match(updatedReviewHtml, /Add to TG after profile review/i);
   } catch (error) {
     throw new Error(`${error instanceof Error ? error.message : String(error)}\nServer logs:\n${logs}`);
   } finally {
     server.kill("SIGTERM");
     await new Promise((resolve) => server.once("exit", resolve));
     cleanupTestApplications();
+    cleanupTestReviewLog();
   }
 });
