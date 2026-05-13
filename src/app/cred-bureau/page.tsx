@@ -48,7 +48,7 @@ export default function CredBureauPage() {
             Cred Bureau Closed Beta
           </div>
           <h1 style={{ margin: "0 0 20px", color: theme.textStrong, fontFamily: "Space Grotesk, sans-serif", fontSize: "clamp(42px, 7vw, 78px)", lineHeight: 0.96, letterSpacing: "-0.04em" }}>
-            Apply for the human trust layer behind Synagent beta.
+            Apply for the human trust layer behind Synagent.
           </h1>
           <p style={{ margin: "0 0 28px", color: theme.textMuted, fontSize: "17px", lineHeight: 1.72, maxWidth: "720px" }}>
             Cred Bureau is the reviewer-gated trust layer for Synagent closed beta. Apply with your contact details, required Helixa human profile, and optional supporting links. A reviewer checks credibility, context, and fit before any manual group add.
