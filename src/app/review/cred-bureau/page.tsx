@@ -2,6 +2,7 @@ import Link from "next/link";
 import { SiteShell } from "@/components/site-shell";
 import { getCredBureauApplications, getCredBureauReviewLog } from "@/lib/cred-bureau-store";
 import { getReviewApiKey } from "@/lib/review-auth";
+import type { CredBureauApplicationRecord } from "@/lib/cred-bureau-types";
 import { glassCardStyle, outlineButtonStyle, theme } from "@/lib/theme";
 import { ReviewStatusControls } from "./review-status-controls";
 
@@ -18,6 +19,42 @@ function Field({ label, value }: { label: string; value?: string | null }) {
   );
 }
 
+function ApplicationCard({ application, reviewKey }: { application: CredBureauApplicationRecord; reviewKey: string }) {
+  const closedAt = application.review.closedAt || null;
+  return (
+    <article style={{ ...glassCardStyle, borderColor: closedAt ? "rgba(90,138,154,0.28)" : application.status === "approved" ? "rgba(0,229,255,0.36)" : theme.border }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: "14px", flexWrap: "wrap", marginBottom: "16px" }}>
+        <div>
+          <div style={{ color: theme.accent, fontFamily: "JetBrains Mono, monospace", fontSize: "12px", marginBottom: "8px" }}>{application.id}</div>
+          <h2 style={{ margin: 0, color: theme.textStrong, fontFamily: "Space Grotesk, sans-serif", fontSize: "24px" }}>{application.applicant.name}</h2>
+        </div>
+        <div style={{ color: theme.textMuted, fontFamily: "JetBrains Mono, monospace", fontSize: "12px" }}>
+          {application.status} | {new Date(application.createdAt).toLocaleString("en-US", { timeZone: "UTC" })} UTC{closedAt ? ` | closed ${new Date(closedAt).toLocaleString("en-US", { timeZone: "UTC" })} UTC` : ""}
+        </div>
+      </div>
+
+      <div className="cred-bureau-form-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: "14px", marginBottom: "16px" }}>
+        <Field label="Telegram" value={application.applicant.telegram} />
+        <Field label="Email" value={application.applicant.email} />
+        <Field label="Role" value={application.applicant.role} />
+        <Field label="Availability" value={application.reviewAddendum.availability} />
+        <Field label="LinkedIn" value={application.applicant.linkedinUrl} />
+        <Field label="Website" value={application.applicant.websiteUrl} />
+      </div>
+
+      <div style={{ display: "grid", gap: "12px" }}>
+        <Field label="Why review" value={application.reviewAddendum.whyJoin} />
+        <Field label="Disclosure" value={application.reviewAddendum.disclosure} />
+        <a href={application.humanProfile.url || "https://helixa.xyz/join/human"} target="_blank" rel="noreferrer" style={{ color: theme.accent, wordBreak: "break-all" }}>
+          {application.humanProfile.url || "Helixa profile required"}
+        </a>
+      </div>
+
+      <ReviewStatusControls application={application} reviewKey={reviewKey} />
+    </article>
+  );
+}
+
 export default async function CredBureauReviewPage({
   searchParams,
 }: {
@@ -25,9 +62,12 @@ export default async function CredBureauReviewPage({
 }) {
   const params = await searchParams;
   const reviewKey = getSingle(params.key)?.trim() || "";
+  const showClosed = getSingle(params.showClosed) === "1";
   const configuredKey = getReviewApiKey();
   const authorized = Boolean(configuredKey && reviewKey === configuredKey);
   const applications = authorized ? getCredBureauApplications() : [];
+  const openApplications = applications.filter((application) => !application.review.closedAt);
+  const closedApplications = applications.filter((application) => application.review.closedAt);
   const reviewLog = authorized ? getCredBureauReviewLog().slice(0, 25) : [];
 
   return (
@@ -70,41 +110,45 @@ export default async function CredBureauReviewPage({
           </div>
         )}
 
-        {authorized && applications.length > 0 && (
+        {authorized && closedApplications.length > 0 && !showClosed && (
+          <div style={{ ...glassCardStyle, color: theme.textMuted, lineHeight: 1.7, marginBottom: "16px" }}>
+            Closed review boxes hidden by default: {closedApplications.length}.{" "}
+            <Link href={`/review/cred-bureau?key=${encodeURIComponent(reviewKey)}&showClosed=1`} style={{ color: theme.accent }}>
+              Show closed boxes
+            </Link>
+          </div>
+        )}
+
+        {authorized && applications.length > 0 && openApplications.length === 0 && (
+          <div style={{ ...glassCardStyle, color: theme.textMuted, lineHeight: 1.7 }}>
+            No open review boxes. Approved and rejected boxes can be reopened from the closed box view if needed.
+          </div>
+        )}
+
+        {authorized && openApplications.length > 0 && (
           <div style={{ display: "grid", gap: "16px" }}>
-            {applications.map((application) => (
-              <article key={application.id} style={{ ...glassCardStyle, borderColor: application.status === "approved" ? "rgba(0,229,255,0.36)" : theme.border }}>
-                <div style={{ display: "flex", justifyContent: "space-between", gap: "14px", flexWrap: "wrap", marginBottom: "16px" }}>
-                  <div>
-                    <div style={{ color: theme.accent, fontFamily: "JetBrains Mono, monospace", fontSize: "12px", marginBottom: "8px" }}>{application.id}</div>
-                    <h2 style={{ margin: 0, color: theme.textStrong, fontFamily: "Space Grotesk, sans-serif", fontSize: "24px" }}>{application.applicant.name}</h2>
-                  </div>
-                  <div style={{ color: theme.textMuted, fontFamily: "JetBrains Mono, monospace", fontSize: "12px" }}>
-                    {application.status} | {new Date(application.createdAt).toLocaleString("en-US", { timeZone: "UTC" })} UTC
-                  </div>
-                </div>
-
-                <div className="cred-bureau-form-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: "14px", marginBottom: "16px" }}>
-                  <Field label="Telegram" value={application.applicant.telegram} />
-                  <Field label="Email" value={application.applicant.email} />
-                  <Field label="Role" value={application.applicant.role} />
-                  <Field label="Availability" value={application.reviewAddendum.availability} />
-                  <Field label="LinkedIn" value={application.applicant.linkedinUrl} />
-                  <Field label="Website" value={application.applicant.websiteUrl} />
-                </div>
-
-                <div style={{ display: "grid", gap: "12px" }}>
-                  <Field label="Why review" value={application.reviewAddendum.whyJoin} />
-                  <Field label="Disclosure" value={application.reviewAddendum.disclosure} />
-                  <a href={application.humanProfile.url || "https://helixa.xyz/join/human"} target="_blank" rel="noreferrer" style={{ color: theme.accent, wordBreak: "break-all" }}>
-                    {application.humanProfile.url || "Helixa profile required"}
-                  </a>
-                </div>
-
-                <ReviewStatusControls application={application} reviewKey={reviewKey} />
-              </article>
+            {openApplications.map((application) => (
+              <ApplicationCard key={application.id} application={application} reviewKey={reviewKey} />
             ))}
           </div>
+        )}
+
+        {authorized && showClosed && closedApplications.length > 0 && (
+          <section style={{ marginTop: "24px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", alignItems: "center", flexWrap: "wrap", marginBottom: "14px" }}>
+              <h2 style={{ margin: 0, color: theme.textStrong, fontFamily: "Space Grotesk, sans-serif", fontSize: "26px" }}>
+                Closed Review Boxes
+              </h2>
+              <Link href={`/review/cred-bureau?key=${encodeURIComponent(reviewKey)}`} style={{ ...outlineButtonStyle, width: "auto" }}>
+                Hide Closed Boxes
+              </Link>
+            </div>
+            <div style={{ display: "grid", gap: "16px" }}>
+              {closedApplications.map((application) => (
+                <ApplicationCard key={application.id} application={application} reviewKey={reviewKey} />
+              ))}
+            </div>
+          </section>
         )}
 
         {authorized && reviewLog.length > 0 && (

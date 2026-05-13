@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { appendCredBureauApplication, buildCredBureauApplicationRecord, getCredBureauApplications, updateCredBureauApplicationStatus } from "@/lib/cred-bureau-store";
+import { appendCredBureauApplication, buildCredBureauApplicationRecord, getCredBureauApplications, setCredBureauReviewBoxClosed, updateCredBureauApplicationStatus } from "@/lib/cred-bureau-store";
 import { assertReviewAuthorized } from "@/lib/review-auth";
 import type { CredBureauApplicationResponse, CredBureauApplicationStatus, CredBureauStatusUpdateResponse } from "@/lib/cred-bureau-types";
 
@@ -56,6 +56,12 @@ export async function PATCH(req: Request) {
     const id = typeof payload.id === "string" ? payload.id.trim() : "";
     const status = payload.status;
     if (!id) throw new Error("Application ID is required");
+
+    if (typeof payload.closeReviewBox === "boolean") {
+      const { application, reviewLogEntry } = setCredBureauReviewBoxClosed(id, payload.closeReviewBox);
+      return NextResponse.json({ success: true, application, reviewLogEntry } satisfies CredBureauStatusUpdateResponse);
+    }
+
     if (!isValidStatus(status)) throw new Error("Status must be pending-review, approved, or rejected");
 
     const { application, reviewLogEntry } = updateCredBureauApplicationStatus(id, status, typeof payload.reviewerNotes === "string" ? payload.reviewerNotes : null);

@@ -14,6 +14,7 @@ test("Cred Bureau application is linked from public Synagent entry points", () =
   const siteShell = fs.readFileSync("src/components/site-shell.tsx", "utf8");
   const credBureauForm = fs.readFileSync("src/app/cred-bureau/cred-bureau-application-form.tsx", "utf8");
   const credBureauPage = fs.readFileSync("src/app/cred-bureau/page.tsx", "utf8");
+  const reviewStatusControls = fs.readFileSync("src/app/review/cred-bureau/review-status-controls.tsx", "utf8");
 
   assert.match(homePage, /href=\"\/cred-bureau\"/);
   assert.doesNotMatch(siteShell, /href=\"\/cred-bureau\"/);
@@ -25,6 +26,8 @@ test("Cred Bureau application is linked from public Synagent entry points", () =
   assert.doesNotMatch(credBureauPage, /href=\"\/match\?category=mvp-build\"/);
   assert.doesNotMatch(`${credBureauForm}\n${credBureauPage}`, /source=cred-bureau/);
   assert.doesNotMatch(`${credBureauForm}\n${credBureauPage}`, /First create|do not create separate profiles|reviewer and operator bench/i);
+  assert.match(reviewStatusControls, /Close Review Box/i);
+  assert.match(reviewStatusControls, /closeReviewBox/i);
 });
 
 test("Cred Bureau page has mobile stack rules for the application flow", () => {
@@ -291,6 +294,44 @@ test("Cred Bureau application page, API, and review queue require Helixa profile
     assert.match(updatedReviewHtml, /Cred Reviewer/i);
     assert.match(updatedReviewHtml, /approved/i);
     assert.match(updatedReviewHtml, /Add to TG after profile review/i);
+    assert.match(updatedReviewHtml, /Close Review Box/i);
+
+    const closeBox = await fetch(`http://127.0.0.1:${port}/api/cred-bureau/applications`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", Authorization: "Bearer test-review-key" },
+      body: JSON.stringify({ id: body.applicationId, closeReviewBox: true }),
+    });
+    const closeBoxBody = await closeBox.json() as Record<string, any>;
+    assert.equal(closeBox.status, 200);
+    assert.equal(closeBoxBody.success, true);
+    assert.equal(closeBoxBody.application.id, body.applicationId);
+    assert.equal(closeBoxBody.application.status, "approved");
+    assert.ok(closeBoxBody.application.review.closedAt, "expected closed approved review box to have a closedAt timestamp");
+    assert.equal(closeBoxBody.reviewLogEntry, null);
+
+    const closedReviewPage = await fetch(`http://127.0.0.1:${port}/review/cred-bureau?key=test-review-key`);
+    const closedReviewHtml = await closedReviewPage.text();
+    assert.equal(closedReviewPage.status, 200);
+    assert.match(closedReviewHtml, /Closed review boxes hidden/i);
+    assert.doesNotMatch(closedReviewHtml, /Close Review Box/i);
+    assert.match(closedReviewHtml, /Decision Log/i);
+    assert.match(closedReviewHtml, /Add to TG after profile review/i);
+
+    const showClosedReviewPage = await fetch(`http://127.0.0.1:${port}/review/cred-bureau?key=test-review-key&showClosed=1`);
+    const showClosedReviewHtml = await showClosedReviewPage.text();
+    assert.equal(showClosedReviewPage.status, 200);
+    assert.match(showClosedReviewHtml, /Closed Review Boxes/i);
+    assert.match(showClosedReviewHtml, /Reopen Review Box/i);
+
+    const reopenBox = await fetch(`http://127.0.0.1:${port}/api/cred-bureau/applications`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", Authorization: "Bearer test-review-key" },
+      body: JSON.stringify({ id: body.applicationId, closeReviewBox: false }),
+    });
+    const reopenBoxBody = await reopenBox.json() as Record<string, any>;
+    assert.equal(reopenBox.status, 200);
+    assert.equal(reopenBoxBody.success, true);
+    assert.equal(reopenBoxBody.application.review.closedAt, null);
   } catch (error) {
     throw new Error(`${error instanceof Error ? error.message : String(error)}\nServer logs:\n${logs}`);
   } finally {

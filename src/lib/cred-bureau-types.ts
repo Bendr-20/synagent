@@ -45,6 +45,7 @@ export type CredBureauApplicationRecord = {
     manualGroupAddRequired: true;
     autoInviteSent: false;
     reviewerNotes?: string | null;
+    closedAt?: string | null;
   };
 };
 

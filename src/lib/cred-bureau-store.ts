@@ -132,6 +132,7 @@ export function buildCredBureauApplicationRecord(payload: CredBureauApplicationP
       manualGroupAddRequired: true,
       autoInviteSent: false,
       reviewerNotes: null,
+      closedAt: null,
     },
   };
 }
@@ -188,6 +189,7 @@ export function updateCredBureauApplicationStatus(id: string, status: CredBureau
     review: {
       ...previous.review,
       reviewerNotes: cleanOptionalString(reviewerNotes),
+      closedAt: status === "pending-review" ? null : previous.review.closedAt || null,
     },
   };
 
@@ -199,4 +201,28 @@ export function updateCredBureauApplicationStatus(id: string, status: CredBureau
     : null;
 
   return { application: updated, reviewLogEntry };
+}
+
+export function setCredBureauReviewBoxClosed(id: string, closeReviewBox: boolean) {
+  const applications = getCredBureauApplications();
+  const index = applications.findIndex((application) => application.id === id);
+  if (index === -1) throw new Error("Cred Bureau application not found");
+
+  const previous = applications[index];
+  if (closeReviewBox && previous.status === "pending-review") {
+    throw new Error("Only approved or rejected review boxes can be closed.");
+  }
+
+  const updated: CredBureauApplicationRecord = {
+    ...previous,
+    review: {
+      ...previous.review,
+      closedAt: closeReviewBox ? new Date().toISOString() : null,
+    },
+  };
+
+  applications[index] = updated;
+  writeJsonFile(APPLICATIONS_PATH, applications);
+
+  return { application: updated, reviewLogEntry: null };
 }
