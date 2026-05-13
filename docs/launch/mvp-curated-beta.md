@@ -34,6 +34,8 @@ Cred Bureau closed beta:
 - Backup reviewer: Jim
 - Response SLA: same business day; late-day submissions roll to next morning
 - Manual group adds: Jim
+- Applicant approval mode: manual only during closed beta; automation can be considered later
+- Applicant rules: `docs/cred-bureau-applicant-rules.md`
 - Escalation path: flag in Fool Spectrum without posting the review key
 - Provider availability check cadence: TBD
 
@@ -169,4 +171,5 @@ For soft launch, MVP-ready means:
 - review APIs are protected by a review key
 - ops secrets are set in deployment
 - a human owner and SLA are named
+- applicant rules are locked and manual-only for closed beta
 - at least one end-to-end request has been tested in the deployed environment

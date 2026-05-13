@@ -24,8 +24,8 @@ Status: locked for closed beta
 ## Review workflow
 
 1. Applicant submits the Cred Bureau form with a required Helixa human profile URL.
-2. Review owner checks contact info, Helixa profile, Cred context, optional LinkedIn/website, why-join note, availability, and disclosure.
-3. Reviewer sets the application to pending, approved, or rejected with reviewer notes.
+2. Review owner checks contact info, Helixa profile, Cred context, optional LinkedIn/website, why-join note, availability, and disclosure against `docs/cred-bureau-applicant-rules.md`.
+3. Reviewer sets the application to pending, approved, or rejected manually with reviewer notes.
 4. Approved/rejected decisions automatically create a Decision Log entry.
 5. If approved, Jim manually adds the applicant to the group.
 6. After the decision and any manual add are complete, close the review box so it leaves the active queue.
@@ -33,7 +33,9 @@ Status: locked for closed beta
 
 ## Operating rules
 
+- Closed beta approvals are manual only; criteria guide reviewers but do not auto-approve applicants.
 - Do not auto-invite applicants.
+- Follow `docs/cred-bureau-applicant-rules.md` for qualification, pending, rejection, and conflict handling.
 - Do not approve incomplete Helixa human profiles unless Quigley explicitly wants to park or make an exception.
 - Do not share the review key in the group chat.
 - Follow `docs/review-queue-security.md` for authorized reviewer roster, key handling, and rotation.

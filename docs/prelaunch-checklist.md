@@ -12,10 +12,12 @@ Last updated: 2026-05-13 UTC
 - [x] YELLOW - Primary offer selected: Create an MVP
 - [ ] YELLOW - Define who Synagent is for and not for in launch copy
 - [x] GREEN - Cred Bureau closed beta review owner and SLA locked
+- [x] GREEN - Cred Bureau applicant rules locked as manual-only approval for closed beta
 
 Notes:
 - MVP should be concierge routing with Helixa trust underneath.
 - Cred Bureau closed beta ops are locked in `docs/cred-bureau-closed-beta-ops.md`: Quigley review owner, Jim backup reviewer and manual group adds, same-business-day SLA.
+- Cred Bureau applicant rules are locked in `docs/cred-bureau-applicant-rules.md`: manual approval only for this beta; automation can be considered later.
 - Broader Synagent MVP request handling can reuse this ops pattern, but should be explicitly confirmed before broad public launch.
 
 ## 2. Offer + homepage clarity
@@ -133,12 +135,11 @@ Notes:
 
 ## Current overall launch call
 - RED - Not ready for broad public launch
-- YELLOW - Close to curated beta once delivery secrets, provider availability, backups, and final applicant rules are locked
+- YELLOW - Close to curated beta once delivery secrets, provider availability, and backups are locked
 
 ## Fastest path to soft launch
 1. Set notification secrets in deployment if alerts are enabled.
 2. Privately confirm only Jim, Quigley, and Epifani have the review key, or rotate it before wider beta.
 3. Test one real request end to end in preview.
 4. Confirm Degeneer availability and add 2-3 more real providers if possible.
-5. Lock applicant qualification/rejection rules.
-6. Launch as concierge beta, not marketplace.
+5. Launch as concierge beta, not marketplace.
