@@ -109,10 +109,14 @@ Notes:
 - [ ] YELLOW - Check 404 and broken-state UX manually
 - [ ] YELLOW - Check metadata and social preview behavior manually
 - [ ] YELLOW - Check mobile Safari and Telegram in-app browser manually
-- [ ] YELLOW - Test successful request submission end to end in deployed preview
+- [x] GREEN - Live HTTPS Cred Bureau page loads with valid TLS
+- [x] GREEN - Live Cred Bureau smoke submit reached protected review queue
+- [x] GREEN - Git tree clean after final technical check
 
 Build result:
-- `next build` passed successfully on 2026-05-09 UTC.
+- `npm test` passed `next build` plus 14/14 tests on 2026-05-13 UTC.
+- Live HTTPS check passed for `https://synagent.helixa.xyz/cred-bureau` with HTTP 200 and TLS verify result 0 on 2026-05-13 UTC.
+- Live smoke application `cba_mp4ola1s_796356` submitted successfully, appeared in the protected review queue as `pending-review`, and was removed after verification to keep the queue clean.
 
 ## 9. Launch ops
 - [ ] YELLOW - Pick launch date
@@ -137,7 +141,7 @@ Notes:
 
 ## Current overall launch call
 - RED - Not ready for broad public launch
-- YELLOW - Close to curated beta once delivery secrets, provider availability, and backups are locked
+- YELLOW - Close to curated beta once provider availability and backups are locked
 
 ## Fastest path to soft launch
 1. Set notification secrets in deployment if alerts are enabled.
