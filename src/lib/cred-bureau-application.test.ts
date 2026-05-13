@@ -30,6 +30,23 @@ test("Cred Bureau application is linked from public Synagent entry points", () =
   assert.match(reviewStatusControls, /closeReviewBox/i);
 });
 
+test("public launch copy stays curated, manual, and modest", () => {
+  const homePage = fs.readFileSync("src/app/page.tsx", "utf8");
+  const credBureauPage = fs.readFileSync("src/app/cred-bureau/page.tsx", "utf8");
+  const credBureauForm = fs.readFileSync("src/app/cred-bureau/cred-bureau-application-form.tsx", "utf8");
+  const receivedPage = fs.readFileSync("src/app/cred-bureau/received/page.tsx", "utf8");
+  const publicCopy = [homePage, credBureauPage, credBureauForm, receivedPage].join("\n");
+
+  assert.match(homePage, /reviewed intake/i);
+  assert.match(homePage, /Submit Reviewed Request/i);
+  assert.doesNotMatch(homePage, /route it to trusted humans and agents/i);
+  assert.match(credBureauPage, /Apply for Manual Review/i);
+  assert.match(credBureauPage, /No instant access/i);
+  assert.match(credBureauForm, /Manual review only/i);
+  assert.match(receivedPage, /No automatic approval/i);
+  assert.doesNotMatch(publicCopy, /instant approval|guaranteed routing|escrow|payment promise|open marketplace/i);
+});
+
 test("Cred Bureau page has mobile stack rules for the application flow", () => {
   const css = fs.readFileSync("src/app/globals.css", "utf8");
 

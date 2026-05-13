@@ -6,7 +6,7 @@ Last updated: 2026-05-13 UTC
 
 Synagent launches as a curated beta, not an open marketplace.
 
-The MVP promise is concierge routing: a requester submits an MVP/build request, Synagent stores the intake, reviews fit, and routes only credible matches to real operators. If no match is strong enough, the request stays in manual review.
+The MVP promise is reviewed intake and concierge routing: a requester submits an MVP/build request, Synagent stores the intake, a human reviews fit, and only credible matches move toward an operator intro. If no match is strong enough, the request stays in manual review.
 
 ## Lead offer
 
@@ -17,14 +17,14 @@ Support lanes:
 - AI implementation guidance
 - Automation, design, growth, and research only when a real provider fit exists
 
-Do not position Synagent as a broad freelancer marketplace yet.
+Do not position Synagent as an open marketplace, instant matching engine, escrow product, or guaranteed delivery network yet.
 
 ## Current launch providers and profile status
 
 Public provider list:
 - Degeneer, remote, USDC/CRED accepted, profile pending in Helixa
 
-Current supply is intentionally thin. If public providers remain below 3 real operators, launch copy should frame this as concierge beta handling, not marketplace density.
+Current supply is intentionally thin. If public providers remain below 3 real operators, launch copy should frame this as reviewed concierge beta handling, not marketplace density.
 
 ## Owner and SLA fields
 
@@ -134,7 +134,7 @@ If no curated beta provider meets the threshold:
 
 Suggested requester copy:
 
-> We received your request. It does not have a strong curated-provider match yet, so a reviewer is checking it manually instead of routing it to the wrong operator.
+> We received your request. It does not have a strong curated-provider match yet, so a reviewer is checking it manually instead of routing it to the wrong operator. No automatic match, payment, or delivery promise has been created.
 
 ## Anti-spam posture
 
@@ -155,7 +155,7 @@ Do not promise:
 - a large marketplace
 - instant automatic matching for every request
 - guaranteed delivery timelines before reviewer/provider confirmation
-- payments or escrow through Synagent until checkout exists
+- payments, payment handling, or escrow through Synagent until checkout exists
 - x402 checkout in the launch MVP
 - verified Helixa profiles for providers whose profiles are still pending
 - public exposure of requester contact details
@@ -172,4 +172,5 @@ For soft launch, MVP-ready means:
 - ops secrets are set in deployment
 - a human owner and SLA are named
 - applicant rules are locked and manual-only for closed beta
+- launch copy frames Synagent as reviewed intake, manual routing, and curated beta access
 - at least one end-to-end request has been tested in the deployed environment

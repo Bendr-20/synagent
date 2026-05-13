@@ -14,33 +14,33 @@ type ServiceCard = {
   buttonHref?: string;
 };
 
-const betaPositioning = "Synagent is a curated platform for MVP builds, AI workflow fixes, and human-agent delivery teams powered by Helixa and Cred.";
+const betaPositioning = "Synagent is a curated beta for reviewed intake: MVP builds, AI workflow fixes, and human-agent delivery teams powered by Helixa and Cred.";
 
 const serviceCards: ServiceCard[] = [
   {
     number: "01",
     title: "Create An MVP",
-    description: "Submit the MVP you need built. We review the brief, shape the scope, and route fit-matched requests to trusted humans and agents.",
+    description: "Submit the MVP you need built. We review the brief, shape scope, and manually route only fit-matched requests to real operators.",
     titleColor: theme.accent,
     isPrimary: true,
     calloutLabel: "Primary beta offer",
     calloutItems: [
       "Built around real MVP, workflow, and launch-support requests.",
       "Scope is reviewed before any operator intro is made.",
-      "You get a clear next step instead of a generic marketplace result.",
+      "You get a clear next step instead of a random directory result.",
     ],
-    buttonText: "Create An MVP",
+    buttonText: "Submit Reviewed Request",
     buttonHref: "/match?category=mvp-build",
   },
   {
     number: "02",
     title: "Hire A Human",
-    description: "A support lane for requests that need human execution, review, or operator judgment alongside the MVP build path.",
+    description: "A reviewed support lane for requests that need human execution or operator judgment alongside the MVP build path.",
     titleColor: "#9ff9ff",
     calloutLabel: "Support lane",
     calloutItems: [
       "Available when a request needs human-only expertise.",
-      "Routed only after fit and availability are checked.",
+      "Introductions happen only after fit and availability are checked.",
       "Profiles are shown only for real operators who are available.",
     ],
     buttonText: "Request Human Support",
@@ -49,7 +49,7 @@ const serviceCards: ServiceCard[] = [
   {
     number: "03",
     title: "Human AI Consultants",
-    description: "A support lane for teams that need agent strategy, workflow diagnosis, or AI implementation guidance before a build starts.",
+    description: "A reviewed support lane for teams that need agent strategy, workflow diagnosis, or AI implementation guidance before a build starts.",
     titleColor: theme.accentDark,
     calloutLabel: "Support lane",
     calloutItems: [
@@ -64,8 +64,8 @@ const serviceCards: ServiceCard[] = [
 
 const howItWorksSteps = [
   "Submit a brief",
-  "We review fit",
-  "We route to real operators",
+  "Reviewer checks fit",
+  "Manual routing if fit is real",
   "You get a human-readable next step",
 ];
 
@@ -143,7 +143,7 @@ function MvpFlow() {
     <div className="mvp-flow" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px", marginTop: "20px" }}>
       <div style={{ ...boxStyle, padding: "12px 14px", color: theme.textStrong, fontSize: "12px", letterSpacing: "0.08em" }}>Your Brief</div>
       <div style={{ color: theme.textMuted, fontSize: "18px", fontFamily: "JetBrains Mono, monospace", lineHeight: 1 }}>↓</div>
-      <div style={{ ...boxStyle, color: theme.accent, fontSize: "11px", letterSpacing: "0.06em" }}>Fit Review &gt; Trusted Routing</div>
+      <div style={{ ...boxStyle, color: theme.accent, fontSize: "11px", letterSpacing: "0.06em" }}>Fit Review &gt; Manual Routing</div>
       <div style={{ color: theme.textMuted, fontSize: "18px", fontFamily: "JetBrains Mono, monospace", lineHeight: 1 }}>↓</div>
       <div style={{ ...boxStyle, color: theme.textStrong, fontSize: "11px", letterSpacing: "0.08em" }}>Next Step</div>
     </div>
@@ -181,7 +181,7 @@ export default function HomePage() {
 
         <h1 className="hero-title" style={{ fontSize: "56px", fontWeight: 700, fontFamily: "Space Grotesk, sans-serif", lineHeight: 1.1, marginBottom: "22px", maxWidth: "780px" }}>
           <span style={{ color: theme.textStrong }}>Tell us what you need built.</span>{" "}
-          <span style={{ color: theme.accent }}>We route it to trusted humans and agents.</span>
+          <span style={{ color: theme.accent }}>We review the brief before any intro.</span>
         </h1>
 
         <p style={{ maxWidth: "760px", color: theme.textMuted, fontSize: "17px", lineHeight: 1.7, margin: "0 0 30px" }}>
@@ -195,7 +195,7 @@ export default function HomePage() {
             aria-label="Project brief"
             name="brief"
             rows={2}
-            placeholder="Tell us what you're building, the workflow fix you need, or the delivery team you want..."
+            placeholder="Tell us what you're building, the workflow fix you need, or the operator help you want reviewed..."
             style={{
               width: "100%",
               minHeight: "70px",
@@ -213,7 +213,7 @@ export default function HomePage() {
             }}
           />
           <button type="submit" style={{ ...solidButtonStyle, alignSelf: "center", width: "auto", minWidth: "220px" }}>
-            Start match
+            Submit Reviewed Request
           </button>
         </form>
 

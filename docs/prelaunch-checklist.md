@@ -10,7 +10,7 @@ Last updated: 2026-05-13 UTC
 ## 1. Launch definition
 - [x] YELLOW - Launch mode selected: curated beta / concierge routing
 - [x] YELLOW - Primary offer selected: Create an MVP
-- [ ] YELLOW - Define who Synagent is for and not for in launch copy
+- [x] GREEN - Launch copy defines curated beta boundaries and avoids open-marketplace promises
 - [x] GREEN - Cred Bureau closed beta review owner and SLA locked
 - [x] GREEN - Cred Bureau applicant rules locked as manual-only approval for closed beta
 
@@ -21,14 +21,14 @@ Notes:
 - Broader Synagent MVP request handling can reuse this ops pattern, but should be explicitly confirmed before broad public launch.
 
 ## 2. Offer + homepage clarity
-- [x] YELLOW - Homepage is refocused around Create an MVP
-- [x] YELLOW - Plain how-it-works section exists
-- [x] YELLOW - CTA language matches the reviewed-intake flow
-- [x] YELLOW - Support lanes are secondary instead of equal marketplace promises
+- [x] GREEN - Homepage is refocused around reviewed MVP intake
+- [x] GREEN - Plain how-it-works section exists
+- [x] GREEN - CTA language matches the reviewed-intake flow
+- [x] GREEN - Support lanes are secondary instead of equal marketplace promises
 
 Notes:
-- Offer clarity moved from RED to YELLOW because the homepage now leads with MVP/build requests.
-- Still needs team review of exact launch copy before public announcement.
+- Step 6 copy pass completed on 2026-05-13 UTC after team approval in group.
+- Homepage now leads with reviewed intake, manual routing, and curated beta boundaries instead of instant matching or marketplace density.
 
 ## 3. Directory integrity
 - [x] YELLOW - Fake provider directory removed from public export
@@ -86,7 +86,7 @@ Notes:
 - [x] YELLOW - Fake-looking marketplace density removed
 - [x] YELLOW - Privacy/contact copy added to intake
 - [x] YELLOW - Fallback path exists when matching fails
-- [ ] YELLOW - Add clearer payment expectations before launch copy goes public
+- [x] GREEN - Launch copy and runbook avoid payment or escrow promises until checkout exists
 - [ ] YELLOW - Finish or link Helixa profiles for launch providers where possible
 
 Notes:

@@ -25,7 +25,7 @@ export default async function CredBureauReceivedPage({
             Application Received
           </h1>
           <p style={{ margin: 0, color: theme.textMuted, lineHeight: 1.8, fontSize: "16px" }}>
-            We received your Cred Bureau application and it is under review. The Synagent team will review your Helixa profile, Cred context, and supporting links before manually contacting approved applicants.
+            We received your Cred Bureau application and it is under review. The Synagent team will review your Helixa profile, Cred context, supporting links, and fit before manually contacting approved applicants. No automatic approval or public access link is issued from this form.
           </p>
           {applicationId && (
             <div style={{ padding: "14px 16px", borderRadius: "12px", border: `1px solid ${theme.border}`, color: theme.textStrong, fontFamily: "JetBrains Mono, monospace", wordBreak: "break-all" }}>

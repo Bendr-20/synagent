@@ -13,7 +13,7 @@ const flowSteps = [
   },
   {
     label: "Manual review",
-    body: "Profile and addendum are reviewed before access. No auto-approval, no public invite link.",
+    body: "Profile and addendum are reviewed before access. No automatic approval, no public invite link.",
   },
   {
     label: "Manual group add",
@@ -25,6 +25,7 @@ const bureauSignals = [
   "Simple application with Telegram contact",
   "Required Helixa human profile link",
   "Manual review before group access",
+  "No instant access or public invite link",
 ];
 
 export default function CredBureauPage() {
@@ -47,14 +48,14 @@ export default function CredBureauPage() {
             Cred Bureau Closed Beta
           </div>
           <h1 style={{ margin: "0 0 20px", color: theme.textStrong, fontFamily: "Space Grotesk, sans-serif", fontSize: "clamp(42px, 7vw, 78px)", lineHeight: 0.96, letterSpacing: "-0.04em" }}>
-            Join the human trust layer behind Synagent beta.
+            Apply for the human trust layer behind Synagent beta.
           </h1>
           <p style={{ margin: "0 0 28px", color: theme.textMuted, fontSize: "17px", lineHeight: 1.72, maxWidth: "720px" }}>
-            Cred Bureau is invite-only access for Synagent beta reviewers and operators. Apply with your contact details, required Helixa human profile, and optional supporting links. Approved applicants are manually added to the group chat.
+            Cred Bureau is the reviewer-gated trust layer for Synagent closed beta. Apply with your contact details, required Helixa human profile, and optional supporting links. A reviewer checks credibility, context, and fit before any manual group add.
           </p>
           <div className="cred-bureau-actions" style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}>
             <a href="#apply" style={{ ...solidButtonStyle, width: "auto", minWidth: "190px" }}>
-              Apply to Cred Bureau
+              Apply for Manual Review
             </a>
           </div>
         </div>

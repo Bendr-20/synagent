@@ -177,9 +177,9 @@ export function CredBureauApplicationForm() {
     <form id="apply" onSubmit={onSubmit} style={{ ...glassCardStyle, display: "flex", flexDirection: "column", gap: "18px" }}>
       <div>
         <div style={{ ...fieldLabelStyle, color: theme.accent }}>Apply to Cred Bureau</div>
-        <h2 style={{ margin: "0 0 10px", color: theme.textStrong, fontFamily: "Space Grotesk, sans-serif", fontSize: "28px" }}>Submit for manual review</h2>
+        <h2 style={{ margin: "0 0 10px", color: theme.textStrong, fontFamily: "Space Grotesk, sans-serif", fontSize: "28px" }}>Manual review only</h2>
         <p style={{ margin: 0, color: theme.textMuted, lineHeight: 1.7 }}>
-          Helixa human profile is required for Cred Bureau applications. Create or update your profile first, then submit it with any supporting LinkedIn or website links you want reviewers to see.
+          Helixa human profile is required for Cred Bureau applications. Create or update your profile first, then submit it with any supporting LinkedIn or website links you want reviewers to see. Submitting does not grant access or trigger an automatic invite.
         </p>
       </div>
 
@@ -263,7 +263,7 @@ export function CredBureauApplicationForm() {
       </div>
 
       <button type="submit" disabled={submitState.kind === "submitting"} style={{ ...solidButtonStyle, opacity: submitState.kind === "submitting" ? 0.72 : 1 }}>
-        {submitState.kind === "submitting" ? "Submitting for review" : "Submit Application"}
+        {submitState.kind === "submitting" ? "Submitting for review" : "Submit for Manual Review"}
       </button>
 
       {submitState.kind === "success" && (
