@@ -46,7 +46,7 @@ Before broad public launch, confirm whether the same owner/SLA model also applie
 Set these in the deployment environment, never in git:
 
 ```bash
-SYNAGENT_NOTIFICATION_MODE=review
+SYNAGENT_NOTIFICATION_MODE=queue-only
 SYNAGENT_REVIEW_API_KEY=<strong shared review key; private to Jim, Quigley, Epifani during closed beta>
 SYNAGENT_AGENTMAIL_API_KEY=<agentmail api key, if email dispatch is enabled>
 SYNAGENT_AGENTMAIL_INBOX_ID=<agentmail inbox id, if email dispatch is enabled>
@@ -57,10 +57,14 @@ SYNAGENT_TELEGRAM_BASE_URL=https://api.telegram.org
 
 Review queue security is documented in `docs/review-queue-security.md`. Do not paste the key in group chat; rotate it before wider beta if distribution is uncertain.
 
-Recommended MVP mode:
-- `queue-only` until the reviewer has checked request quality manually
-- `review` once AgentMail or Telegram secrets are configured and tested
-- `live` only after the team is comfortable with automatic dispatch behavior
+Closed beta notification mode: `queue-only`.
+
+Reviewers check protected queues manually during closed beta. No outbound AgentMail or Telegram alerts should be considered enabled until real delivery secrets are configured and a smoke test succeeds.
+
+Mode progression:
+- `queue-only` for closed beta: requests and provider notifications are saved for protected review, but no outbound alert is sent.
+- `review` only after AgentMail or Telegram secrets are configured and tested; a reviewer can dispatch queued provider notifications.
+- `live` only after the team is comfortable with automatic dispatch behavior.
 
 ## Provider onboarding checklist
 
@@ -118,9 +122,9 @@ curl -X POST "https://<deployment-host>/api/match/dispatch" \
 ```
 
 Expected behavior:
-- `queue-only`: dispatch is blocked because providers are not configured
-- `review`: reviewer can send queued notifications after checking fit
-- `live`: notifications can be sent through configured channels
+- `queue-only`: dispatch is intentionally blocked even if delivery providers are present; reviewers use the protected queues manually.
+- `review`: reviewer can send queued notifications after checking fit, once AgentMail or Telegram secrets are configured and tested.
+- `live`: notifications can be sent through configured channels after the team approves automatic dispatch behavior.
 
 ## Fallback path when no match is strong
 
@@ -169,7 +173,7 @@ For soft launch, MVP-ready means:
 - weird requests fall back to review
 - spam has basic rate limiting
 - review APIs are protected by a review key
-- ops secrets are set in deployment
+- notification mode is locked to `queue-only` unless AgentMail or Telegram delivery has been configured and smoke-tested
 - a human owner and SLA are named
 - applicant rules are locked and manual-only for closed beta
 - launch copy frames Synagent as reviewed intake, manual routing, and curated beta access

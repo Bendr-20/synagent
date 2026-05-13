@@ -60,16 +60,18 @@ Notes:
 - [x] GREEN - Cred Bureau review key configured and server-side security audit passed
 - [x] GREEN - Cred Bureau authorized reviewer roster restricted to Jim, Quigley, and Epifani
 - [ ] YELLOW - Rotate review key before wider beta if private distribution cannot be confirmed
-- [ ] RED - Replace placeholder delivery config with real deployment values
-- [ ] YELLOW - Test AgentMail delivery with a real request
-- [ ] YELLOW - Test Telegram delivery with a real request if Telegram alerts are enabled
+- [x] GREEN - Closed beta notification mode selected: queue-only/manual queue review
+- [x] GREEN - Missing delivery secrets resolve to queue-only instead of outbound alerts
+- [ ] YELLOW - Configure and test AgentMail delivery only if email alerts are enabled later
+- [ ] YELLOW - Configure and test Telegram delivery only if Telegram alerts are enabled later
 - [x] GREEN - Cred Bureau review owner, backup reviewer, manual add owner, and SLA locked
 
 Notes:
 - Review endpoints require `SYNAGENT_REVIEW_API_KEY`.
 - Review queue security is documented in `docs/review-queue-security.md`: authorized holders are Jim, Quigley, and Epifani; key must not be posted in group; rotate before wider beta if distribution is uncertain.
 - Cred Bureau closed beta ops are locked in `docs/cred-bureau-closed-beta-ops.md`: Quigley owns review, Jim backs up and manually adds approved applicants, same-business-day SLA.
-- Notification mode remains operationally safe when provider secrets are missing, but that is not launch-complete.
+- Step 8 decision: closed beta uses queue-only notification mode. Reviewers manually check protected queues; outbound AgentMail/Telegram alerts are disabled until real secrets and a delivery smoke test exist.
+- `SYNAGENT_NOTIFICATION_MODE=queue-only` is the safe default. Explicit queue-only mode overrides configured providers so alerts do not start just because a secret was added.
 
 ## 6. Data durability
 - [ ] RED - Decide if JSON file storage is acceptable for soft launch

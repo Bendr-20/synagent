@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "next build && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test src/lib/review-auth.test.ts src/lib/match-api.test.ts src/lib/mobile-ux.test.ts src/lib/cred-bureau-application.test.ts"
+    "test": "next build && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test src/lib/review-auth.test.ts src/lib/notification-dispatch.test.ts src/lib/match-api.test.ts src/lib/mobile-ux.test.ts src/lib/cred-bureau-application.test.ts"
   },
   "keywords": [],
   "author": "",
