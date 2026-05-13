@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type CSSProperties, type FormEvent } from "react";
+import { useRef, useState, type CSSProperties, type FormEvent, type RefObject } from "react";
 import { glassCardStyle, outlineButtonStyle, solidButtonStyle, theme } from "@/lib/theme";
 
 type SubmitState =
@@ -8,6 +8,14 @@ type SubmitState =
   | { kind: "submitting" }
   | { kind: "success"; applicationId: string; nextStep: string }
   | { kind: "error"; message: string };
+
+type ProfileLoadState =
+  | { kind: "idle" }
+  | { kind: "loading" }
+  | { kind: "success"; message: string }
+  | { kind: "error"; message: string };
+
+type InputRef = RefObject<HTMLInputElement | null>;
 
 const fieldLabelStyle: CSSProperties = {
   fontSize: "11px",
@@ -31,8 +39,96 @@ const inputStyle: CSSProperties = {
   outline: "none",
 };
 
+function extractHelixaProfileId(value: string) {
+  const cleaned = value.trim();
+  if (!cleaned) return "";
+
+  try {
+    const parsed = cleaned.startsWith("/h/") ? new URL(cleaned, "https://helixa.xyz") : new URL(cleaned);
+    const [, type, encodedId, extra] = parsed.pathname.split("/");
+    if (parsed.protocol !== "https:" || parsed.hostname.toLowerCase() !== "helixa.xyz" || type !== "h" || !encodedId || extra) return "";
+    return decodeURIComponent(encodedId);
+  } catch {
+    return "";
+  }
+}
+
+function firstString(...values: unknown[]) {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) return value.trim();
+  }
+  return "";
+}
+
+function fillIfEmpty(ref: InputRef, value: string) {
+  const input = ref.current;
+  if (!input || input.value.trim() || !value.trim()) return false;
+  input.value = value.trim();
+  return true;
+}
+
+function normalizeTelegram(value: string) {
+  const cleaned = value.replace(/^@/, "").trim();
+  return cleaned ? `@${cleaned}` : "";
+}
+
+function externalWebsiteFromProfile(profile: any) {
+  const url = firstString(profile?.services?.web?.url, profile?.linkedAccounts?.website, profile?.externalIds?.website);
+  if (!url || /^https:\/\/helixa\.xyz\/h\//i.test(url)) return "";
+  return url;
+}
+
 export function CredBureauApplicationForm() {
   const [submitState, setSubmitState] = useState<SubmitState>({ kind: "idle" });
+  const [profileLoadState, setProfileLoadState] = useState<ProfileLoadState>({ kind: "idle" });
+  const nameRef = useRef<HTMLInputElement | null>(null);
+  const telegramRef = useRef<HTMLInputElement | null>(null);
+  const roleRef = useRef<HTMLInputElement | null>(null);
+  const linkedinRef = useRef<HTMLInputElement | null>(null);
+  const websiteRef = useRef<HTMLInputElement | null>(null);
+  const humanProfileUrlRef = useRef<HTMLInputElement | null>(null);
+
+  async function loadHelixaProfile() {
+    const rawProfileUrl = humanProfileUrlRef.current?.value || "";
+    const profileId = extractHelixaProfileId(rawProfileUrl);
+
+    if (!profileId) {
+      setProfileLoadState({ kind: "error", message: "Paste a Helixa human profile URL like https://helixa.xyz/h/your-profile-id first." });
+      return;
+    }
+
+    setProfileLoadState({ kind: "loading" });
+
+    try {
+      const response = await fetch("https://api.helixa.xyz/api/v2/human/" + encodeURIComponent(profileId), { cache: "no-store" });
+      const profile = await response.json().catch(() => null);
+      if (!response.ok || !profile) throw new Error(profile?.error || "Helixa profile could not be loaded.");
+
+      const skills = Array.isArray(profile.skills) ? profile.skills : [];
+      const serviceCategories = Array.isArray(profile.metadata?.serviceCategories) ? profile.metadata.serviceCategories : [];
+      const roleSummary = [...serviceCategories, ...skills].slice(0, 3).join(", ");
+      const telegram = normalizeTelegram(firstString(profile.linkedAccounts?.telegram, profile.services?.telegram?.handle));
+      const linkedIn = firstString(profile.services?.linkedin?.url, profile.linkedAccounts?.linkedin, profile.externalIds?.linkedin);
+      const website = externalWebsiteFromProfile(profile);
+
+      const filled = [
+        fillIfEmpty(nameRef, firstString(profile.name, profile.registration?.name)),
+        fillIfEmpty(telegramRef, telegram),
+        fillIfEmpty(roleRef, roleSummary),
+        fillIfEmpty(linkedinRef, linkedIn),
+        fillIfEmpty(websiteRef, website),
+      ].filter(Boolean).length;
+
+      setProfileLoadState({
+        kind: "success",
+        message: filled > 0
+          ? `Loaded ${profile.name || "Helixa profile"} and filled ${filled} public field${filled === 1 ? "" : "s"}. Add any private contact detail that is still missing.`
+          : "Profile loaded. Nothing public was missing here, so add the remaining private contact details manually.",
+      });
+    } catch (error: any) {
+      setProfileLoadState({ kind: "error", message: error?.message || "Helixa profile could not be loaded." });
+    }
+  }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -87,11 +183,11 @@ export function CredBureauApplicationForm() {
       <div className="cred-bureau-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
         <label>
           <div style={fieldLabelStyle}>Name</div>
-          <input name="name" required placeholder="Your name or operator handle" style={inputStyle} />
+          <input ref={nameRef} name="name" required placeholder="Your name or operator handle" style={inputStyle} />
         </label>
         <label>
           <div style={fieldLabelStyle}>Telegram Handle</div>
-          <input name="telegram" placeholder="@username" style={inputStyle} />
+          <input ref={telegramRef} name="telegram" placeholder="@username" style={inputStyle} />
         </label>
       </div>
 
@@ -102,7 +198,7 @@ export function CredBureauApplicationForm() {
         </label>
         <label>
           <div style={fieldLabelStyle}>Role / Fit</div>
-          <input name="role" placeholder="Reviewer, operator, builder, founder" style={inputStyle} />
+          <input ref={roleRef} name="role" placeholder="Reviewer, operator, builder, founder" style={inputStyle} />
         </label>
       </div>
 
@@ -117,17 +213,33 @@ export function CredBureauApplicationForm() {
 
       <label>
         <div style={fieldLabelStyle}>Helixa Human Profile URL (required)</div>
-        <input name="humanProfileUrl" required placeholder="https://helixa.xyz/h/your-profile-id" style={inputStyle} />
+        <input ref={humanProfileUrlRef} name="humanProfileUrl" required placeholder="https://helixa.xyz/h/your-profile-id" style={inputStyle} />
       </label>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+        <button
+          type="button"
+          onClick={loadHelixaProfile}
+          disabled={profileLoadState.kind === "loading"}
+          style={{ ...outlineButtonStyle, width: "auto", minWidth: "230px", justifyContent: "center", opacity: profileLoadState.kind === "loading" ? 0.72 : 1 }}
+        >
+          {profileLoadState.kind === "loading" ? "Loading Helixa Profile" : "Load from Helixa Profile"}
+        </button>
+        <div style={{ color: profileLoadState.kind === "error" ? "#ffc8c8" : theme.textMuted, fontSize: "13px", lineHeight: 1.55 }}>
+          {profileLoadState.kind === "success" || profileLoadState.kind === "error"
+            ? profileLoadState.message
+            : "Paste your Helixa profile URL first. We can pull public name, Telegram, skills, and website so you do not retype profile data."}
+        </div>
+      </div>
 
       <div className="cred-bureau-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
         <label>
           <div style={fieldLabelStyle}>LinkedIn (optional)</div>
-          <input name="linkedinUrl" type="url" placeholder="https://www.linkedin.com/in/yourname" style={inputStyle} />
+          <input ref={linkedinRef} name="linkedinUrl" type="url" placeholder="https://www.linkedin.com/in/yourname" style={inputStyle} />
         </label>
         <label>
           <div style={fieldLabelStyle}>Website / Portfolio (optional)</div>
-          <input name="websiteUrl" type="url" placeholder="https://your-site.com" style={inputStyle} />
+          <input ref={websiteRef} name="websiteUrl" type="url" placeholder="https://your-site.com" style={inputStyle} />
         </label>
       </div>
 

@@ -231,7 +231,7 @@ export function SiteShell({ children, mainClassName, mainStyle, showFooter = tru
                 textDecoration: "none",
               }}
             >
-              CONNECT
+              Submit Request
             </Link>
           </div>
 
@@ -303,7 +303,7 @@ export function SiteShell({ children, mainClassName, mainStyle, showFooter = tru
                   textDecoration: "none",
                 }}
               >
-                Connect
+                Submit Request
               </Link>
             </div>
           )}

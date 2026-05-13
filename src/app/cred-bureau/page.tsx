@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { CredBureauApplicationForm } from "./cred-bureau-application-form";
 import { SiteShell } from "@/components/site-shell";
-import { glassCardStyle, outlineButtonStyle, solidButtonStyle, theme } from "@/lib/theme";
+import { glassCardStyle, solidButtonStyle, theme } from "@/lib/theme";
 
 const flowSteps = [
   {
@@ -57,10 +56,6 @@ export default function CredBureauPage() {
             <a href="#apply" style={{ ...solidButtonStyle, width: "auto", minWidth: "190px" }}>
               Apply to Cred Bureau
             </a>
-            <Link href="/match?category=mvp-build" style={{ ...outlineButtonStyle, width: "auto", minWidth: "210px" }}>
-              <span>View Synagent Beta</span>
-              <span>{">"}</span>
-            </Link>
           </div>
         </div>
 

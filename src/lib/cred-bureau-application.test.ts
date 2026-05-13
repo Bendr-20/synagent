@@ -6,6 +6,7 @@ import path from "node:path";
 import test from "node:test";
 
 const TEST_PROFILE_URL = "https://helixa.xyz/h/cred-bureau-test";
+const TEST_PRIVY_PROFILE_URL = "https://helixa.xyz/h/did%3Aprivy%3Acmogsl16503bq0ck09ck2f6dm";
 const TEST_OPTIONAL_PROFILE_TELEGRAM = "@credreviewer";
 
 test("Cred Bureau application is linked from public Synagent entry points", () => {
@@ -16,6 +17,12 @@ test("Cred Bureau application is linked from public Synagent entry points", () =
 
   assert.match(homePage, /href=\"\/cred-bureau\"/);
   assert.doesNotMatch(siteShell, /href=\"\/cred-bureau\"/);
+  assert.doesNotMatch(siteShell, />\s*CONNECT\s*</i);
+  assert.match(siteShell, /Submit Request/i);
+  assert.match(credBureauForm, /Load from Helixa Profile/i);
+  assert.match(credBureauForm, /fetch\("https:\/\/api\.helixa\.xyz\/api\/v2\/human\//i);
+  assert.doesNotMatch(credBureauPage, /View Synagent Beta/i);
+  assert.doesNotMatch(credBureauPage, /href=\"\/match\?category=mvp-build\"/);
   assert.doesNotMatch(`${credBureauForm}\n${credBureauPage}`, /source=cred-bureau/);
   assert.doesNotMatch(`${credBureauForm}\n${credBureauPage}`, /First create|do not create separate profiles|reviewer and operator bench/i);
 });
@@ -81,7 +88,7 @@ function cleanupTestApplications() {
   const applications = JSON.parse(fs.readFileSync(applicationsPath, "utf8")) as Array<Record<string, any>>;
   fs.writeFileSync(
     applicationsPath,
-    `${JSON.stringify(applications.filter((application) => application?.humanProfile?.url !== TEST_PROFILE_URL && application?.applicant?.telegram !== TEST_OPTIONAL_PROFILE_TELEGRAM), null, 2)}\n`,
+    `${JSON.stringify(applications.filter((application) => ![TEST_PROFILE_URL, TEST_PRIVY_PROFILE_URL].includes(application?.humanProfile?.url) && ![TEST_OPTIONAL_PROFILE_TELEGRAM, "@privyreviewer"].includes(application?.applicant?.telegram)), null, 2)}\n`,
   );
 }
 
@@ -111,6 +118,7 @@ test("Cred Bureau application page, API, and review queue require Helixa profile
     assert.doesNotMatch(html, /optional for the first pass|Profile missing/i);
     assert.match(html, /https:\/\/helixa\.xyz\/join\/human/i);
     assert.match(html, /https:\/\/helixa\.xyz\/manage\/human/i);
+    assert.match(html, /Load from Helixa Profile/i);
     assert.match(html, /manual review/i);
     assert.match(html, /manually added to the group chat/i);
     assert.doesNotMatch(html, /source=cred-bureau|First create|do not create separate profiles|Skills and Cred Signals/i);
@@ -135,6 +143,26 @@ test("Cred Bureau application page, API, and review queue require Helixa profile
     assert.equal(missingProfileSubmit.status, 400);
     assert.equal(missingProfileBody.success, false);
     assert.match(missingProfileBody.error, /Helixa human profile URL/i);
+
+    const encodedPrivyProfileSubmit = await fetch(`http://127.0.0.1:${port}/api/cred-bureau/applications`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        applicant: {
+          name: "Privy Reviewer",
+          telegram: "@privyreviewer",
+          email: "privy-reviewer@example.com",
+          role: "Operator / reviewer",
+        },
+        humanProfile: { url: TEST_PRIVY_PROFILE_URL },
+        reviewAddendum: {
+          whyJoin: "I want to test the encoded Privy profile URL path that Helixa shares.",
+        },
+      }),
+    });
+    const encodedPrivyProfileBody = await encodedPrivyProfileSubmit.json() as Record<string, any>;
+    assert.equal(encodedPrivyProfileSubmit.status, 201);
+    assert.equal(encodedPrivyProfileBody.success, true);
 
     const submit = await fetch(`http://127.0.0.1:${port}/api/cred-bureau/applications`, {
       method: "POST",
@@ -166,6 +194,9 @@ test("Cred Bureau application page, API, and review queue require Helixa profile
     assert.match(body.nextStep, /manually contact approved applicants/i);
 
     const applications = JSON.parse(fs.readFileSync(path.join(process.cwd(), "data", "cred-bureau-applications.json"), "utf8")) as Array<Record<string, any>>;
+    const storedPrivy = applications.find((application) => application?.applicant?.telegram === "@privyreviewer");
+    assert.ok(storedPrivy, "expected encoded Privy profile URL application to be persisted");
+    assert.equal(storedPrivy.humanProfile.url, TEST_PRIVY_PROFILE_URL);
     const stored = applications.find((application) => application?.applicant?.telegram === TEST_OPTIONAL_PROFILE_TELEGRAM);
     assert.ok(stored, "expected application to be persisted for the team review queue");
     assert.equal(stored.status, "pending-review");

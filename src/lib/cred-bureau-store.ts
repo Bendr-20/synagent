@@ -50,10 +50,23 @@ function normalizeTelegram(value: unknown) {
   return cleaned.startsWith("@") ? cleaned : `@${cleaned}`;
 }
 
+function extractHelixaHumanProfileId(url: string | null) {
+  if (!url) return null;
+
+  try {
+    const parsed = url.startsWith("/h/") ? new URL(url, "https://helixa.xyz") : new URL(url);
+    const isHelixa = parsed.protocol === "https:" && parsed.hostname.toLowerCase() === "helixa.xyz";
+    const [, type, encodedId, extra] = parsed.pathname.split("/");
+    if (!isHelixa || type !== "h" || !encodedId || extra) return null;
+    return decodeURIComponent(encodedId);
+  } catch {
+    return null;
+  }
+}
+
 function normalizeHelixaProfileUrl(url: string | null, id: string | null) {
-  if (url?.startsWith("/h/")) return `https://helixa.xyz${url}`;
-  if (url) return url;
-  if (id) return `https://helixa.xyz/h/${encodeURIComponent(id)}`;
+  const profileId = id || extractHelixaHumanProfileId(url);
+  if (profileId) return `https://helixa.xyz/h/${encodeURIComponent(profileId)}`;
   return null;
 }
 
@@ -67,11 +80,11 @@ function buildHumanProfileRef(profile: CredBureauApplicationPayload["humanProfil
     throw new Error("A Helixa human profile URL is required before Cred Bureau review.");
   }
 
-  if (url && !/^https:\/\/helixa\.xyz\/h\/[A-Za-z0-9._:-]+\/?$/i.test(url)) {
+  if (!url) {
     throw new Error("Use a Helixa human profile URL like https://helixa.xyz/h/your-profile-id.");
   }
 
-  return { id, url, wallet, handle };
+  return { id: id || extractHelixaHumanProfileId(url), url, wallet, handle };
 }
 
 function buildApplicant(payload: CredBureauApplicationPayload) {
