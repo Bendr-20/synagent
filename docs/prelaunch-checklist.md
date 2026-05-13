@@ -1,6 +1,6 @@
 # Synagent Prelaunch Checklist
 
-Last updated: 2026-05-09 UTC
+Last updated: 2026-05-13 UTC
 
 ## Status key
 - GREEN: launch-ready
@@ -11,11 +11,12 @@ Last updated: 2026-05-09 UTC
 - [x] YELLOW - Launch mode selected: curated beta / concierge routing
 - [x] YELLOW - Primary offer selected: Create an MVP
 - [ ] YELLOW - Define who Synagent is for and not for in launch copy
-- [ ] RED - Lock response SLA and name the review owner
+- [x] GREEN - Cred Bureau closed beta review owner and SLA locked
 
 Notes:
 - MVP should be concierge routing with Helixa trust underneath.
-- Do not launch externally until owner and SLA are filled in `docs/launch/mvp-curated-beta.md`.
+- Cred Bureau closed beta ops are locked in `docs/cred-bureau-closed-beta-ops.md`: Quigley review owner, Jim backup reviewer and manual group adds, same-business-day SLA.
+- Broader Synagent MVP request handling can reuse this ops pattern, but should be explicitly confirmed before broad public launch.
 
 ## 2. Offer + homepage clarity
 - [x] YELLOW - Homepage is refocused around Create an MVP
@@ -57,10 +58,11 @@ Notes:
 - [ ] RED - Replace placeholder review auth and delivery config with real deployment values
 - [ ] YELLOW - Test AgentMail delivery with a real request
 - [ ] YELLOW - Test Telegram delivery with a real request if Telegram alerts are enabled
-- [ ] RED - Decide who reviews requests and what the SLA is
+- [x] GREEN - Cred Bureau review owner, backup reviewer, manual add owner, and SLA locked
 
 Notes:
 - Review endpoints require `SYNAGENT_REVIEW_API_KEY`.
+- Cred Bureau closed beta ops are locked in `docs/cred-bureau-closed-beta-ops.md`: Quigley owns review, Jim backs up and manually adds approved applicants, same-business-day SLA.
 - Notification mode remains operationally safe when provider secrets are missing, but that is not launch-complete.
 
 ## 6. Data durability
@@ -127,11 +129,11 @@ Notes:
 
 ## Current overall launch call
 - RED - Not ready for broad public launch
-- YELLOW - Close to curated beta once real ops secrets, owner/SLA, and provider availability are locked
+- YELLOW - Close to curated beta once real ops secrets, provider availability, backups, and final applicant rules are locked
 
 ## Fastest path to soft launch
 1. Set `SYNAGENT_REVIEW_API_KEY` and notification secrets in deployment.
-2. Name the review owner and response SLA.
-3. Test one real request end to end in preview.
-4. Confirm Degeneer availability and add 2-3 more real providers if possible.
+2. Test one real request end to end in preview.
+3. Confirm Degeneer availability and add 2-3 more real providers if possible.
+4. Lock applicant qualification/rejection rules.
 5. Launch as concierge beta, not marketplace.
