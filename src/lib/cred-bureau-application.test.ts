@@ -28,6 +28,14 @@ test("Cred Bureau page has mobile stack rules for the application flow", () => {
   assert.match(css, /@media \(max-width: 768px\)[\s\S]*\.cred-bureau-form-grid\s*\{[\s\S]*grid-template-columns:\s*1fr !important;/);
 });
 
+test("Cred Bureau mobile form uses a multiline conflict disclosure field", () => {
+  const credBureauForm = fs.readFileSync("src/app/cred-bureau/cred-bureau-application-form.tsx", "utf8");
+
+  assert.match(credBureauForm, /<textarea\s+name="disclosure"[\s\S]*rows=\{3\}/);
+  assert.doesNotMatch(credBureauForm, /<input\s+name="disclosure"/);
+  assert.match(credBureauForm, /className="cred-bureau-disclosure-field"/);
+});
+
 function getFreePort() {
   return new Promise<number>((resolve, reject) => {
     const server = net.createServer();

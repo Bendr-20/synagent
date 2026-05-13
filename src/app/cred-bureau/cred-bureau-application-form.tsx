@@ -141,9 +141,9 @@ export function CredBureauApplicationForm() {
           <div style={fieldLabelStyle}>Availability</div>
           <input name="availability" placeholder="A few hours/week, nights, weekends" style={inputStyle} />
         </label>
-        <label>
+        <label className="cred-bureau-disclosure-field" style={{ gridColumn: "1 / -1" }}>
           <div style={fieldLabelStyle}>Conflict Disclosure</div>
-          <input name="disclosure" placeholder="Anything we should know before review" style={inputStyle} />
+          <textarea name="disclosure" rows={3} placeholder="List any conflicts, affiliations, or review context." style={{ ...inputStyle, resize: "vertical" }} />
         </label>
       </div>
 
