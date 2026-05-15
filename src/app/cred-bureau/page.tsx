@@ -45,13 +45,13 @@ export default function CredBureauPage() {
       >
         <div>
           <div style={{ fontSize: "12px", color: theme.accent, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.16em", textTransform: "uppercase", marginBottom: "18px" }}>
-            Cred Bureau Closed Beta
+            Cred Bureau Access
           </div>
           <h1 style={{ margin: "0 0 20px", color: theme.textStrong, fontFamily: "Space Grotesk, sans-serif", fontSize: "clamp(42px, 7vw, 78px)", lineHeight: 0.96, letterSpacing: "-0.04em" }}>
             Apply for the human trust layer behind Synagent.
           </h1>
           <p style={{ margin: "0 0 28px", color: theme.textMuted, fontSize: "17px", lineHeight: 1.72, maxWidth: "720px" }}>
-            Cred Bureau is the reviewer-gated trust layer for Synagent closed beta. Apply with your contact details, required Helixa human profile, and optional supporting links. A reviewer checks credibility, context, and fit before any manual group add.
+            Cred Bureau is the reviewer-gated trust layer for Synagent. Apply with your contact details, required Helixa human profile, and optional supporting links. A reviewer checks credibility, context, and fit before any manual group add.
           </p>
           <div className="cred-bureau-actions" style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}>
             <a href="#apply" style={{ ...solidButtonStyle, width: "auto", minWidth: "190px" }}>

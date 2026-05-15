@@ -8,16 +8,16 @@ Last updated: 2026-05-13 UTC
 - RED: blocker or trust-breaking issue
 
 ## 1. Launch definition
-- [x] YELLOW - Launch mode selected: curated beta / concierge routing
+- [x] YELLOW - Launch mode selected: reviewed access / concierge routing
 - [x] YELLOW - Primary offer selected: Create an MVP
-- [x] GREEN - Launch copy defines curated beta boundaries and avoids open-marketplace promises
-- [x] GREEN - Cred Bureau closed beta review owner and SLA locked
-- [x] GREEN - Cred Bureau applicant rules locked as manual-only approval for closed beta
+- [x] GREEN - Launch copy defines reviewed access boundaries and avoids open-marketplace promises
+- [x] GREEN - Cred Bureau reviewed access review owner and SLA locked
+- [x] GREEN - Cred Bureau applicant rules locked as manual-only approval for reviewed access
 
 Notes:
 - MVP should be concierge routing with Helixa trust underneath.
-- Cred Bureau closed beta ops are locked in `docs/cred-bureau-closed-beta-ops.md`: Quigley review owner, Jim backup reviewer and manual group adds, same-business-day SLA.
-- Cred Bureau applicant rules are locked in `docs/cred-bureau-applicant-rules.md`: manual approval only for this beta; automation can be considered later.
+- Cred Bureau review ops are locked in `docs/cred-bureau-review-ops.md`: Quigley review owner, Jim backup reviewer and manual group adds, same-business-day SLA.
+- Cred Bureau applicant rules are locked in `docs/cred-bureau-applicant-rules.md`: manual approval only for this launch phase; automation can be considered later.
 - Broader Synagent MVP request handling can reuse this ops pattern, but should be explicitly confirmed before broad public launch.
 
 ## 2. Offer + homepage clarity
@@ -28,7 +28,7 @@ Notes:
 
 Notes:
 - Step 6 copy pass completed on 2026-05-13 UTC after team approval in group.
-- Homepage now leads with reviewed intake, manual routing, and curated beta boundaries instead of instant matching or marketplace density.
+- Homepage now leads with reviewed intake, manual routing, and reviewed access boundaries instead of instant matching or marketplace density.
 
 ## 3. Directory integrity
 - [x] YELLOW - Fake provider directory removed from public export
@@ -59,8 +59,8 @@ Notes:
 - [x] GREEN - Protected notification queue endpoint exists: `/api/match/notifications`
 - [x] GREEN - Cred Bureau review key configured and server-side security audit passed
 - [x] GREEN - Cred Bureau authorized reviewer roster restricted to Jim, Quigley, and Epifani
-- [ ] YELLOW - Rotate review key before wider beta if private distribution cannot be confirmed
-- [x] GREEN - Closed beta notification mode selected: queue-only/manual queue review
+- [ ] YELLOW - Rotate review key before wider access if private distribution cannot be confirmed
+- [x] GREEN - Reviewed access notification mode selected: queue-only/manual queue review
 - [x] GREEN - Missing delivery secrets resolve to queue-only instead of outbound alerts
 - [ ] YELLOW - Configure and test AgentMail delivery only if email alerts are enabled later
 - [ ] YELLOW - Configure and test Telegram delivery only if Telegram alerts are enabled later
@@ -68,9 +68,9 @@ Notes:
 
 Notes:
 - Review endpoints require `SYNAGENT_REVIEW_API_KEY`.
-- Review queue security is documented in `docs/review-queue-security.md`: authorized holders are Jim, Quigley, and Epifani; key must not be posted in group; rotate before wider beta if distribution is uncertain.
-- Cred Bureau closed beta ops are locked in `docs/cred-bureau-closed-beta-ops.md`: Quigley owns review, Jim backs up and manually adds approved applicants, same-business-day SLA.
-- Step 8 decision: closed beta uses queue-only notification mode. Reviewers manually check protected queues; outbound AgentMail/Telegram alerts are disabled until real secrets and a delivery smoke test exist.
+- Review queue security is documented in `docs/review-queue-security.md`: authorized holders are Jim, Quigley, and Epifani; key must not be posted in group; rotate before wider access if distribution is uncertain.
+- Cred Bureau review ops are locked in `docs/cred-bureau-review-ops.md`: Quigley owns review, Jim backs up and manually adds approved applicants, same-business-day SLA.
+- Step 8 decision: reviewed access uses queue-only notification mode. Reviewers manually check protected queues; outbound AgentMail/Telegram alerts are disabled until real secrets and a delivery smoke test exist.
 - `SYNAGENT_NOTIFICATION_MODE=queue-only` is the safe default. Explicit queue-only mode overrides configured providers so alerts do not start just because a secret was added.
 
 ## 6. Data durability
@@ -81,7 +81,7 @@ Notes:
 
 Notes:
 - Current storage is file-backed JSON in `src/lib/match-store.ts`.
-- Fine for prototype or very limited beta, shaky for multiple reviewers or real volume.
+- Fine for prototype or very limited pilot, shaky for multiple reviewers or real volume.
 
 ## 7. Trust layer
 - [x] YELLOW - Public directory uses only real providers
@@ -141,11 +141,11 @@ Notes:
 
 ## Current overall launch call
 - RED - Not ready for broad public launch
-- YELLOW - Close to curated beta once provider availability and backups are locked
+- YELLOW - Close to limited launch once provider availability and backups are locked
 
 ## Fastest path to soft launch
 1. Set notification secrets in deployment if alerts are enabled.
-2. Privately confirm only Jim, Quigley, and Epifani have the review key, or rotate it before wider beta.
+2. Privately confirm only Jim, Quigley, and Epifani have the review key, or rotate it before wider access.
 3. Test one real request end to end in preview.
 4. Confirm Degeneer availability and add 2-3 more real providers if possible.
-5. Launch as concierge beta, not marketplace.
+5. Launch as concierge access, not marketplace.

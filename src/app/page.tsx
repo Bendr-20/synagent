@@ -14,7 +14,7 @@ type ServiceCard = {
   buttonHref?: string;
 };
 
-const betaPositioning = "Synagent is a curated beta for reviewed intake: MVP builds, AI workflow fixes, and human-agent delivery teams powered by Helixa and Cred.";
+const platformPositioning = "Synagent is reviewed intake for MVP builds, AI workflow fixes, and human-agent delivery teams powered by Helixa and Cred.";
 
 const serviceCards: ServiceCard[] = [
   {
@@ -23,7 +23,7 @@ const serviceCards: ServiceCard[] = [
     description: "Submit the MVP you need built. We review the brief, shape scope, and manually route only fit-matched requests to real operators.",
     titleColor: theme.accent,
     isPrimary: true,
-    calloutLabel: "Primary beta offer",
+    calloutLabel: "Primary offer",
     calloutItems: [
       "Built around real MVP, workflow, and launch-support requests.",
       "Scope is reviewed before any operator intro is made.",
@@ -185,7 +185,7 @@ export default function HomePage() {
         </h1>
 
         <p style={{ maxWidth: "760px", color: theme.textMuted, fontSize: "17px", lineHeight: 1.7, margin: "0 0 30px" }}>
-          {betaPositioning}
+          {platformPositioning}
         </p>
 
         <form className="hero-intake-form" action="/match" method="get" style={{ width: "100%", maxWidth: "860px", marginBottom: "20px", display: "flex", flexDirection: "column", gap: "12px" }}>

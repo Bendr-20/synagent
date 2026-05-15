@@ -26,7 +26,7 @@ const CATEGORY_KEYWORDS: Record<string, string[]> = {
 };
 
 const HIGH_RECOMMENDATION_SCORE = 80;
-const NO_STRONG_MATCH_FALLBACK_REASON = "No high-confidence curated-provider match met the recommendation threshold.";
+const NO_STRONG_MATCH_FALLBACK_REASON = "No high-confidence verified-provider match met the recommendation threshold.";
 
 const CATEGORY_LABELS: Record<string, string> = {
   "mvp-build": "MVP build",
@@ -323,7 +323,7 @@ function scoreAgent(agent: (typeof synagents)[number], intake: MatchRequestPaylo
   }
 
   if (intake.deliveryType === "unsure" || intake.deliveryType === "hybrid") {
-    addScore("Delivery flexibility", 5, "Hybrid or unsure delivery is compatible with curated routing");
+    addScore("Delivery flexibility", 5, "Hybrid or unsure delivery is compatible with reviewed routing");
   } else if (intake.deliveryType === "human-only" && agent.operatorModel !== "agent-only") {
     addScore("Delivery fit", 6, "Provider can support human-led delivery", "human delivery compatible");
   } else if (intake.deliveryType === "agent-only" && agent.operatorModel !== "human-only") {

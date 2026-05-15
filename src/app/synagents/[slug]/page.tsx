@@ -186,7 +186,7 @@ export default async function SynagentProfilePage({ params }: { params: Promise<
               ) : (
                 <div style={{ color: theme.textMuted, fontSize: "14px", lineHeight: 1.7 }}>
                   <div style={{ color: theme.textStrong, marginBottom: "4px" }}>Helixa profile pending</div>
-                  This operator is manually curated for beta while the Helixa profile is being completed.
+                  This operator is manually verified while the Helixa profile is being completed.
                 </div>
               )}
             </div>

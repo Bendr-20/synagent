@@ -1,13 +1,13 @@
-# Cred Bureau Closed Beta Ops
+# Cred Bureau Review Ops
 
 Last updated: 2026-05-13 UTC
-Status: locked for closed beta
+Status: locked for reviewed access
 
 ## Owners
 
 - Review owner: Quigley
   - Owns approve/reject quality.
-  - Makes the final call on whether an applicant belongs in the closed beta.
+  - Makes the final call on whether an applicant belongs in reviewed access.
 - Backup reviewer: Jim
   - Covers the queue when Quigley is busy.
   - Handles technical/admin edge cases.
@@ -17,7 +17,7 @@ Status: locked for closed beta
 
 ## Response SLA
 
-- Same business day for closed beta applications.
+- Same business day for reviewed-access applications.
 - Applications submitted late in the day roll to the next morning.
 - If the owner cannot review inside SLA, the backup reviewer should make the call or flag it in the team chat.
 
@@ -33,7 +33,7 @@ Status: locked for closed beta
 
 ## Operating rules
 
-- Closed beta approvals are manual only; criteria guide reviewers but do not auto-approve applicants.
+- Reviewed-access approvals are manual only; criteria guide reviewers but do not auto-approve applicants.
 - Do not auto-invite applicants.
 - Follow `docs/cred-bureau-applicant-rules.md` for qualification, pending, rejection, and conflict handling.
 - Do not approve incomplete Helixa human profiles unless Quigley explicitly wants to park or make an exception.

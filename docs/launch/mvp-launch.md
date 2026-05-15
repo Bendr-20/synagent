@@ -1,10 +1,10 @@
-# Synagent MVP Curated Beta Runbook
+# Synagent MVP Launch Runbook
 
 Last updated: 2026-05-13 UTC
 
 ## Launch mode
 
-Synagent launches as a curated beta, not an open marketplace.
+Synagent launches with reviewed access, not as an open marketplace.
 
 The MVP promise is reviewed intake and concierge routing: a requester submits an MVP/build request, Synagent stores the intake, a human reviews fit, and only credible matches move toward an operator intro. If no match is strong enough, the request stays in manual review.
 
@@ -24,17 +24,17 @@ Do not position Synagent as an open marketplace, instant matching engine, escrow
 Public provider list:
 - Degeneer, remote, USDC/CRED accepted, profile pending in Helixa
 
-Current supply is intentionally thin. If public providers remain below 3 real operators, launch copy should frame this as reviewed concierge beta handling, not marketplace density.
+Current supply is intentionally thin. If public providers remain below 3 real operators, launch copy should frame this as reviewed concierge handling, not marketplace density.
 
 ## Owner and SLA fields
 
-Cred Bureau closed beta:
+Cred Bureau reviewed access:
 
 - Review owner: Quigley
 - Backup reviewer: Jim
 - Response SLA: same business day; late-day submissions roll to next morning
 - Manual group adds: Jim
-- Applicant approval mode: manual only during closed beta; automation can be considered later
+- Applicant approval mode: manual only during reviewed access; automation can be considered later
 - Applicant rules: `docs/cred-bureau-applicant-rules.md`
 - Escalation path: flag in Fool Spectrum without posting the review key
 - Provider availability check cadence: TBD
@@ -47,7 +47,7 @@ Set these in the deployment environment, never in git:
 
 ```bash
 SYNAGENT_NOTIFICATION_MODE=queue-only
-SYNAGENT_REVIEW_API_KEY=<strong shared review key; private to Jim, Quigley, Epifani during closed beta>
+SYNAGENT_REVIEW_API_KEY=<strong shared review key; private to Jim, Quigley, Epifani during reviewed access>
 SYNAGENT_AGENTMAIL_API_KEY=<agentmail api key, if email dispatch is enabled>
 SYNAGENT_AGENTMAIL_INBOX_ID=<agentmail inbox id, if email dispatch is enabled>
 SYNAGENT_AGENTMAIL_BASE_URL=https://api.agentmail.to
@@ -55,14 +55,14 @@ SYNAGENT_TELEGRAM_BOT_TOKEN=<telegram bot token, if telegram dispatch is enabled
 SYNAGENT_TELEGRAM_BASE_URL=https://api.telegram.org
 ```
 
-Review queue security is documented in `docs/review-queue-security.md`. Do not paste the key in group chat; rotate it before wider beta if distribution is uncertain.
+Review queue security is documented in `docs/review-queue-security.md`. Do not paste the key in group chat; rotate it before wider access if distribution is uncertain.
 
-Closed beta notification mode: `queue-only`.
+Reviewed access notification mode: `queue-only`.
 
-Reviewers check protected queues manually during closed beta. No outbound AgentMail or Telegram alerts should be considered enabled until real delivery secrets are configured and a smoke test succeeds.
+Reviewers check protected queues manually during reviewed access. No outbound AgentMail or Telegram alerts should be considered enabled until real delivery secrets are configured and a smoke test succeeds.
 
 Mode progression:
-- `queue-only` for closed beta: requests and provider notifications are saved for protected review, but no outbound alert is sent.
+- `queue-only` for reviewed access: requests and provider notifications are saved for protected review, but no outbound alert is sent.
 - `review` only after AgentMail or Telegram secrets are configured and tested; a reviewer can dispatch queued provider notifications.
 - `live` only after the team is comfortable with automatic dispatch behavior.
 
@@ -128,7 +128,7 @@ Expected behavior:
 
 ## Fallback path when no match is strong
 
-If no curated beta provider meets the threshold:
+If no verified provider meets the threshold:
 
 1. Keep the request in manual review.
 2. Do not introduce the requester to a random provider.
@@ -138,7 +138,7 @@ If no curated beta provider meets the threshold:
 
 Suggested requester copy:
 
-> We received your request. It does not have a strong curated-provider match yet, so a reviewer is checking it manually instead of routing it to the wrong operator. No automatic match, payment, or delivery promise has been created.
+> We received your request. It does not have a strong verified-provider match yet, so a reviewer is checking it manually instead of routing it to the wrong operator. No automatic match, payment, or delivery promise has been created.
 
 ## Anti-spam posture
 
@@ -163,7 +163,7 @@ Do not promise:
 - x402 checkout in the launch MVP
 - verified Helixa profiles for providers whose profiles are still pending
 - public exposure of requester contact details
-- automatic dispatch for requests outside the curated supply
+- automatic dispatch for requests outside the verified supply
 
 ## MVP-ready definition
 
@@ -175,6 +175,6 @@ For soft launch, MVP-ready means:
 - review APIs are protected by a review key
 - notification mode is locked to `queue-only` unless AgentMail or Telegram delivery has been configured and smoke-tested
 - a human owner and SLA are named
-- applicant rules are locked and manual-only for closed beta
-- launch copy frames Synagent as reviewed intake, manual routing, and curated beta access
+- applicant rules are locked and manual-only for reviewed access
+- launch copy frames Synagent as reviewed intake, manual routing, and reviewed access
 - at least one end-to-end request has been tested in the deployed environment

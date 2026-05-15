@@ -112,7 +112,7 @@ test("match API treats an API-provided MVP category as explicit user intent", { 
     await waitForServer(port, server);
 
     const explicitMvp = await postMatch(port, {
-      title: "Need an MVP for a curated routing beta",
+      title: "Need an MVP for a reviewed routing pilot",
       category: "mvp-build",
       budgetRange: "3k-10k",
       urgency: "this-week",

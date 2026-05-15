@@ -22,7 +22,7 @@ test("Cred Bureau application is linked from public Synagent entry points", () =
   assert.match(siteShell, /Submit Request/i);
   assert.match(credBureauForm, /Load from Helixa Profile/i);
   assert.match(credBureauForm, /fetch\("https:\/\/api\.helixa\.xyz\/api\/v2\/human\//i);
-  assert.doesNotMatch(credBureauPage, /View Synagent Beta/i);
+  assert.doesNotMatch(credBureauPage, new RegExp("View Synagent" + "\\s+Beta", "i"));
   assert.doesNotMatch(credBureauPage, /href=\"\/match\?category=mvp-build\"/);
   assert.doesNotMatch(`${credBureauForm}\n${credBureauPage}`, /source=cred-bureau/);
   assert.doesNotMatch(`${credBureauForm}\n${credBureauPage}`, /First create|do not create separate profiles|reviewer and operator bench/i);
@@ -30,12 +30,15 @@ test("Cred Bureau application is linked from public Synagent entry points", () =
   assert.match(reviewStatusControls, /closeReviewBox/i);
 });
 
-test("public launch copy stays curated, manual, and modest", () => {
+test("public launch copy stays reviewed, manual, and modest without beta framing", () => {
   const homePage = fs.readFileSync("src/app/page.tsx", "utf8");
   const credBureauPage = fs.readFileSync("src/app/cred-bureau/page.tsx", "utf8");
   const credBureauForm = fs.readFileSync("src/app/cred-bureau/cred-bureau-application-form.tsx", "utf8");
   const receivedPage = fs.readFileSync("src/app/cred-bureau/received/page.tsx", "utf8");
-  const publicCopy = [homePage, credBureauPage, credBureauForm, receivedPage].join("\n");
+  const synagentsPage = fs.readFileSync("src/app/synagents/page.tsx", "utf8");
+  const synagentProfilePage = fs.readFileSync("src/app/synagents/[slug]/page.tsx", "utf8");
+  const matchEngine = fs.readFileSync("src/lib/match-engine.ts", "utf8");
+  const publicCopy = [homePage, credBureauPage, credBureauForm, receivedPage, synagentsPage, synagentProfilePage, matchEngine].join("\n");
 
   assert.match(homePage, /reviewed intake/i);
   assert.match(homePage, /Submit Reviewed Request/i);
@@ -44,6 +47,16 @@ test("public launch copy stays curated, manual, and modest", () => {
   assert.match(credBureauPage, /No instant access/i);
   assert.match(credBureauForm, /Manual review only/i);
   assert.match(receivedPage, /No automatic approval/i);
+  const disallowedBetaFraming = new RegExp([
+    "curated\s+beta",
+    "closed\s+beta",
+    "Synagent\s+beta",
+    "beta\s+offer",
+    "curated" + "-provider",
+    "curated\s+routing",
+    "curated\s+for\s+beta",
+  ].join("|"), "i");
+  assert.doesNotMatch(publicCopy, disallowedBetaFraming);
   assert.doesNotMatch(publicCopy, /instant approval|guaranteed routing|escrow|payment promise|open marketplace/i);
 });
 
@@ -211,7 +224,7 @@ test("Cred Bureau application page, API, and review queue require Helixa profile
         humanProfile: { url: TEST_PROFILE_URL },
         reviewAddendum: {
           whyJoin: "I want to help review early Synagent requests and test Cred-based routing.",
-          availability: "A few hours per week during closed beta.",
+          availability: "A few hours per week during onboarding.",
           disclosure: "No conflicts to disclose.",
         },
       }),

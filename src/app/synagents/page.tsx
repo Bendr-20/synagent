@@ -28,7 +28,7 @@ export default function SynagentsPage() {
             Synagent Directory
           </h1>
           <p style={{ maxWidth: "680px", margin: "10px 0 0", color: theme.textMuted, fontSize: "15px", lineHeight: 1.7 }}>
-            Curated beta directory. We are showing only real launch operators while the network is being filled out.
+            Verified operator directory. We are showing only real launch operators while the network is being filled out.
           </p>
         </div>
 

@@ -1,7 +1,7 @@
 # Review Queue Security
 
 Last updated: 2026-05-13 UTC
-Status: locked for closed beta
+Status: locked for reviewed access
 
 ## Authorized reviewers
 
@@ -11,7 +11,7 @@ The shared review key is restricted to:
 - Quigley
 - Epifani
 
-No one else should receive the key during closed beta unless the team explicitly updates this roster.
+No one else should receive the key during reviewed access unless the team explicitly updates this roster.
 
 ## Key handling rules
 
@@ -20,7 +20,7 @@ No one else should receive the key during closed beta unless the team explicitly
 - Do not include the key in screenshots, Looms, docs, or support messages.
 - Share the key only through a private channel controlled by the intended reviewer.
 - If the key is sent to the wrong person, posted in a group, exposed in a screenshot, or included in any public artifact, rotate it immediately.
-- Rotate the key before wider beta if there is any uncertainty about who has it.
+- Rotate the key before wider access if there is any uncertainty about who has it.
 
 ## Server-side audit result
 
@@ -57,4 +57,4 @@ openssl rand -base64 32 | tr -d '\n'
 
 Server checks can confirm the key is configured and not leaked in the repo. They cannot prove who has received it in private chats.
 
-Before wider beta, Jim, Quigley, and Epifani should confirm privately that no one else has the current key. If that cannot be confirmed, rotate it.
+Before wider access, Jim, Quigley, and Epifani should confirm privately that no one else has the current key. If that cannot be confirmed, rotate it.

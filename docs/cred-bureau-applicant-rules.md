@@ -1,13 +1,13 @@
-# Cred Bureau Closed Beta Applicant Rules
+# Cred Bureau Applicant Rules
 
 Last updated: 2026-05-13 UTC
-Status: locked for closed beta
+Status: locked for reviewed access
 
 ## Approval mode
 
-Closed beta approvals are manual only.
+Reviewed-access approvals are manual only.
 
-The rules below are reviewer guidance, not automatic approval logic. No applicant should be auto-approved during this beta round, even if they satisfy every baseline requirement. Automated approvals can be considered later after the team has enough reviewed applications, abuse patterns, and quality signals.
+The rules below are reviewer guidance, not automatic approval logic. No applicant should be auto-approved during this launch phase, even if they satisfy every baseline requirement. Automated approvals can be considered later after the team has enough reviewed applications, abuse patterns, and quality signals.
 
 ## Baseline requirements
 
@@ -22,7 +22,7 @@ Applications that miss a baseline requirement should stay pending with reviewer 
 
 ## Good-fit applicants
 
-Closed beta should prioritize:
+Reviewed access should prioritize:
 
 - Builders who can test Synagent or Helixa workflows seriously.
 - Reviewers/operators who can evaluate agents, profiles, or trust signals.
@@ -48,9 +48,9 @@ Reject when the reviewer sees:
 - Spam, bot-like, or low-effort application behavior.
 - Impersonation or obviously fake identity signals.
 - No usable contact path after follow-up or review.
-- Bad-faith intent, recruiting spam, scam patterns, or attempts to exploit the beta.
+- Bad-faith intent, recruiting spam, scam patterns, or attempts to exploit the launch.
 - Conflicts that would compromise review integrity or user safety.
-- Requests for access that are clearly outside the purpose of Cred Bureau closed beta.
+- Requests for access that are clearly outside the purpose of Cred Bureau reviewed access.
 
 ## Conflict and disclosure handling
 
