@@ -14,7 +14,7 @@ test("Cred Bureau reward config locks the beta pool, seasons, and category alloc
   assert.equal(CRED_BUREAU_REWARD_CONFIG.seasons[0].allocationShare, 0.4);
   assert.equal(CRED_BUREAU_REWARD_CONFIG.seasons[1].durationWeeks, 3);
   assert.equal(CRED_BUREAU_REWARD_CONFIG.seasons[1].allocationShare, 0.6);
-  assert.equal(CRED_BUREAU_REWARD_CONFIG.socialContributionSeasonPayoutCapShare, 0.15);
+  assert.equal(CRED_BUREAU_REWARD_CONFIG.socialContribution.seasonPayoutCapShare, 0.15);
   assert.equal(CRED_BUREAU_REWARD_CONFIG.socialContribution.maxScoredPerUtcDay, 2);
   assert.equal(CRED_BUREAU_REWARD_CONFIG.socialContribution.role, "supporting-signal-only");
 

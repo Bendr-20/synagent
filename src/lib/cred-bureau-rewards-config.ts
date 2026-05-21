@@ -19,7 +19,6 @@ export const CRED_BUREAU_REWARD_CONFIG = {
   totalPoolPercent: 1,
   betaDurationWeeks: 6,
   weeklyCheckpointCadence: "weekly",
-  socialContributionSeasonPayoutCapShare: 0.15,
   socialContribution: {
     role: "supporting-signal-only",
     maxScoredPerUtcDay: 2,
