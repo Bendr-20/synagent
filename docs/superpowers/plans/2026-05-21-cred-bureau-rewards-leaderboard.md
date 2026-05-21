@@ -23,17 +23,16 @@
 
 ## Reward Categories
 
-Use these categories in product copy and data models.
+Use these allocation categories in product copy and data models. This is the canonical breakdown agreed by the team.
 
-- `cred-review` - useful Cred reviews
-- `human-ai-task` - completed human-AI work tasks
-- `agent-qa` - QA reports on agents/tools
-- `ecosystem-intel` - high-signal ecosystem intel
-- `partner-community` - partner/community tasks, including Toshi-style work if that lands
-- `social-contribution` - original posts, quote posts, and substantive replies that add useful public signal; supporting category only, not the primary leaderboard driver
-- `task-creation` - high-quality task creation that other testers want to take
-- `referral` - referrals that become active members
-- `wildcard` - manual grants for unusually valuable work
+- `matched-task` - 50% - posted task, accepted, completed, rated
+- `task-creation` - 15% - high-quality tasks other testers actually want to take
+- `bug-friction-log` - 15% - bug reports and friction logs
+- `product-feedback` - 10% - feedback that directly changes product
+- `referral` - 5% - referrals that become active matched users
+- `wildcard` - 5% - manual grants for unusually valuable work
+
+Social contributions are supporting evidence only. They may help justify feedback/community/wildcard scoring, but they are not a primary allocation bucket and cannot dominate payout scoring.
 
 ## Files to Create or Modify
 
@@ -151,7 +150,17 @@ assert.equal(CRED_BUREAU_REWARD_CONFIG.seasons[0].durationWeeks, 3);
 assert.equal(CRED_BUREAU_REWARD_CONFIG.seasons[0].allocationShare, 0.4);
 assert.equal(CRED_BUREAU_REWARD_CONFIG.seasons[1].durationWeeks, 3);
 assert.equal(CRED_BUREAU_REWARD_CONFIG.seasons[1].allocationShare, 0.6);
-assert.ok(CRED_BUREAU_REWARD_CONFIG.categories.some((category) => category.id === "human-ai-task"));
+assert.deepEqual(
+  CRED_BUREAU_REWARD_CONFIG.categories.map((category) => ({ id: category.id, allocationShare: category.allocationShare })),
+  [
+    { id: "matched-task", allocationShare: 0.5 },
+    { id: "task-creation", allocationShare: 0.15 },
+    { id: "bug-friction-log", allocationShare: 0.15 },
+    { id: "product-feedback", allocationShare: 0.1 },
+    { id: "referral", allocationShare: 0.05 },
+    { id: "wildcard", allocationShare: 0.05 },
+  ],
+);
 ```
 
 - [ ] **Step 2: Run test and verify it fails**
@@ -171,13 +180,10 @@ Define these exported types:
 ```ts
 export type CredBureauRewardSeasonId = "season-1" | "season-2";
 export type CredBureauRewardCategoryId =
-  | "cred-review"
-  | "human-ai-task"
-  | "agent-qa"
-  | "ecosystem-intel"
-  | "partner-community"
-  | "social-contribution"
+  | "matched-task"
   | "task-creation"
+  | "bug-friction-log"
+  | "product-feedback"
   | "referral"
   | "wildcard";
 
@@ -267,20 +273,23 @@ export const CRED_BUREAU_REWARD_CONFIG = {
   totalPoolPercent: 1,
   betaDurationWeeks: 6,
   weeklyCheckpointCadence: "weekly",
+  socialContributionSeasonPayoutCapShare: 0.15,
+  socialContribution: {
+    role: "supporting-signal-only",
+    maxScoredPerUtcDay: 2,
+    seasonPayoutCapShare: 0.15,
+  },
   seasons: [
     { id: "season-1", label: "Season 1", durationWeeks: 3, allocationShare: 0.4 },
     { id: "season-2", label: "Season 2", durationWeeks: 3, allocationShare: 0.6 },
   ],
   categories: [
-    { id: "cred-review", label: "Useful Cred reviews", defaultPointGuidance: "10-40 points" },
-    { id: "human-ai-task", label: "Completed human-AI work tasks", defaultPointGuidance: "25-100 points" },
-    { id: "agent-qa", label: "QA reports on agents/tools", defaultPointGuidance: "10-60 points" },
-    { id: "ecosystem-intel", label: "High-signal ecosystem intel", defaultPointGuidance: "10-50 points" },
-    { id: "partner-community", label: "Partner/community tasks", defaultPointGuidance: "10-75 points" },
-    { id: "social-contribution", label: "Original posts, quote posts, and substantive replies", defaultPointGuidance: "0-20 points, max 2 scored per day" },
-    { id: "task-creation", label: "High-quality task creation", defaultPointGuidance: "10-40 points" },
-    { id: "referral", label: "Referrals that become active members", defaultPointGuidance: "10-30 points" },
-    { id: "wildcard", label: "Wildcard grants", defaultPointGuidance: "Manual" },
+    { id: "matched-task", label: "Matched-task rewards", allocationShare: 0.5, defaultPointGuidance: "25-100 points" },
+    { id: "task-creation", label: "High-quality task creation", allocationShare: 0.15, defaultPointGuidance: "10-40 points" },
+    { id: "bug-friction-log", label: "Bug reports and friction logs", allocationShare: 0.15, defaultPointGuidance: "10-60 points" },
+    { id: "product-feedback", label: "Product-changing feedback", allocationShare: 0.1, defaultPointGuidance: "10-50 points" },
+    { id: "referral", label: "Active referrals", allocationShare: 0.05, defaultPointGuidance: "10-30 points" },
+    { id: "wildcard", label: "Wildcard grants", allocationShare: 0.05, defaultPointGuidance: "Manual" },
   ],
 } as const;
 ```
@@ -397,8 +406,8 @@ Rules:
 - Normalize Telegram to `@handle`.
 - Require wallet format to start with `0x` and contain 40 hex chars.
 - On approve, require `reviewedBy`, set `reviewedAt`, `approvedAt`, `assignedPoints`, and `payoutEligible`.
-- For `social-contribution`, enforce max 2 scored social contributions per participant per UTC day. Extra approved social items can remain visible in review history but must get `assignedPoints: 0` or `payoutEligible: false`.
-- For payout eligibility, cap `social-contribution` points at 15% of each participant's season payout-eligible score. Any points above that cap can remain visible in internal review history but must not increase payout allocation.
+- For social supporting evidence, enforce max 2 scored social contributions per participant per UTC day. Extra approved social items can remain visible in review history but must get `assignedPoints: 0` or `payoutEligible: false`.
+- For payout eligibility, cap social-supporting-evidence points at 15% of each participant's season payout-eligible score. Any points above that cap can remain visible in internal review history but must not increase payout allocation.
 - On reject, set `reviewedAt`, `rejectedAt`, and `payoutEligible: false`.
 - On needs-info, set `reviewedAt`, `needsInfoAt`, and `payoutEligible: false`.
 - Append review log entries for every protected review transition.
@@ -586,7 +595,7 @@ Content:
 - Headline: `Cred Bureau Rewards`
 - Explain that it is being wired up and will begin soon if launch flag is off.
 - State 1% pool, 2 seasons, 3 weeks each, 40/60 split.
-- State rewards are earned through useful Cred reviews, human-AI task work, agent/tool QA, ecosystem intel, partner/community work, substantive social contributions, task creation, referrals, and wildcard grants.
+- State rewards are earned through matched tasks, high-quality task creation, bug reports and friction logs, product-changing feedback, active referrals, and wildcard grants. Social contributions are supporting evidence only.
 - Link to application page for last chance to join.
 - Link to leaderboard.
 - Include submission form only if `NEXT_PUBLIC_CRED_BUREAU_REWARDS_OPEN=1`, otherwise show `Submissions opening soon`.
@@ -770,7 +779,7 @@ In `src/lib/cred-bureau-rewards-ui.test.ts`, assert docs include:
 - `weekly recap`
 - `final winners post`
 - `no guaranteed rewards`
-- social contributions are capped as a supporting signal, not allowed to dominate task/review/product work
+- social contributions are capped as a supporting signal, not allowed to dominate matched-task, task-creation, bug/friction, or product-feedback work
 
 - [ ] **Step 2: Add rules doc**
 
@@ -791,16 +800,13 @@ Rules doc must include:
 Rubric doc must include:
 
 - point ranges by category:
-  - useful Cred reviews: 10-40
-  - completed human-AI work tasks: 25-100
-  - agent/tool QA reports: 10-60
-  - ecosystem intel: 10-50
-  - partner/community tasks: 10-75
-  - social contributions: 0-20
-  - task creation: 10-40
-  - active referrals: 10-30
-  - wildcard grants: manual
-- social scoring rubric: original post/thread 10 base points, quote post with real commentary 6, substantive reply 3, emoji-only/one-word/simple reply 0, quality multiplier 0x/1x/1.5x/2x, max 2 scored social contributions per participant per UTC day, and max 15% of payout-eligible season score
+  - matched-task rewards: 25-100, 50% allocation
+  - task creation: 10-40, 15% allocation
+  - bug reports and friction logs: 10-60, 15% allocation
+  - product-changing feedback: 10-50, 10% allocation
+  - active referrals: 10-30, 5% allocation
+  - wildcard grants: manual, 5% allocation
+- social scoring rubric for supporting evidence: original post/thread 10 base points, quote post with real commentary 6, substantive reply 3, emoji-only/one-word/simple reply 0, quality multiplier 0x/1x/1.5x/2x, max 2 scored social contributions per participant per UTC day, and max 15% of payout-eligible season score
 - duplicate/spam handling
 - evidence quality rules
 - conflict notes

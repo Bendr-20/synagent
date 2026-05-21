@@ -1,13 +1,10 @@
 export type CredBureauRewardSeasonId = "season-1" | "season-2";
 
 export type CredBureauRewardCategoryId =
-  | "cred-review"
-  | "human-ai-task"
-  | "agent-qa"
-  | "ecosystem-intel"
-  | "partner-community"
-  | "social-contribution"
+  | "matched-task"
   | "task-creation"
+  | "bug-friction-log"
+  | "product-feedback"
   | "referral"
   | "wildcard";
 
