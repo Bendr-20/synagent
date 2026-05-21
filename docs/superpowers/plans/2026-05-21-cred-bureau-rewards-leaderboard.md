@@ -30,7 +30,7 @@ Use these categories in product copy and data models.
 - `agent-qa` - QA reports on agents/tools
 - `ecosystem-intel` - high-signal ecosystem intel
 - `partner-community` - partner/community tasks, including Toshi-style work if that lands
-- `social-contribution` - original posts, quote posts, and substantive replies that add useful public signal
+- `social-contribution` - original posts, quote posts, and substantive replies that add useful public signal; supporting category only, not the primary leaderboard driver
 - `task-creation` - high-quality task creation that other testers want to take
 - `referral` - referrals that become active members
 - `wildcard` - manual grants for unusually valuable work
@@ -325,6 +325,7 @@ In `src/lib/cred-bureau-rewards-store.test.ts`, test these cases:
 - invalid category is rejected
 - invalid season is rejected
 - social contribution daily cap rejects or marks over-cap items as non-scoring after 2 scored social contributions per participant per UTC day
+- social contribution season cap prevents social points from exceeding 15% of a participant's payout-eligible season score
 - contribution POST payload with missing evidence URL is allowed but stored as `null`
 
 Use a temp data directory so tests do not mutate real `data/` files.
@@ -397,6 +398,7 @@ Rules:
 - Require wallet format to start with `0x` and contain 40 hex chars.
 - On approve, require `reviewedBy`, set `reviewedAt`, `approvedAt`, `assignedPoints`, and `payoutEligible`.
 - For `social-contribution`, enforce max 2 scored social contributions per participant per UTC day. Extra approved social items can remain visible in review history but must get `assignedPoints: 0` or `payoutEligible: false`.
+- For payout eligibility, cap `social-contribution` points at 15% of each participant's season payout-eligible score. Any points above that cap can remain visible in internal review history but must not increase payout allocation.
 - On reject, set `reviewedAt`, `rejectedAt`, and `payoutEligible: false`.
 - On needs-info, set `reviewedAt`, `needsInfoAt`, and `payoutEligible: false`.
 - Append review log entries for every protected review transition.
@@ -497,7 +499,8 @@ Behavior:
 - Protected PATCH allows reviewer to set status, assigned points, notes, anti-farm notes, and payout eligibility.
 - PATCH must reject negative points.
 - PATCH must reject points above 250 unless category is `wildcard`.
-- PATCH must enforce the social scoring cap: max 2 scored social contributions per participant per UTC day.
+- PATCH must enforce the daily social scoring cap: max 2 scored social contributions per participant per UTC day.
+- Payout calculation must enforce the season social cap: social points cannot exceed 15% of a participant's payout-eligible season score.
 - Use `assertReviewAuthorized` for protected GET/PATCH.
 - Apply `checkRateLimit` to public POST using `x-forwarded-for`.
 
@@ -767,6 +770,7 @@ In `src/lib/cred-bureau-rewards-ui.test.ts`, assert docs include:
 - `weekly recap`
 - `final winners post`
 - `no guaranteed rewards`
+- social contributions are capped as a supporting signal, not allowed to dominate task/review/product work
 
 - [ ] **Step 2: Add rules doc**
 
@@ -786,8 +790,17 @@ Rules doc must include:
 
 Rubric doc must include:
 
-- point ranges by category
-- social scoring rubric: original post/thread 10 base points, quote post with real commentary 6, substantive reply 3, emoji-only/one-word/simple reply 0, quality multiplier 0x/1x/1.5x/2x, max 2 scored social contributions per participant per UTC day
+- point ranges by category:
+  - useful Cred reviews: 10-40
+  - completed human-AI work tasks: 25-100
+  - agent/tool QA reports: 10-60
+  - ecosystem intel: 10-50
+  - partner/community tasks: 10-75
+  - social contributions: 0-20
+  - task creation: 10-40
+  - active referrals: 10-30
+  - wildcard grants: manual
+- social scoring rubric: original post/thread 10 base points, quote post with real commentary 6, substantive reply 3, emoji-only/one-word/simple reply 0, quality multiplier 0x/1x/1.5x/2x, max 2 scored social contributions per participant per UTC day, and max 15% of payout-eligible season score
 - duplicate/spam handling
 - evidence quality rules
 - conflict notes
