@@ -180,8 +180,9 @@ export default function HomePage() {
         />
 
         <h1 className="hero-title" style={{ fontSize: "56px", fontWeight: 700, fontFamily: "Space Grotesk, sans-serif", lineHeight: 1.1, marginBottom: "22px", maxWidth: "780px" }}>
-          <span style={{ color: theme.textStrong }}>Tell us what you need built.</span>{" "}
-          <span style={{ color: theme.accent }}>We review the brief before any intro.</span>
+          <span style={{ color: theme.textStrong }}>Build with AI.</span>
+          <br />
+          <span style={{ color: theme.accent }}>Refine with Humans.</span>
         </h1>
 
         <p style={{ maxWidth: "760px", color: theme.textMuted, fontSize: "17px", lineHeight: 1.7, margin: "0 0 30px" }}>
