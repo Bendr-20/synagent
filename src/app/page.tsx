@@ -225,6 +225,27 @@ export default function HomePage() {
         </Link>
       </section>
 
+      <section className="cred-bureau-rewards-home-cta" style={{ maxWidth: "980px", margin: "0 auto", padding: "0 24px 34px" }}>
+        <div style={{ ...glassCardStyle, display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "16px", padding: "18px 20px" }}>
+          <div>
+            <div style={{ color: theme.accent, fontFamily: "JetBrains Mono, monospace", fontSize: "11px", letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "8px" }}>
+              Cred Bureau Rewards
+            </div>
+            <div style={{ color: theme.textStrong, fontWeight: 700, lineHeight: 1.5 }}>
+              Track reviewed contribution rewards and public leaderboard progress.
+            </div>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+            <Link href="/cred-bureau/rewards" style={{ ...outlineButtonStyle, width: "auto", minWidth: "160px" }}>
+              Rewards
+            </Link>
+            <Link href="/cred-bureau/leaderboard" style={{ ...outlineButtonStyle, width: "auto", minWidth: "160px" }}>
+              Leaderboard
+            </Link>
+          </div>
+        </div>
+      </section>
+
       <section className="cards-grid" style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px 34px", display: "flex", gap: "16px", alignItems: "stretch" }}>
         {serviceCards.map((card) => (
           <div

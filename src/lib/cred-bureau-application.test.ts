@@ -17,6 +17,10 @@ test("Cred Bureau application is linked from public Synagent entry points", () =
   const reviewStatusControls = fs.readFileSync("src/app/review/cred-bureau/review-status-controls.tsx", "utf8");
 
   assert.match(homePage, /href=\"\/cred-bureau\"/);
+  assert.match(homePage, /href=\"\/cred-bureau\/rewards\"/);
+  assert.match(homePage, /href=\"\/cred-bureau\/leaderboard\"/);
+  assert.match(credBureauPage, /href=\"\/cred-bureau\/rewards\"/);
+  assert.match(credBureauPage, /href=\"\/cred-bureau\/leaderboard\"/);
   assert.doesNotMatch(siteShell, /href=\"\/cred-bureau\"/);
   assert.doesNotMatch(siteShell, />\s*CONNECT\s*</i);
   assert.match(siteShell, /Submit Request/i);

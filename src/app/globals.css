@@ -383,3 +383,35 @@
     font-size: 30px !important;
   }
 }
+
+.cred-bureau-rewards-grid,
+.cred-bureau-reward-form-grid {
+  min-width: 0;
+}
+
+.cred-bureau-leaderboard-row {
+  min-width: 0;
+}
+
+.cred-bureau-leaderboard-row > * {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 768px) {
+  .cred-bureau-rewards-grid,
+  .cred-bureau-reward-form-grid,
+  .cred-bureau-leaderboard-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .cred-bureau-leaderboard-header {
+    display: none !important;
+  }
+
+  .cred-bureau-reward-form button,
+  .cred-bureau-reward-form a {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
