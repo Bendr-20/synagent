@@ -73,6 +73,81 @@ test("Review transitions and review log", async () => {
   cleanupTestFiles();
 });
 
+test("Store rejects transitions from terminal statuses (approved/rejected)", async () => {
+  const { buildRewardContribution, appendRewardContribution, updateRewardContributionReview } = await loadRewardStore();
+  cleanupTestFiles();
+
+  const contribution = buildRewardContribution({
+    participantId: "test-participant",
+    seasonId: "season-1",
+    categoryId: "matched-task",
+    title: "Test task",
+    description: "Test description",
+  });
+  appendRewardContribution(contribution);
+
+  // First approve
+  const result1 = updateRewardContributionReview(
+    contribution.id,
+    "approved",
+    "reviewer-1",
+    "Approve",
+    null,
+    10,
+  );
+  assert.equal(result1.contribution.status, "approved");
+
+  // Attempt to transition from approved to needs-info
+  try {
+    updateRewardContributionReview(
+      contribution.id,
+      "needs-info",
+      "reviewer-2",
+      "Reopen",
+      null,
+    );
+    assert.fail("Should not allow transition from approved to needs-info");
+  } catch (error: any) {
+    assert.match(error.message, /Cannot transition from approved to needs-info/);
+  }
+
+  // Create a rejected contribution
+  const contribution2 = buildRewardContribution({
+    participantId: "test-participant-2",
+    seasonId: "season-1",
+    categoryId: "task-creation",
+    title: "Another",
+    description: "Another",
+  });
+  appendRewardContribution(contribution2);
+  const result2 = updateRewardContributionReview(
+    contribution2.id,
+    "rejected",
+    "reviewer-1",
+    "Reject",
+    null,
+    0,
+  );
+  assert.equal(result2.contribution.status, "rejected");
+
+  // Attempt to transition from rejected to approved
+  try {
+    updateRewardContributionReview(
+      contribution2.id,
+      "approved",
+      "reviewer-2",
+      "Approve later",
+      null,
+      5,
+    );
+    assert.fail("Should not allow transition from rejected to approved");
+  } catch (error: any) {
+    assert.match(error.message, /Cannot transition from rejected to approved/);
+  }
+
+  cleanupTestFiles();
+});
+
 test("Review transitions from needs-info", async () => {
   const { buildRewardContribution, appendRewardContribution, updateRewardContributionReview, getRewardReviewLog } = await loadRewardStore();
   cleanupTestFiles();

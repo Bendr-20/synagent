@@ -70,3 +70,62 @@ test("Cred Bureau rewards links are exposed from public surfaces without changin
   assert.match(css, /cred-bureau-rewards-grid/);
   assert.match(css, /cred-bureau-leaderboard-row/);
 });
+
+test("Cred Bureau rewards protected review queue exposes manual reviewer workflow", () => {
+  const reviewPage = read("src/app/review/cred-bureau/rewards/page.tsx");
+  const reviewControls = read("src/app/review/cred-bureau/rewards/reward-review-controls.tsx");
+  const existingReviewPage = read("src/app/review/cred-bureau/page.tsx");
+  const css = read("src/app/globals.css");
+  const source = [reviewPage, reviewControls, existingReviewPage, css].join("\n");
+
+  for (const required of [
+    "Reviewer key required",
+    "Contribution queue",
+    "Status controls",
+    "Assigned points",
+    "Anti-farm notes",
+    "Weekly checkpoint",
+    "Weekly recap prompt/template",
+    "Final winners post prompt/template",
+    "Payout export form",
+    "Anti-farm review confirmation",
+    "Manual review required before sending rewards.",
+    "Export JSON",
+    "Export CSV",
+    "href={`/review/cred-bureau/rewards?key=${encodeURIComponent(reviewKey)}`}",
+    "cred-bureau-reward-review-grid",
+  ]) {
+    assert.match(source, new RegExp(required.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"));
+  }
+});
+
+test("Cred Bureau rewards review template links target real docs anchors", () => {
+  const reviewPage = read("src/app/review/cred-bureau/rewards/page.tsx");
+  const reviewOps = read("docs/cred-bureau-review-ops.md");
+
+  assert.match(reviewPage, /#weekly-recap-template/);
+  assert.match(reviewPage, /#final-winners-post-template/);
+  assert.match(reviewOps, /^## Weekly recap template$/m);
+  assert.match(reviewOps, /^## Final winners post template$/m);
+
+  for (const required of [
+    "public-safe",
+    "do not include wallets",
+    "manual review",
+    "anti-farm checks",
+    "Cred Bureau weekly checkpoint",
+    "Cred Bureau Season [N] final standings",
+  ]) {
+    assert.match(reviewOps, new RegExp(required.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"));
+  }
+
+  for (const disallowed of [
+    /automatic payout/i,
+    /guaranteed payout/i,
+    /claim contract/i,
+    /escrow/i,
+    /reviewer key:\s*[A-Za-z0-9_-]+/i,
+  ]) {
+    assert.doesNotMatch(reviewOps, disallowed);
+  }
+});

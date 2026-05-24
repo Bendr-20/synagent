@@ -85,9 +85,16 @@ export default async function CredBureauReviewPage({
               Review applicants, inspect their required Helixa human profile and supporting links, copy their Telegram contact, and manually add approved profiles to the group.
             </p>
           </div>
-          <Link href="/cred-bureau" style={{ ...outlineButtonStyle, width: "auto" }}>
-            Public Application
-          </Link>
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+            <Link href="/cred-bureau" style={{ ...outlineButtonStyle, width: "auto" }}>
+              Public Application
+            </Link>
+            {authorized && (
+              <Link href={`/review/cred-bureau/rewards?key=${encodeURIComponent(reviewKey)}`} style={{ ...outlineButtonStyle, width: "auto" }}>
+                Reward Review Queue
+              </Link>
+            )}
+          </div>
         </div>
 
         {!configuredKey && (

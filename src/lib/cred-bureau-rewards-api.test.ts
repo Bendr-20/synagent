@@ -330,6 +330,7 @@ test("Cred Bureau rewards API integration tests", { timeout: 60_000 }, async () 
         status: "approved",
         assignedPoints: 50,
         reviewerNotes: "Good work on this test contribution",
+        reviewedBy: "test-reviewer",
       },
       "Bearer test-review-key"
     );
@@ -344,7 +345,9 @@ test("Cred Bureau rewards API integration tests", { timeout: 60_000 }, async () 
     assert.equal(updatedContrib.status, "approved");
     assert.equal(updatedContrib.assignedPoints, 50);
     assert.equal(updatedContrib.payoutEligible, true);
+    assert.equal(updatedContrib.reviewedBy, "test-reviewer");
     assert.ok(patchResult.body.reviewLogEntry);
+    assert.equal((patchResult.body.reviewLogEntry as any).reviewedBy, "test-reviewer");
 
     // Test 8: protected payout export refuses to generate without explicit anti‑farm review confirmation
     const payoutExportNoConfirm = await postPayoutExport(port, {

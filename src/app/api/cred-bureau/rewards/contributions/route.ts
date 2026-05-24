@@ -158,7 +158,9 @@ export async function PATCH(req: Request) {
     const status = payload.status;
     if (!isValidStatus(status)) throw new Error("Status must be 'approved', 'rejected', or 'needs-info'");
     
-    const reviewedBy = "reviewer"; // TODO: Get reviewer identity from auth
+    const reviewedBy = typeof payload.reviewedBy === "string" && payload.reviewedBy.trim()
+      ? payload.reviewedBy.trim()
+      : "reviewer";
     
     const assignedPoints = typeof payload.assignedPoints === "number" ? payload.assignedPoints : undefined;
     const reviewerNotes = typeof payload.reviewerNotes === "string" ? payload.reviewerNotes : undefined;
