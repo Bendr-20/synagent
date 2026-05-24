@@ -1,6 +1,6 @@
 # Cred Bureau Review Ops
 
-Last updated: 2026-05-13 UTC
+Last updated: 2026-05-24 UTC
 Status: locked for reviewed access
 
 ## Owners
@@ -40,3 +40,47 @@ Status: locked for reviewed access
 - Do not share the review key in the group chat.
 - Follow `docs/review-queue-security.md` for authorized reviewer roster, key handling, and rotation.
 - Keep reviewer notes concrete enough that the Decision Log is useful later.
+
+## Weekly recap template
+
+Use this after the weekly checkpoint is reviewed by the owner. Keep it public-safe: do not include wallets, reviewer keys, private notes, or individual payout promises.
+
+```text
+Cred Bureau weekly checkpoint — Week [N] / Season [1|2]
+
+Reviewed this week:
+- Approved contributions: [count]
+- Points awarded after manual review: [points]
+- Top contribution categories: [categories]
+- Open queue: [submitted count] submitted, [needs-info count] needs-info
+
+Current public leaderboard snapshot:
+1. [display name] — [points] pts
+2. [display name] — [points] pts
+3. [display name] — [points] pts
+
+Reviewer note:
+- Contributions remain subject to manual review and anti-farm checks before rewards are sent.
+- Next checkpoint: [date/time UTC]
+```
+
+## Final winners post template
+
+Use this only after the season review is closed, anti-farm review is complete, the payout export has been created, and owners approve the post. Keep it public-safe: do not include wallets, reviewer keys, private notes, or payout export files.
+
+```text
+Cred Bureau Season [N] final standings
+
+1. [display name] — [points] pts — [primary contribution type]
+2. [display name] — [points] pts — [primary contribution type]
+3. [display name] — [points] pts — [primary contribution type]
+
+Season notes:
+- Total reviewed contributors: [count]
+- Total approved contributions: [count]
+- Review window: [start date UTC] to [end date UTC]
+- Manual anti-farm review completed: [yes/no + reviewer initials]
+
+Rewards are handled manually by the team after final checks.
+Questions or corrections: [contact/process]
+```

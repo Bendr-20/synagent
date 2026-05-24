@@ -1,6 +1,7 @@
+import Link from "next/link";
 import { CredBureauApplicationForm } from "./cred-bureau-application-form";
 import { SiteShell } from "@/components/site-shell";
-import { glassCardStyle, solidButtonStyle, theme } from "@/lib/theme";
+import { glassCardStyle, outlineButtonStyle, solidButtonStyle, theme } from "@/lib/theme";
 
 const flowSteps = [
   {
@@ -57,6 +58,12 @@ export default function CredBureauPage() {
             <a href="#apply" style={{ ...solidButtonStyle, width: "auto", minWidth: "190px" }}>
               Apply for Manual Review
             </a>
+            <Link href="/cred-bureau/rewards" style={{ ...outlineButtonStyle, width: "auto", minWidth: "190px" }}>
+              View Rewards
+            </Link>
+            <Link href="/cred-bureau/leaderboard" style={{ ...outlineButtonStyle, width: "auto", minWidth: "190px" }}>
+              View Leaderboard
+            </Link>
           </div>
         </div>
 

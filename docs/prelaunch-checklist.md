@@ -118,7 +118,27 @@ Build result:
 - Live HTTPS check passed for `https://synagent.helixa.xyz/cred-bureau` with HTTP 200 and TLS verify result 0 on 2026-05-13 UTC.
 - Live smoke application `cba_mp4ola1s_796356` submitted successfully, appeared in the protected review queue as `pending-review`, and was removed after verification to keep the queue clean.
 
-## 9. Launch ops
+## 9. Cred Bureau Rewards Launch Checks
+- [x] GREEN - Rewards rules documented in `docs/cred-bureau-rewards-rules.md`
+- [x] GREEN - Review rubric documented in `docs/cred-bureau-rewards-review-rubric.md`
+- [x] GREEN - Weekly ops documented in `docs/cred-bureau-rewards-weekly-ops.md`
+- [x] GREEN - Public rewards pages exist (`/cred-bureau/rewards`, `/cred-bureau/leaderboard`)
+- [x] GREEN - Protected review queue exists (`/review/cred-bureau/rewards`)
+- [x] GREEN - Review API integration tests pass
+- [x] GREEN - Social scoring caps implemented in store
+- [x] GREEN - Anti-farm review checklist required in review workflow
+- [ ] YELLOW - Test end-to-end reward submission → review → leaderboard flow
+- [ ] YELLOW - Verify weekly checkpoint communication templates
+- [ ] YELLOW - Confirm manual payout process for season end
+
+Notes:
+- Rewards are 6-week beta with 2 seasons of 3 weeks each
+- 1% pool split 40% Season 1, 60% Season 2
+- No automated payouts in v0 – all rewards require manual review
+-_ No guaranteed rewards – quality-based discretionary allocation only
+- Social contributions capped at 15% of season score
+
+## 10. Launch ops
 - [ ] YELLOW - Pick launch date
 - [ ] RED - Pick launch owner for inbound request handling
 - [ ] RED - Set response SLA
@@ -130,7 +150,7 @@ Build result:
 Notes:
 - Do not block soft launch on x402, but do not promise payments/escrow until the flow exists.
 
-## 10. Success metrics
+## 11. Success metrics
 - [ ] YELLOW - Define first-2-week success criteria
 - [ ] YELLOW - Track submissions
 - [ ] YELLOW - Track qualified requests
@@ -138,6 +158,10 @@ Notes:
 - [ ] YELLOW - Track replies sent
 - [ ] YELLOW - Track paid engagements
 - [ ] YELLOW - Track intake drop-off
+- [ ] YELLOW - Track reward contributions submitted
+- [ ] YELLOW - Track reward contributions approved
+- [ ] YELLOW - Track reward points awarded
+- [ ] YELLOW - Track leaderboard engagement
 
 ## Current overall launch call
 - RED - Not ready for broad public launch

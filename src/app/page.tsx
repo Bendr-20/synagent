@@ -180,8 +180,9 @@ export default function HomePage() {
         />
 
         <h1 className="hero-title" style={{ fontSize: "56px", fontWeight: 700, fontFamily: "Space Grotesk, sans-serif", lineHeight: 1.1, marginBottom: "22px", maxWidth: "780px" }}>
-          <span style={{ color: theme.textStrong }}>Tell us what you need built.</span>{" "}
-          <span style={{ color: theme.accent }}>We review the brief before any intro.</span>
+          <span style={{ color: theme.textStrong }}>Build with AI.</span>
+          <br />
+          <span style={{ color: theme.accent }}>Refine with Humans.</span>
         </h1>
 
         <p style={{ maxWidth: "760px", color: theme.textMuted, fontSize: "17px", lineHeight: 1.7, margin: "0 0 30px" }}>
@@ -222,6 +223,27 @@ export default function HomePage() {
           <span>Apply to Cred Bureau</span>
           <span>{">"}</span>
         </Link>
+      </section>
+
+      <section className="cred-bureau-rewards-home-cta" style={{ maxWidth: "980px", margin: "0 auto", padding: "0 24px 34px" }}>
+        <div style={{ ...glassCardStyle, display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "16px", padding: "18px 20px" }}>
+          <div>
+            <div style={{ color: theme.accent, fontFamily: "JetBrains Mono, monospace", fontSize: "11px", letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "8px" }}>
+              Cred Bureau Rewards
+            </div>
+            <div style={{ color: theme.textStrong, fontWeight: 700, lineHeight: 1.5 }}>
+              Track reviewed contribution rewards and public leaderboard progress.
+            </div>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+            <Link href="/cred-bureau/rewards" style={{ ...outlineButtonStyle, width: "auto", minWidth: "160px" }}>
+              Rewards
+            </Link>
+            <Link href="/cred-bureau/leaderboard" style={{ ...outlineButtonStyle, width: "auto", minWidth: "160px" }}>
+              Leaderboard
+            </Link>
+          </div>
+        </div>
       </section>
 
       <section className="cards-grid" style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px 34px", display: "flex", gap: "16px", alignItems: "stretch" }}>
