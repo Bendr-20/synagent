@@ -83,9 +83,11 @@ export function calculateSeasonPayoutRows(
   seasonId: CredBureauRewardSeasonId,
   seasonTokenPool: string,
 ): CredBureauPayoutExportRow[] {
-  // only approved and payout‑eligible contributions
+  const participantIds = new Set(participants.map(p => p.id));
+
+  // only approved, payout‑eligible contributions for active known participants
   const eligible = contributions.filter(
-    c => c.seasonId === seasonId && c.status === "approved" && c.payoutEligible === true,
+    c => c.seasonId === seasonId && c.status === "approved" && c.payoutEligible === true && participantIds.has(c.participantId),
   );
 
   // group points by participant
@@ -142,11 +144,11 @@ export function calculateSeasonPayoutRows(
 
   // distribute remaining units to highest‑ranked rows (deterministic)
   let i = 0;
-  while (remainingUnits > 0n && rows.length > 0) {
+  while (remainingUnits > BigInt(0) && rows.length > 0) {
     const row = rows[i % rows.length];
-    row.amountUnits = (BigInt(row.amountUnits) + 1n).toString();
+    row.amountUnits = (BigInt(row.amountUnits) + BigInt(1)).toString();
     row.amount = formatTokenUnits(BigInt(row.amountUnits), 18);
-    remainingUnits -= 1n;
+    remainingUnits -= BigInt(1);
     i++;
   }
 

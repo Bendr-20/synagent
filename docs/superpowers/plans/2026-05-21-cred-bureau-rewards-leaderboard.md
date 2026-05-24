@@ -437,15 +437,13 @@ Rules:
 - Allocate floor units by points and distribute remaining smallest units by leaderboard order.
 - Never use floating point for final payout amounts.
 
-- [ ] **Step 7: Run tests and verify they pass**
+- [x] **Step 7: Run tests and verify they pass**
 
-```bash
-node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test src/lib/cred-bureau-rewards-store.test.ts src/lib/cred-bureau-rewards-scoring.test.ts
-```
+Verified: store and scoring tests pass.
 
-Expected: PASS.
+- [x] **Step 8: Commit**
 
-- [ ] **Step 8: Commit**
+Committed `ec92a8e`.
 
 ```bash
 git add src/lib/cred-bureau-rewards-store.ts src/lib/cred-bureau-rewards-scoring.ts src/lib/cred-bureau-rewards-store.test.ts src/lib/cred-bureau-rewards-scoring.test.ts

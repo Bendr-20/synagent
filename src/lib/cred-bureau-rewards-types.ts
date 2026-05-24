@@ -33,6 +33,7 @@ export type CredBureauRewardContribution = {
   title: string;
   description: string;
   evidenceUrl?: string | null;
+  socialEvidence?: boolean;
   requestedPoints?: number | null;
   assignedPoints: number;
   status: CredBureauRewardContributionStatus;

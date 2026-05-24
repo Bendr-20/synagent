@@ -46,7 +46,7 @@ function validateWallet(wallet: string): string {
   if (!regex.test(trimmed)) {
     throw new Error("Wallet must be an EVM address: 0x followed by 40 hex characters");
   }
-  return trimmed.toLowerCase();
+  return trimmed;
 }
 
 function cleanString(value: unknown) {
@@ -74,7 +74,7 @@ function isLowEffortSocial(description: string): boolean {
   // Common low-effort CT phrases
   const lowEffortWords = ["gm", "gn", "based", "wagmi", "ngmi", "lfg", "gm!", "gn!", "gm.", "gn."];
   const singleWord = trimmed.split(/\s+/).length === 1 && lowEffortWords.includes(trimmed.toLowerCase());
-  return emojiOnly || singleTeam;
+  return emojiOnly || singleWord;
 }
 
 function getUtcDateString(date: Date): string {
@@ -133,15 +133,6 @@ export function buildRewardContribution(payload: {
   const socialEvidence = payload.socialEvidence === true;
   const requestedPoints = typeof payload.requestedPoints === "number" && payload.requestedPoints > 0 ? payload.requestedPoints : null;
 
-  // Check for low-effort social if socialEvidence is true
-  let assignedPoints = 0;
-  let payoutEligible = true;
-  
-  if (socialEvidence && isLowEffortSocial(description)) {
-    assignedPoints = 0;
-    payoutEligible = false;
-  }
-
   return {
     id: makeContributionId(),
     createdAt: new Date().toISOString(),
@@ -154,9 +145,9 @@ export function buildRewardContribution(payload: {
     evidenceUrl,
     socialEvidence,
     requestedPoints,
-    assignedPoints,
+    assignedPoints: 0,
     status: "submitted",
-    payoutEligible,
+    payoutEligible: false,
   };
 }
 
@@ -173,6 +164,80 @@ export function getRewardContributions() {
 
 export function getRewardParticipants() {
   return readJsonFile<CredBureauRewardParticipant[]>(PARTICIPANTS_PATH, []);
+}
+
+function makeParticipantId() {
+  return `cbrp_${Date.now().toString(36)}_${Math.random().toString(16).slice(2, 8)}`;
+}
+
+export function buildRewardParticipant(payload: {
+  displayName: string;
+  wallet: string;
+  telegram?: string | null;
+  email?: string | null;
+  helixaProfileUrl?: string | null;
+  applicationId?: string | null;
+}): CredBureauRewardParticipant {
+  const displayName = cleanString(payload.displayName);
+  if (!displayName) throw new Error("Display name is required");
+
+  const wallet = validateWallet(payload.wallet);
+  const telegram = cleanOptionalString(payload.telegram);
+  const email = cleanOptionalString(payload.email);
+  const helixaProfileUrl = cleanOptionalUrl(payload.helixaProfileUrl, "Helixa profile URL");
+  const applicationId = cleanOptionalString(payload.applicationId);
+
+  return {
+    id: makeParticipantId(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    displayName,
+    telegram,
+    email,
+    wallet,
+    helixaProfileUrl,
+    applicationId,
+    status: "active",
+  };
+}
+
+export function appendRewardParticipant(participant: CredBureauRewardParticipant): CredBureauRewardParticipant {
+  const participants = getRewardParticipants();
+  participants.unshift(participant);
+  writeJsonFile(PARTICIPANTS_PATH, participants);
+  return participant;
+}
+
+export function updateRewardParticipant(
+  id: string,
+  updates: {
+    displayName?: string;
+    telegram?: string | null;
+    email?: string | null;
+    helixaProfileUrl?: string | null;
+    applicationId?: string | null;
+    status?: "active" | "suspended";
+  }
+): CredBureauRewardParticipant {
+  const participants = getRewardParticipants();
+  const index = participants.findIndex(p => p.id === id);
+  if (index === -1) throw new Error("Participant not found");
+
+  const existing = participants[index];
+  const updated: CredBureauRewardParticipant = {
+    ...existing,
+    updatedAt: new Date().toISOString(),
+    displayName: updates.displayName ? cleanString(updates.displayName) : existing.displayName,
+    telegram: updates.telegram !== undefined ? cleanOptionalString(updates.telegram) : existing.telegram,
+    email: updates.email !== undefined ? cleanOptionalString(updates.email) : existing.email,
+    helixaProfileUrl: updates.helixaProfileUrl !== undefined ? cleanOptionalUrl(updates.helixaProfileUrl, "Helixa profile URL") : existing.helixaProfileUrl,
+    applicationId: updates.applicationId !== undefined ? cleanOptionalString(updates.applicationId) : existing.applicationId,
+    status: updates.status || existing.status,
+  };
+
+  participants[index] = updated;
+  writeJsonFile(PARTICIPANTS_PATH, participants);
+  return updated;
 }
 
 export function getRewardReviewLog() {
@@ -230,9 +295,19 @@ export function updateRewardContributionReview(
   }
 
   // Apply daily social cap if approving a social contribution
-  let finalAssignedPoints = assignedPoints !== undefined ? assignedPoints : previous.assignedPoints;
-  let finalPayoutEligible = previous.payoutEligible;
+  let finalAssignedPoints = status === "approved"
+    ? assignedPoints !== undefined ? assignedPoints : previous.assignedPoints
+    : 0;
+  let finalPayoutEligible = status === "approved" && finalAssignedPoints > 0;
   let finalReviewerNotes = cleanOptionalString(reviewerNotes);
+
+  if (status === "approved" && previous.socialEvidence && isLowEffortSocial(previous.description)) {
+    finalAssignedPoints = 0;
+    finalPayoutEligible = false;
+    finalReviewerNotes = finalReviewerNotes
+      ? `${finalReviewerNotes} [Low-effort social evidence excluded]`
+      : "Low-effort social evidence excluded";
+  }
 
   if (status === "approved" && previous.socialEvidence) {
     const utcDate = getUtcDateString(new Date(previous.createdAt));
