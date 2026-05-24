@@ -129,3 +129,77 @@ test("Cred Bureau rewards review template links target real docs anchors", () =>
     assert.doesNotMatch(reviewOps, disallowed);
   }
 });
+
+test("Cred Bureau rewards docs include required rules and workflow references", () => {
+  // This test will fail initially until we create the required docs files
+  // We'll check for the existence of the files first
+  const files = [
+    "docs/cred-bureau-rewards-rules.md",
+    "docs/cred-bureau-rewards-review-rubric.md",
+    "docs/cred-bureau-rewards-weekly-ops.md",
+  ];
+  
+  for (const file of files) {
+    assert.ok(fs.existsSync(file), `Required file ${file} should exist`);
+  }
+  
+  // Now check content of each file
+  const rulesContent = read("docs/cred-bureau-rewards-rules.md");
+  const rubricContent = read("docs/cred-bureau-rewards-review-rubric.md");
+  const weeklyOpsContent = read("docs/cred-bureau-rewards-weekly-ops.md");
+  
+  // Check for required terms in rules
+  for (const required of [
+    "1%",
+    "6-week",
+    "2 seasons",
+    "3 weeks",
+    "40/60",
+    "weekly checkpoint",
+    "manual review",
+    "manual anti-farm review",
+    "no guaranteed rewards",
+  ]) {
+    assert.match(rulesContent, new RegExp(required.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"));
+  }
+  
+  // Check for required terms in rubric
+  for (const required of [
+    "25-100",
+    "10-40",
+    "10-60",
+    "10-50",
+    "10-30",
+    "50% allocation",
+    "15% allocation",
+    "10% allocation",
+    "5% allocation",
+    "social scoring",
+    "original post",
+    "quote post",
+    "substantive reply",
+    "emoji-only",
+    "one-word",
+    "simple reply",
+    "quality multiplier",
+    "max 2 scored social contributions",
+    "max 15%",
+    "duplicate",
+    "spam",
+    "evidence quality",
+    "conflict notes",
+    "payout eligible",
+    "anti-farm review checklist",
+  ]) {
+    assert.match(rubricContent, new RegExp(required.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"));
+  }
+  
+  // Check for required terms in weekly ops
+  for (const required of [
+    "weekly checkpoint",
+    "weekly recap",
+    "final winners post",
+  ]) {
+    assert.match(weeklyOpsContent, new RegExp(required.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"));
+  }
+});

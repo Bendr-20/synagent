@@ -165,6 +165,35 @@ Do not promise:
 - public exposure of requester contact details
 - automatic dispatch for requests outside the verified supply
 
+## Cred Bureau Rewards Operations
+
+### Program Structure
+- **6-week beta** with **2 seasons** of **3 weeks** each
+- **1% pool** of $CRED supply (40% Season 1, 60% Season 2)
+- **Manual review required** before any payouts
+- **No automated payouts** in v0 – all rewards discretionary
+- **No guaranteed rewards** – quality-based allocation only
+
+### Review Process
+- **Weekly checkpoint** every Monday UTC
+- **Review rubric:** `docs/cred-bureau-rewards-review-rubric.md`
+- **Rules:** `docs/cred-bureau-rewards-rules.md`
+- **Weekly ops:** `docs/cred-bureau-rewards-weekly-ops.md`
+- **Protected review queue:** `/review/cred-bureau/rewards`
+
+### Key Principles
+- Social contributions capped at **15%** of season score
+- Maximum **2 scored social contributions** per participant per UTC day
+- **Anti-farm checklist** required before payout eligibility
+- **No entitlement to rewards** – all payouts subject to manual review
+
+### Payout Process
+1. Season points calculated after week 3
+2. Top participants identified
+3. Final anti-farm review pass
+4. Manual payout execution by Cred Bureau team
+5. Public announcement of winners (wallet addresses excluded)
+
 ## MVP-ready definition
 
 For soft launch, MVP-ready means:
@@ -178,3 +207,4 @@ For soft launch, MVP-ready means:
 - applicant rules are locked and manual-only for reviewed access
 - launch copy frames Synagent as reviewed intake, manual routing, and reviewed access
 - at least one end-to-end request has been tested in the deployed environment
+- Cred Bureau rewards docs and review workflow are established
