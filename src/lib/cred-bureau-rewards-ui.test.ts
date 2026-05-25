@@ -43,6 +43,7 @@ test("Cred Bureau public leaderboard source avoids private reviewer and particip
   assert.doesNotMatch(leaderboardPage, /reviewer notes/i);
   assert.doesNotMatch(leaderboardPage, /anti-farm notes/i);
   assert.doesNotMatch(leaderboardPage, /reviewer key/i);
+  assert.match(leaderboardPage, /export const dynamic = "force-dynamic";/);
 
   for (const publicField of [
     /Rank/i,

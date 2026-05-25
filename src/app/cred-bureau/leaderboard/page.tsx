@@ -3,6 +3,8 @@ import { getRewardContributions, getRewardParticipants } from "@/lib/cred-bureau
 import { buildCredBureauLeaderboard } from "@/lib/cred-bureau-rewards-scoring";
 import { glassCardStyle, theme } from "@/lib/theme";
 
+export const dynamic = "force-dynamic";
+
 function categoryLabel(id: string) {
   const labels: Record<string, string> = {
     "matched-task": "Matched task",
