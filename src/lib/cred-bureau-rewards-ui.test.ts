@@ -47,14 +47,51 @@ test("Cred Bureau public leaderboard source avoids private reviewer and particip
 
   for (const publicField of [
     /Rank/i,
+    /Name/i,
+    /Total points/i,
+    /Completed work/i,
+  ]) {
+    assert.match(leaderboardPage, publicField);
+  }
+
+  for (const removedTableField of [
     /Display name/i,
     /Season points/i,
     /Total approved contributions/i,
     /Top category/i,
     /Last approved contribution date/i,
   ]) {
-    assert.match(leaderboardPage, publicField);
+    assert.doesNotMatch(leaderboardPage, removedTableField);
   }
+});
+
+test("Cred Bureau leaderboard uses card rows and contributor detail pages", () => {
+  const leaderboardPage = read("src/app/cred-bureau/leaderboard/page.tsx");
+  const detailPage = read("src/app/cred-bureau/leaderboard/[participantId]/page.tsx");
+  const css = read("src/app/globals.css");
+
+  assert.match(leaderboardPage, /cred-bureau-leaderboard-card/);
+  assert.match(leaderboardPage, /cred-bureau-leaderboard-card--\$\{index % 3\}/);
+  assert.match(leaderboardPage, /href=\{`\/cred-bureau\/leaderboard\/\$\{row\.participantId\}`\}/);
+  assert.match(leaderboardPage, /View completed work/);
+  assert.match(css, /cred-bureau-leaderboard-card:nth-child\(3n \+ 1\)/);
+  assert.match(css, /rgba\(0,229,255,0\.12\)/);
+  assert.match(css, /rgba\(180,144,255,0\.12\)/);
+  assert.match(css, /rgba\(128,208,255,0\.12\)/);
+
+  for (const required of [
+    "Completed work",
+    "Approved contributions",
+    "Points awarded",
+    "Back to leaderboard",
+  ]) {
+    assert.match(detailPage, new RegExp(required.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"));
+  }
+
+  assert.doesNotMatch(detailPage, /wallet/i);
+  assert.doesNotMatch(detailPage, /email/i);
+  assert.doesNotMatch(detailPage, /reviewer notes/i);
+  assert.doesNotMatch(detailPage, /anti-farm notes/i);
 });
 
 test("Cred Bureau rewards links are exposed from public surfaces without changing the hero", () => {

@@ -419,3 +419,48 @@
     justify-content: center !important;
   }
 }
+
+.cred-bureau-leaderboard-card {
+  min-width: 0;
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.cred-bureau-leaderboard-card:nth-child(3n + 1),
+.cred-bureau-leaderboard-card--0 {
+  background: linear-gradient(135deg, rgba(0,229,255,0.12), rgba(5,10,14,0.76));
+}
+
+.cred-bureau-leaderboard-card:nth-child(3n + 2),
+.cred-bureau-leaderboard-card--1 {
+  background: linear-gradient(135deg, rgba(180,144,255,0.12), rgba(5,10,14,0.76));
+}
+
+.cred-bureau-leaderboard-card:nth-child(3n + 3),
+.cred-bureau-leaderboard-card--2 {
+  background: linear-gradient(135deg, rgba(128,208,255,0.12), rgba(5,10,14,0.76));
+}
+
+.cred-bureau-leaderboard-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0,229,255,0.34) !important;
+  box-shadow: 0 24px 58px rgba(0, 229, 255, 0.12) !important;
+}
+
+.cred-bureau-completed-work-card,
+.cred-bureau-contributor-summary {
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .cred-bureau-leaderboard-card {
+    grid-template-columns: 1fr !important;
+  }
+
+  .cred-bureau-leaderboard-header-card {
+    display: none !important;
+  }
+
+  .cred-bureau-contributor-summary {
+    grid-template-columns: 1fr !important;
+  }
+}
