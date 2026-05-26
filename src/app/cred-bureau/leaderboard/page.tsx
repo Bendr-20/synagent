@@ -19,6 +19,21 @@ export default function CredBureauLeaderboardPage() {
   return (
     <SiteShell>
       <section style={{ maxWidth: "980px", margin: "0 auto", padding: "88px 24px 96px" }}>
+        <nav className="cred-bureau-toggle" style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px", padding: "8px 14px", borderRadius: "999px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.5)" }}>
+          <Link
+            href="/cred-bureau/leaderboard"
+            style={{ fontSize: "13px", color: theme.textStrong, fontWeight: 900, textDecoration: "none", letterSpacing: "0.06em", textTransform: "uppercase" }}
+          >
+            Public leaderboard
+          </Link>
+          <span style={{ color: theme.textMuted, fontSize: "11px", fontWeight: 700 }}>|</span>
+          <Link
+            href="/cred-bureau/rewards"
+            style={{ fontSize: "13px", color: theme.textMuted, fontWeight: 700, textDecoration: "none", letterSpacing: "0.06em", textTransform: "uppercase" }}
+          >
+            Rewards
+          </Link>
+        </nav>
         <div style={{ marginBottom: "18px" }}>
           <div style={{ fontSize: "12px", color: theme.accent, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.16em", textTransform: "uppercase", marginBottom: "14px" }}>
             Cred Bureau leaderboard

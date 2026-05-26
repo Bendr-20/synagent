@@ -44,6 +44,21 @@ export default function CredBureauPage() {
           alignItems: "center",
         }}
       >
+        <nav className="cred-bureau-toggle" style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px", padding: "8px 14px", borderRadius: "999px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.5)", gridColumn: "1 / -1" }}>
+          <Link
+            href="/cred-bureau/rewards"
+            style={{ fontSize: "13px", color: theme.textMuted, fontWeight: 700, textDecoration: "none", letterSpacing: "0.06em", textTransform: "uppercase" }}
+          >
+            Rewards
+          </Link>
+          <span style={{ color: theme.textMuted, fontSize: "11px", fontWeight: 700 }}>|</span>
+          <Link
+            href="/cred-bureau/leaderboard"
+            style={{ fontSize: "13px", color: theme.textMuted, fontWeight: 700, textDecoration: "none", letterSpacing: "0.06em", textTransform: "uppercase" }}
+          >
+            Public leaderboard
+          </Link>
+        </nav>
         <div>
           <div style={{ fontSize: "12px", color: theme.accent, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.16em", textTransform: "uppercase", marginBottom: "18px" }}>
             Cred Bureau Access

@@ -18,6 +18,21 @@ export default function CredBureauRewardsPage() {
   return (
     <SiteShell>
       <section style={{ maxWidth: "1180px", margin: "0 auto", padding: "88px 24px 34px" }}>
+        <nav className="cred-bureau-toggle" style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px", padding: "8px 14px", borderRadius: "999px", border: `1px solid ${theme.border}`, background: "rgba(5,10,14,0.5)" }}>
+          <Link
+            href="/cred-bureau/rewards"
+            style={{ fontSize: "13px", color: theme.textStrong, fontWeight: 900, textDecoration: "none", letterSpacing: "0.06em", textTransform: "uppercase" }}
+          >
+            Rewards
+          </Link>
+          <span style={{ color: theme.textMuted, fontSize: "11px", fontWeight: 700 }}>|</span>
+          <Link
+            href="/cred-bureau/leaderboard"
+            style={{ fontSize: "13px", color: theme.textMuted, fontWeight: 700, textDecoration: "none", letterSpacing: "0.06em", textTransform: "uppercase" }}
+          >
+            Public leaderboard
+          </Link>
+        </nav>
         <div className="cred-bureau-rewards-grid" style={{ display: "grid", gridTemplateColumns: "1.05fr 0.95fr", gap: "22px", alignItems: "stretch" }}>
           <div style={{ ...glassCardStyle, borderColor: "rgba(0,229,255,0.32)" }}>
             <div style={{ fontSize: "12px", color: theme.accent, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.16em", textTransform: "uppercase", marginBottom: "18px" }}>

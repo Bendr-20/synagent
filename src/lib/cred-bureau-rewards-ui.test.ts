@@ -120,6 +120,28 @@ test("Cred Bureau rewards links are exposed from public surfaces without changin
   assert.match(css, /cred-bureau-leaderboard-row/);
 });
 
+test("Cred Bureau pages have small public toggle for rewards / leaderboard navigation", () => {
+  const rewardsPage = read("src/app/cred-bureau/rewards/page.tsx");
+  const leaderboardPage = read("src/app/cred-bureau/leaderboard/page.tsx");
+  const credBureauPage = read("src/app/cred-bureau/page.tsx");
+  
+  // each page should have a small nav bar that toggles between /cred-bureau/rewards and /cred-bureau/leaderboard
+  const expectedPattern = /Rewards[\s\S]*Public leaderboard|Public leaderboard[\s\S]*Rewards/i;
+  assert.match(rewardsPage, expectedPattern);
+  assert.match(leaderboardPage, expectedPattern);
+  assert.match(credBureauPage, expectedPattern);
+  
+  // desktop rewards page should have a "View leaderboard" link; leaderboard page should have a "View rewards" link
+  assert.match(rewardsPage, /href="\/cred-bureau\/leaderboard"/);
+  assert.match(leaderboardPage, /href="\/cred-bureau\/rewards"/);
+  assert.match(credBureauPage, /href="\/cred-bureau\/rewards"/);
+  assert.match(credBureauPage, /href="\/cred-bureau\/leaderboard"/);
+  
+  // no placeholder href="#" in those pages
+  assert.doesNotMatch(rewardsPage, /href="#"/);
+  assert.doesNotMatch(leaderboardPage, /href="#"/);
+});
+
 test("Cred Bureau rewards protected review queue exposes manual reviewer workflow", () => {
   const reviewPage = read("src/app/review/cred-bureau/rewards/page.tsx");
   const reviewControls = read("src/app/review/cred-bureau/rewards/reward-review-controls.tsx");
