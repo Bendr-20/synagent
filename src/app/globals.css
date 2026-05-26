@@ -420,30 +420,41 @@
   }
 }
 
+.cred-bureau-leaderboard-header-card {
+  border-radius: 8px;
+  border: 1px solid rgba(0,229,255,0.1);
+  background: rgba(5,10,14,0.38);
+}
+
 .cred-bureau-leaderboard-card {
   min-width: 0;
-  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+  transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease, background 140ms ease;
 }
 
-.cred-bureau-leaderboard-card:nth-child(3n + 1),
 .cred-bureau-leaderboard-card--0 {
-  background: linear-gradient(135deg, rgba(0,229,255,0.12), rgba(5,10,14,0.76));
+  background: linear-gradient(90deg, rgba(110,236,216,0.2), rgba(5,10,14,0.76) 58%);
+  border-color: rgba(110,236,216,0.28) !important;
 }
 
-.cred-bureau-leaderboard-card:nth-child(3n + 2),
 .cred-bureau-leaderboard-card--1 {
-  background: linear-gradient(135deg, rgba(180,144,255,0.12), rgba(5,10,14,0.76));
+  background: linear-gradient(90deg, rgba(180,144,255,0.18), rgba(5,10,14,0.76) 58%);
+  border-color: rgba(180,144,255,0.26) !important;
 }
 
-.cred-bureau-leaderboard-card:nth-child(3n + 3),
 .cred-bureau-leaderboard-card--2 {
-  background: linear-gradient(135deg, rgba(128,208,255,0.12), rgba(5,10,14,0.76));
+  background: linear-gradient(90deg, rgba(128,208,255,0.2), rgba(5,10,14,0.76) 58%);
+  border-color: rgba(128,208,255,0.28) !important;
+}
+
+.cred-bureau-leaderboard-card--3 {
+  background: linear-gradient(90deg, rgba(245,160,208,0.17), rgba(5,10,14,0.76) 58%);
+  border-color: rgba(245,160,208,0.24) !important;
 }
 
 .cred-bureau-leaderboard-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   border-color: rgba(0,229,255,0.34) !important;
-  box-shadow: 0 24px 58px rgba(0, 229, 255, 0.12) !important;
+  box-shadow: 0 14px 32px rgba(0, 229, 255, 0.11) !important;
 }
 
 .cred-bureau-completed-work-card,
