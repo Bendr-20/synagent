@@ -405,7 +405,7 @@
   .cred-bureau-rewards-grid,
   .cred-bureau-reward-form-grid,
   .cred-bureau-reward-review-grid,
-  .cred-bureau-leaderboard-row {
+  .cred-bureau-scoring-guide-row {
     grid-template-columns: 1fr !important;
   }
 
@@ -464,7 +464,10 @@
 
 @media (max-width: 768px) {
   .cred-bureau-leaderboard-card {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: minmax(0,1fr) 64px 56px !important;
+    gap: 8px !important;
+    min-height: 34px !important;
+    padding: 5px 8px !important;
   }
 
   .cred-bureau-leaderboard-header-card {

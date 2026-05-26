@@ -28,12 +28,11 @@ export default function CredBureauLeaderboardPage() {
           </h1>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-          <div className="cred-bureau-leaderboard-row cred-bureau-leaderboard-header-card" style={{ display: "grid", gridTemplateColumns: "56px minmax(0,1fr) 140px 116px", gap: "12px", alignItems: "center", padding: "8px 12px", color: theme.textMuted, fontFamily: "JetBrains Mono, monospace", fontSize: "10px", letterSpacing: "0.1em", textTransform: "uppercase" }}>
-            <div>Rank</div>
-            <div>Name</div>
-            <div>Completed</div>
-            <div style={{ textAlign: "right" }}>Total points</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+          <div className="cred-bureau-leaderboard-row cred-bureau-leaderboard-header-card" style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 96px 88px", gap: "10px", alignItems: "center", padding: "6px 10px", color: theme.textMuted, fontFamily: "JetBrains Mono, monospace", fontSize: "10px", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+            <div>Rank / Name</div>
+            <div style={{ textAlign: "right" }}>Completed</div>
+            <div style={{ textAlign: "right" }}>Points</div>
           </div>
 
           {rows.length === 0 ? (
@@ -50,34 +49,29 @@ export default function CredBureauLeaderboardPage() {
                   className={`cred-bureau-leaderboard-row cred-bureau-leaderboard-card cred-bureau-leaderboard-card--${index % 4}`}
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "56px minmax(0,1fr) 140px 116px",
-                    gap: "12px",
+                    gridTemplateColumns: "minmax(0,1fr) 96px 88px",
+                    gap: "10px",
                     alignItems: "center",
-                    minHeight: "48px",
-                    padding: "7px 12px",
-                    borderRadius: "8px",
+                    minHeight: "36px",
+                    padding: "5px 10px",
+                    borderRadius: "7px",
                     border: "1px solid rgba(0,229,255,0.12)",
                     color: theme.textStrong,
                     textDecoration: "none",
                     boxShadow: "0 6px 14px rgba(0,0,0,0.14)",
                   }}
                 >
-                  <div style={{ color: index < 3 ? theme.accent : theme.textMuted, fontFamily: "JetBrains Mono, monospace", fontSize: "15px", fontWeight: 800 }}>
-                    {index + 1}
+                  <div style={{ display: "flex", alignItems: "baseline", gap: "10px", minWidth: 0, whiteSpace: "nowrap" }}>
+                    <span style={{ color: index < 3 ? theme.accent : theme.textMuted, fontFamily: "JetBrains Mono, monospace", fontSize: "13px", fontWeight: 900, flex: "0 0 auto" }}>
+                      {index + 1}
+                    </span>
+                    <span style={{ fontSize: "14px", fontWeight: 800, letterSpacing: "-0.02em", overflow: "hidden", textOverflow: "ellipsis" }}>{row.displayName}</span>
                   </div>
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: "15px", fontWeight: 800, letterSpacing: "-0.02em", marginBottom: "2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{row.displayName}</div>
-                    <div style={{ color: theme.textMuted, fontSize: "9.5px", fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.06em", textTransform: "uppercase" }}>
-                      View completed work
-                    </div>
+                  <div style={{ color: theme.textMuted, fontFamily: "JetBrains Mono, monospace", fontSize: "10px", fontWeight: 700, textAlign: "right", whiteSpace: "nowrap" }}>
+                    {completedCount} {completedCount === 1 ? "task" : "tasks"}
                   </div>
-                  <div style={{ color: theme.textMuted, fontFamily: "JetBrains Mono, monospace", fontSize: "11px", fontWeight: 700 }}>
-                    {completedCount} approved
-                  </div>
-                  <div style={{ textAlign: "right" }}>
-                    <div style={{ color: theme.accent, fontFamily: "JetBrains Mono, monospace", fontSize: "20px", fontWeight: 900, lineHeight: 1 }}>
-                      {row.points}
-                    </div>
+                  <div style={{ color: theme.accent, fontFamily: "JetBrains Mono, monospace", fontSize: "18px", fontWeight: 900, lineHeight: 1, textAlign: "right" }}>
+                    {row.points}
                   </div>
                 </Link>
               );
