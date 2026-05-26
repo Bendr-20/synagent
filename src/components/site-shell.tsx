@@ -4,6 +4,9 @@ import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 
 import Link from "next/link";
 import { theme } from "@/lib/theme";
 
+const CRED_LINK = "https://dexscreener.com/base/0x55a4f7a23c4c2616cf848e639a08bd4283d13e66f5fcf34f828b5ca7e4e96324";
+const DOCS_LINK = "https://helixa.xyz/docs";
+
 type SiteShellProps = {
   children: ReactNode;
   mainClassName?: string;
@@ -210,10 +213,10 @@ export function SiteShell({ children, mainClassName, mainStyle, showFooter = tru
           </div>
 
           <div className="site-header-links" style={{ display: "flex", alignItems: "center", gap: "32px" }}>
-            <Link href="#" style={{ fontSize: "14px", color: theme.textMuted, textDecoration: "none", letterSpacing: "0.05em" }}>
+            <Link href={CRED_LINK} target="_blank" rel="noreferrer" style={{ fontSize: "14px", color: theme.textMuted, textDecoration: "none", letterSpacing: "0.05em" }}>
               $CRED
             </Link>
-            <Link href="#" style={{ fontSize: "14px", color: theme.textMuted, textDecoration: "none", letterSpacing: "0.05em" }}>
+            <Link href={DOCS_LINK} target="_blank" rel="noreferrer" style={{ fontSize: "14px", color: theme.textMuted, textDecoration: "none", letterSpacing: "0.05em" }}>
               DOCS
             </Link>
             <Link
@@ -250,7 +253,9 @@ export function SiteShell({ children, mainClassName, mainStyle, showFooter = tru
               }}
             >
               <Link
-                href="#"
+                href={CRED_LINK}
+                target="_blank"
+                rel="noreferrer"
                 onClick={closeMobileMenu}
                 className="site-mobile-menu-link"
                 style={{
@@ -268,7 +273,9 @@ export function SiteShell({ children, mainClassName, mainStyle, showFooter = tru
                 $CRED
               </Link>
               <Link
-                href="#"
+                href={DOCS_LINK}
+                target="_blank"
+                rel="noreferrer"
                 onClick={closeMobileMenu}
                 className="site-mobile-menu-link"
                 style={{

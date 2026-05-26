@@ -4,6 +4,7 @@ import test from "node:test";
 
 const matchClient = fs.readFileSync("src/app/match/match-client.tsx", "utf8");
 const homePage = fs.readFileSync("src/app/page.tsx", "utf8");
+const siteShell = fs.readFileSync("src/components/site-shell.tsx", "utf8");
 const css = fs.readFileSync("src/app/globals.css", "utf8");
 
 test("mobile match intake hides structured JSON preview behind an advanced disclosure", () => {
@@ -23,4 +24,12 @@ test("mobile CSS makes the primary flow faster to reach", () => {
   assert.match(css, /@media \(max-width: 768px\)[\s\S]*\.site-status\s*\{[\s\S]*display:\s*none !important;/);
   assert.match(css, /@media \(max-width: 768px\)[\s\S]*\.hero-section\s*\{[\s\S]*padding:\s*40px 16px 24px !important;/);
   assert.match(css, /@media \(max-width: 768px\)[\s\S]*\.match-submit-button\s*\{[\s\S]*position:\s*sticky;/);
+});
+
+test("site header CRED and DOCS navigation use real targets on desktop and mobile", () => {
+  assert.doesNotMatch(siteShell, /href="#"/);
+  assert.match(siteShell, /https:\/\/dexscreener\.com\/base\/0x55a4f7a23c4c2616cf848e639a08bd4283d13e66f5fcf34f828b5ca7e4e96324/);
+  assert.match(siteShell, /https:\/\/helixa\.xyz\/docs/);
+  assert.equal((siteShell.match(/href=\{CRED_LINK\}/g) || []).length, 2);
+  assert.equal((siteShell.match(/href=\{DOCS_LINK\}/g) || []).length, 2);
 });
