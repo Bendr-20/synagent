@@ -50,6 +50,8 @@ test("Cred Bureau public leaderboard source avoids private reviewer and particip
     /Name/i,
     /Total points/i,
     /Completed work/i,
+    /How points are earned/i,
+    /Rewards scoring guide/i,
   ]) {
     assert.match(leaderboardPage, publicField);
   }
@@ -77,6 +79,9 @@ test("Cred Bureau leaderboard uses compact alternating grid rows and contributor
   assert.match(leaderboardPage, /minHeight: "48px"/);
   assert.match(leaderboardPage, /href=\{`\/cred-bureau\/leaderboard\/\$\{row\.participantId\}`\}/);
   assert.match(leaderboardPage, /View completed work/);
+  assert.match(leaderboardPage, /CRED_BUREAU_REWARD_CONFIG\.categories\.map/);
+  assert.match(leaderboardPage, /Social posts are supporting evidence only/);
+  assert.doesNotMatch(leaderboardPage, /Public standings show rank, name/);
   assert.match(css, /cred-bureau-leaderboard-card--0/);
   assert.match(css, /rgba\(110,236,216,0\.2\)/);
   assert.match(css, /rgba\(180,144,255,0\.18\)/);
