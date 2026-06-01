@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "next build && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test src/lib/review-auth.test.ts src/lib/notification-dispatch.test.ts src/lib/match-api.test.ts src/lib/mobile-ux.test.ts src/lib/cred-bureau-application.test.ts src/lib/cred-bureau-rewards-config.test.ts src/lib/cred-bureau-rewards-store.simple.test.ts src/lib/cred-bureau-rewards-store.cap.test.ts src/lib/cred-bureau-rewards-store.review.test.ts src/lib/cred-bureau-rewards-store.scoring.test.ts src/lib/cred-bureau-rewards-participants-store.test.ts src/lib/cred-bureau-rewards-ui.test.ts src/lib/cred-bureau-rewards-api.test.ts"
+    "test": "next build && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test src/lib/review-auth.test.ts src/lib/notification-dispatch.test.ts src/lib/match-api.test.ts src/lib/mobile-ux.test.ts src/lib/cred-bureau-application.test.ts src/lib/cred-bureau-rewards-config.test.ts src/lib/cred-bureau-rewards-data-dir.test.ts src/lib/cred-bureau-rewards-store.simple.test.ts src/lib/cred-bureau-rewards-store.cap.test.ts src/lib/cred-bureau-rewards-store.review.test.ts src/lib/cred-bureau-rewards-store.scoring.test.ts src/lib/cred-bureau-rewards-participants-store.test.ts src/lib/cred-bureau-rewards-ui.test.ts src/lib/cred-bureau-rewards-api.test.ts src/lib/review-surface-ui.test.ts"
   },
   "keywords": [],
   "author": "",

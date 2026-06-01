@@ -86,6 +86,9 @@ export default async function CredBureauReviewPage({
             </p>
           </div>
           <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+            <Link href="/review" style={{ ...outlineButtonStyle, width: "auto" }}>
+              Reviewer Home
+            </Link>
             <Link href="/cred-bureau" style={{ ...outlineButtonStyle, width: "auto" }}>
               Public Application
             </Link>
@@ -106,8 +109,13 @@ export default async function CredBureauReviewPage({
         {configuredKey && !authorized && (
           <div style={{ ...glassCardStyle, lineHeight: 1.7 }}>
             <h2 style={{ margin: "0 0 10px", color: theme.textStrong, fontFamily: "Space Grotesk, sans-serif" }}>Reviewer key required</h2>
-            <p style={{ color: theme.textMuted, margin: "0 0 14px" }}>Open this page with the temporary reviewer key to load applications.</p>
-            <code style={{ color: theme.accent, wordBreak: "break-all" }}>/review/cred-bureau?key=YOUR_REVIEW_KEY</code>
+            <p style={{ color: theme.textMuted, margin: "0 0 14px" }}>Start at Reviewer Home, paste the key once, then open applications.</p>
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
+              <Link href="/review" style={{ ...outlineButtonStyle, width: "auto" }}>
+                Reviewer Home
+              </Link>
+              <code style={{ color: theme.accent, wordBreak: "break-all" }}>/review/cred-bureau?key=YOUR_REVIEW_KEY</code>
+            </div>
           </div>
         )}
 

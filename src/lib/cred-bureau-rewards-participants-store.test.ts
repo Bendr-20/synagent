@@ -2,12 +2,17 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
+import { tmpdir } from "node:os";
 
 async function loadParticipantsStore() {
   return import(new URL("./cred-bureau-rewards-participants-store.ts", import.meta.url).href);
 }
 
-const TEST_DATA_DIR = path.join(process.cwd(), "data");
+const TEST_DATA_DIR = fs.mkdtempSync(path.join(tmpdir(), "synagent-rewards-test-"));
+process.env.SYNAGENT_DATA_DIR = TEST_DATA_DIR;
+process.on("exit", () => {
+  try { fs.rmSync(TEST_DATA_DIR, { recursive: true, force: true }); } catch {}
+});
 const TEST_PARTICIPANTS_PATH = path.join(TEST_DATA_DIR, "cred-bureau-rewards-participants.json");
 
 function cleanupTestFiles() {

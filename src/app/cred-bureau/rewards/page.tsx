@@ -54,6 +54,9 @@ export default function CredBureauRewardsPage() {
               <Link href="/cred-bureau/leaderboard" style={{ ...outlineButtonStyle, width: "auto", minWidth: "190px" }}>
                 View leaderboard
               </Link>
+              <Link href="/cred-bureau/rewards/public" style={{ ...outlineButtonStyle, width: "auto", minWidth: "190px" }}>
+                View public reports
+              </Link>
             </div>
           </div>
 
@@ -82,7 +85,7 @@ export default function CredBureauRewardsPage() {
             Contribution submission
           </h2>
           <p style={{ color: theme.textMuted, lineHeight: 1.65, margin: "0 0 22px" }}>
-            Submit work for review once rewards open. A contribution ID confirms receipt, then it stays pending manual review. No payout is promised from submission alone.
+            Submit work for review once rewards open. A contribution ID confirms receipt, then it stays pending manual review. No payout is promised from submission alone. See <Link href="/cred-bureau/rewards/public" style={{ color: theme.accent, textDecoration: "underline" }}>public redacted reports</Link> for titles and status only.
           </p>
           {rewardsOpen ? (
             <RewardSubmissionForm />

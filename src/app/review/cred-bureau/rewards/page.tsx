@@ -19,7 +19,14 @@ import { PayoutExportControls, RewardReviewControls } from "./reward-review-cont
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const payoutExportsPath = path.join(process.cwd(), "data", "cred-bureau-payout-exports.json");
+function getDataDir() {
+  return process.env.SYNAGENT_DATA_DIR || path.join(process.cwd(), "data");
+}
+
+function getPayoutExportsPath() {
+  return path.join(getDataDir(), "cred-bureau-payout-exports.json");
+}
+
 const reviewOpsDocUrl = "https://github.com/Bendr-20/synagent/blob/main/docs/cred-bureau-review-ops.md";
 
 function getSingle(value: string | string[] | undefined) {
@@ -41,7 +48,7 @@ function formatUtc(value?: string | null) {
 
 function readPayoutExports(): CredBureauPayoutExportRecord[] {
   try {
-    return JSON.parse(fs.readFileSync(payoutExportsPath, "utf8")) as CredBureauPayoutExportRecord[];
+    return JSON.parse(fs.readFileSync(getPayoutExportsPath(), "utf8")) as CredBureauPayoutExportRecord[];
   } catch {
     return [];
   }
@@ -252,6 +259,9 @@ export default async function CredBureauRewardsReviewPage({
             </p>
           </div>
           <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+            <Link href="/review" style={{ ...outlineButtonStyle, width: "auto" }}>
+              Reviewer Home
+            </Link>
             <Link href="/cred-bureau/rewards" style={{ ...outlineButtonStyle, width: "auto" }}>
               Public rewards
             </Link>
@@ -272,8 +282,13 @@ export default async function CredBureauRewardsReviewPage({
         {configuredKey && !authorized && (
           <div style={{ ...glassCardStyle, lineHeight: 1.7 }}>
             <h2 style={{ margin: "0 0 10px", color: theme.textStrong, fontFamily: "Space Grotesk, sans-serif" }}>Reviewer key required</h2>
-            <p style={{ color: theme.textMuted, margin: "0 0 14px" }}>Open this page with the temporary reviewer key to load reward contributions, wallets, and payout export controls.</p>
-            <code style={{ color: theme.accent, wordBreak: "break-all" }}>/review/cred-bureau/rewards?key=YOUR_REVIEW_KEY</code>
+            <p style={{ color: theme.textMuted, margin: "0 0 14px" }}>Start at Reviewer Home, paste the key once, then open reward reports.</p>
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
+              <Link href="/review" style={{ ...outlineButtonStyle, width: "auto" }}>
+                Reviewer Home
+              </Link>
+              <code style={{ color: theme.accent, wordBreak: "break-all" }}>/review/cred-bureau/rewards?key=YOUR_REVIEW_KEY</code>
+            </div>
           </div>
         )}
 

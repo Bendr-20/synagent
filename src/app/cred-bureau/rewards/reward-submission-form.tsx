@@ -29,10 +29,11 @@ export function RewardSubmissionForm() {
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formElement = event.currentTarget;
     setStatus("submitting");
     setMessage("");
 
-    const form = new FormData(event.currentTarget);
+    const form = new FormData(formElement);
     const payload = {
       participant: {
         displayName: String(form.get("displayName") || ""),
@@ -58,7 +59,7 @@ export function RewardSubmissionForm() {
       if (!response.ok || !body.success) throw new Error(body.error || "Submission failed");
       setStatus("success");
       setMessage(`Contribution ${body.contributionId} is pending manual review.`);
-      event.currentTarget.reset();
+      formElement.reset();
     } catch (error) {
       setStatus("error");
       setMessage(error instanceof Error ? error.message : "Submission failed. Please try again.");

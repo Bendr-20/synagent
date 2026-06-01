@@ -120,23 +120,32 @@ test("Cred Bureau rewards links are exposed from public surfaces without changin
   assert.match(css, /cred-bureau-leaderboard-row/);
 });
 
+test("Cred Bureau reward submission resets the captured form after async submit", () => {
+  const submissionForm = read("src/app/cred-bureau/rewards/reward-submission-form.tsx");
+
+  assert.match(submissionForm, /const formElement = event\.currentTarget;/);
+  assert.match(submissionForm, /new FormData\(formElement\)/);
+  assert.match(submissionForm, /formElement\.reset\(\);/);
+  assert.doesNotMatch(submissionForm, /event\.currentTarget\.reset\(\)/);
+});
+
 test("Cred Bureau pages have small public toggle for rewards / leaderboard navigation", () => {
   const rewardsPage = read("src/app/cred-bureau/rewards/page.tsx");
   const leaderboardPage = read("src/app/cred-bureau/leaderboard/page.tsx");
   const credBureauPage = read("src/app/cred-bureau/page.tsx");
-  
+
   // each page should have a small nav bar that toggles between /cred-bureau/rewards and /cred-bureau/leaderboard
   const expectedPattern = /Rewards[\s\S]*Public leaderboard|Public leaderboard[\s\S]*Rewards/i;
   assert.match(rewardsPage, expectedPattern);
   assert.match(leaderboardPage, expectedPattern);
   assert.match(credBureauPage, expectedPattern);
-  
+
   // desktop rewards page should have a "View leaderboard" link; leaderboard page should have a "View rewards" link
   assert.match(rewardsPage, /href="\/cred-bureau\/leaderboard"/);
   assert.match(leaderboardPage, /href="\/cred-bureau\/rewards"/);
   assert.match(credBureauPage, /href="\/cred-bureau\/rewards"/);
   assert.match(credBureauPage, /href="\/cred-bureau\/leaderboard"/);
-  
+
   // no placeholder href="#" in those pages
   assert.doesNotMatch(rewardsPage, /href="#"/);
   assert.doesNotMatch(leaderboardPage, /href="#"/);
@@ -209,16 +218,16 @@ test("Cred Bureau rewards docs include required rules and workflow references", 
     "docs/cred-bureau-rewards-review-rubric.md",
     "docs/cred-bureau-rewards-weekly-ops.md",
   ];
-  
+
   for (const file of files) {
     assert.ok(fs.existsSync(file), `Required file ${file} should exist`);
   }
-  
+
   // Now check content of each file
   const rulesContent = read("docs/cred-bureau-rewards-rules.md");
   const rubricContent = read("docs/cred-bureau-rewards-review-rubric.md");
   const weeklyOpsContent = read("docs/cred-bureau-rewards-weekly-ops.md");
-  
+
   // Check for required terms in rules
   for (const required of [
     "1%",
@@ -233,7 +242,7 @@ test("Cred Bureau rewards docs include required rules and workflow references", 
   ]) {
     assert.match(rulesContent, new RegExp(required.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"));
   }
-  
+
   // Check for required terms in rubric
   for (const required of [
     "25-100",
@@ -264,7 +273,7 @@ test("Cred Bureau rewards docs include required rules and workflow references", 
   ]) {
     assert.match(rubricContent, new RegExp(required.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"));
   }
-  
+
   // Check for required terms in weekly ops
   for (const required of [
     "weekly checkpoint",
@@ -273,4 +282,23 @@ test("Cred Bureau rewards docs include required rules and workflow references", 
   ]) {
     assert.match(weeklyOpsContent, new RegExp(required.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"));
   }
+});
+
+
+test("reward contribution route does not hardcode notification participant names", () => {
+  const route = read("src/app/api/cred-bureau/rewards/contributions/route.ts");
+
+  assert.doesNotMatch(route, /Test User/);
+  assert.doesNotMatch(route, /Direct Telegram send/);
+});
+
+
+test("reward Telegram notifications stay redacted for group delivery", () => {
+  const notifications = read("src/lib/cred-bureau-rewards-notifications.ts");
+
+  assert.match(notifications, /View public submissions/);
+  assert.doesNotMatch(notifications, /contribution\.description/);
+  assert.doesNotMatch(notifications, /participant\.displayName/);
+  assert.doesNotMatch(notifications, /DEBUG:/);
+  assert.doesNotMatch(notifications, /📬/);
 });

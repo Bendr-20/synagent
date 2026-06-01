@@ -392,6 +392,18 @@
   min-width: 0;
 }
 
+.review-console-grid,
+.review-match-grid,
+.public-rewards-grid {
+  min-width: 0;
+}
+
+.review-console-grid > *,
+.review-match-grid > *,
+.public-rewards-grid > * {
+  min-width: 0;
+}
+
 .cred-bureau-leaderboard-row {
   min-width: 0;
 }
@@ -417,6 +429,12 @@
   .cred-bureau-reward-form a {
     width: 100% !important;
     justify-content: center !important;
+  }
+
+  .review-console-grid,
+  .review-match-grid,
+  .public-rewards-grid {
+    grid-template-columns: 1fr !important;
   }
 }
 

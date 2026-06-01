@@ -10,13 +10,24 @@ import type {
   CredBureauPayoutExportRow,
 } from "./cred-bureau-rewards-types";
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const CONTRIBUTIONS_PATH = path.join(DATA_DIR, "cred-bureau-rewards-contributions.json");
-const PARTICIPANTS_PATH = path.join(DATA_DIR, "cred-bureau-rewards-participants.json");
-const REVIEW_LOG_PATH = path.join(DATA_DIR, "cred-bureau-rewards-review-log.json");
+function getDataDir() {
+  return process.env.SYNAGENT_DATA_DIR || path.join(process.cwd(), "data");
+}
+
+function getContributionsPath() {
+  return path.join(getDataDir(), "cred-bureau-rewards-contributions.json");
+}
+
+function getParticipantsPath() {
+  return path.join(getDataDir(), "cred-bureau-rewards-participants.json");
+}
+
+function getReviewLogPath() {
+  return path.join(getDataDir(), "cred-bureau-rewards-review-log.json");
+}
 
 function ensureDataDir() {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
+  fs.mkdirSync(getDataDir(), { recursive: true });
 }
 
 function readJsonFile<T>(filePath: string, fallback: T): T {
@@ -152,18 +163,18 @@ export function buildRewardContribution(payload: {
 }
 
 export function appendRewardContribution(contribution: CredBureauRewardContribution): CredBureauRewardContribution {
-  const contributions = readJsonFile<CredBureauRewardContribution[]>(CONTRIBUTIONS_PATH, []);
+  const contributions = readJsonFile<CredBureauRewardContribution[]>(getContributionsPath(), []);
   contributions.unshift(contribution);
-  writeJsonFile(CONTRIBUTIONS_PATH, contributions);
+  writeJsonFile(getContributionsPath(), contributions);
   return contribution;
 }
 
 export function getRewardContributions() {
-  return readJsonFile<CredBureauRewardContribution[]>(CONTRIBUTIONS_PATH, []);
+  return readJsonFile<CredBureauRewardContribution[]>(getContributionsPath(), []);
 }
 
 export function getRewardParticipants() {
-  return readJsonFile<CredBureauRewardParticipant[]>(PARTICIPANTS_PATH, []);
+  return readJsonFile<CredBureauRewardParticipant[]>(getParticipantsPath(), []);
 }
 
 function makeParticipantId() {
@@ -204,7 +215,7 @@ export function buildRewardParticipant(payload: {
 export function appendRewardParticipant(participant: CredBureauRewardParticipant): CredBureauRewardParticipant {
   const participants = getRewardParticipants();
   participants.unshift(participant);
-  writeJsonFile(PARTICIPANTS_PATH, participants);
+  writeJsonFile(getParticipantsPath(), participants);
   return participant;
 }
 
@@ -236,12 +247,12 @@ export function updateRewardParticipant(
   };
 
   participants[index] = updated;
-  writeJsonFile(PARTICIPANTS_PATH, participants);
+  writeJsonFile(getParticipantsPath(), participants);
   return updated;
 }
 
 export function getRewardReviewLog() {
-  return readJsonFile<CredBureauRewardReviewLogEntry[]>(REVIEW_LOG_PATH, []);
+  return readJsonFile<CredBureauRewardReviewLogEntry[]>(getReviewLogPath(), []);
 }
 
 function appendRewardReviewLogEntry(
@@ -268,7 +279,7 @@ function appendRewardReviewLogEntry(
 
   const reviewLog = getRewardReviewLog();
   reviewLog.unshift(entry);
-  writeJsonFile(REVIEW_LOG_PATH, reviewLog);
+  writeJsonFile(getReviewLogPath(), reviewLog);
   return entry;
 }
 
@@ -338,7 +349,7 @@ export function updateRewardContributionReview(
   };
 
   contributions[index] = updated;
-  writeJsonFile(CONTRIBUTIONS_PATH, contributions);
+  writeJsonFile(getContributionsPath(), contributions);
 
   const reviewLogEntry = appendRewardReviewLogEntry(
     previous,

@@ -4,6 +4,7 @@ import fs from "node:fs";
 import net from "node:net";
 import path from "node:path";
 import test from "node:test";
+import { tmpdir } from "node:os";
 
 
 
@@ -171,8 +172,7 @@ async function getPayoutExportCsv(port: number, exportId: string, authHeader: st
   };
 }
 
-function cleanupTestRecords() {
-  const dataDir = path.join(process.cwd(), "data");
+function cleanupTestRecords(dataDir: string) {
   const participantsPath = path.join(dataDir, "cred-bureau-rewards-participants.json");
   const contributionsPath = path.join(dataDir, "cred-bureau-rewards-contributions.json");
   const reviewLogPath = path.join(dataDir, "cred-bureau-rewards-review-log.json");
@@ -208,11 +208,12 @@ function cleanupTestRecords() {
 }
 
 test("Cred Bureau rewards API integration tests", { timeout: 60_000 }, async () => {
-  cleanupTestRecords();
+  const dataDir = fs.mkdtempSync(path.join(tmpdir(), "synagent-rewards-api-test-"));
+  cleanupTestRecords(dataDir);
   const port = await getFreePort();
   const server = spawn("./node_modules/.bin/next", ["start", "--port", String(port)], {
     cwd: process.cwd(),
-    env: { ...process.env, SYNAGENT_REVIEW_API_KEY: "test-review-key" },
+    env: { ...process.env, SYNAGENT_REVIEW_API_KEY: "test-review-key", SYNAGENT_DATA_DIR: dataDir },
   });
 
   let logs = "";
@@ -391,6 +392,7 @@ test("Cred Bureau rewards API integration tests", { timeout: 60_000 }, async () 
   } finally {
     server.kill("SIGTERM");
     await new Promise((resolve) => server.once("exit", resolve));
-    cleanupTestRecords();
+    cleanupTestRecords(dataDir);
+    fs.rmSync(dataDir, { recursive: true, force: true });
   }
 });

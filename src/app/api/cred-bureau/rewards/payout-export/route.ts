@@ -7,16 +7,21 @@ import path from "node:path";
 
 export const runtime = "nodejs";
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const PAYOUT_EXPORTS_PATH = path.join(DATA_DIR, "cred-bureau-payout-exports.json");
+function getDataDir() {
+  return process.env.SYNAGENT_DATA_DIR || path.join(process.cwd(), "data");
+}
+
+function getPayoutExportsPath() {
+  return path.join(getDataDir(), "cred-bureau-payout-exports.json");
+}
 
 function ensureDataDir() {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
+  fs.mkdirSync(getDataDir(), { recursive: true });
 }
 
 function readPayoutExports() {
   try {
-    return JSON.parse(fs.readFileSync(PAYOUT_EXPORTS_PATH, "utf8")) as Array<any>;
+    return JSON.parse(fs.readFileSync(getPayoutExportsPath(), "utf8")) as Array<any>;
   } catch {
     return [];
   }
@@ -24,7 +29,7 @@ function readPayoutExports() {
 
 function writePayoutExports(exports: Array<any>) {
   ensureDataDir();
-  fs.writeFileSync(PAYOUT_EXPORTS_PATH, `${JSON.stringify(exports, null, 2)}\n`);
+  fs.writeFileSync(getPayoutExportsPath(), `${JSON.stringify(exports, null, 2)}\n`);
 }
 
 function getLimit(req: Request) {

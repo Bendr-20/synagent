@@ -2,11 +2,16 @@ import fs from "node:fs";
 import path from "node:path";
 import type { CredBureauRewardParticipant } from "./cred-bureau-rewards-types";
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const PARTICIPANTS_PATH = path.join(DATA_DIR, "cred-bureau-rewards-participants.json");
+function getDataDir() {
+  return process.env.SYNAGENT_DATA_DIR || path.join(process.cwd(), "data");
+}
+
+function getParticipantsPath() {
+  return path.join(getDataDir(), "cred-bureau-rewards-participants.json");
+}
 
 function ensureDataDir() {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
+  fs.mkdirSync(getDataDir(), { recursive: true });
 }
 
 function readJsonFile<T>(filePath: string, fallback: T): T {
@@ -62,7 +67,7 @@ export function buildRewardParticipant(payload: {
   if (!displayName) throw new Error("Display name is required");
 
   const wallet = validateWallet(payload.wallet);
-  
+
   const telegram = payload.telegram ? normalizeTelegram(payload.telegram) : null;
   const email = cleanOptionalString(payload.email);
   const helixaProfileUrl = cleanOptionalString(payload.helixaProfileUrl);
@@ -87,14 +92,14 @@ export function buildRewardParticipant(payload: {
 }
 
 export function appendRewardParticipant(participant: CredBureauRewardParticipant): CredBureauRewardParticipant {
-  const participants = readJsonFile<CredBureauRewardParticipant[]>(PARTICIPANTS_PATH, []);
+  const participants = readJsonFile<CredBureauRewardParticipant[]>(getParticipantsPath(), []);
   participants.unshift(participant);
-  writeJsonFile(PARTICIPANTS_PATH, participants);
+  writeJsonFile(getParticipantsPath(), participants);
   return participant;
 }
 
 export function getRewardParticipants() {
-  return readJsonFile<CredBureauRewardParticipant[]>(PARTICIPANTS_PATH, []);
+  return readJsonFile<CredBureauRewardParticipant[]>(getParticipantsPath(), []);
 }
 
 export function updateRewardParticipantStatus(id: string, status: "active" | "suspended") {
@@ -110,6 +115,6 @@ export function updateRewardParticipantStatus(id: string, status: "active" | "su
   };
 
   participants[index] = updated;
-  writeJsonFile(PARTICIPANTS_PATH, participants);
+  writeJsonFile(getParticipantsPath(), participants);
   return updated;
 }
