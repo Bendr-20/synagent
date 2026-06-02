@@ -197,3 +197,89 @@ test("Review transitions from needs-info", async () => {
 
   cleanupTestFiles();
 });
+test("Suggested reward review gives reviewers a server-side score and reason", async () => {
+  const { buildRewardContribution, buildSuggestedRewardReview } = await loadRewardStore();
+  cleanupTestFiles();
+
+  const contribution = buildRewardContribution({
+    participantId: "test-participant",
+    seasonId: "season-1",
+    categoryId: "product-feedback",
+    title: "Approval workflow feedback",
+    description: "Detailed feedback with implementation suggestion that changes reviewer workflow and reduces manual scoring friction.",
+    evidenceUrl: "https://example.com/evidence",
+    requestedPoints: 47,
+  });
+
+  const suggestion = buildSuggestedRewardReview(contribution);
+
+  assert.equal(suggestion.suggestedPoints, 47);
+  assert.equal(suggestion.approveSuggestedAvailable, true);
+  assert.match(suggestion.suggestedReason, /Product-changing feedback/i);
+  assert.match(suggestion.suggestedReason, /requested 47/i);
+  assert.deepEqual(suggestion.reviewFlags, []);
+
+  cleanupTestFiles();
+});
+
+test("Approve Suggested applies the same server-generated score that review cards display", async () => {
+  const { buildRewardContribution, appendRewardContribution, buildSuggestedRewardReview, updateRewardContributionReview } = await loadRewardStore();
+  cleanupTestFiles();
+
+  const contribution = buildRewardContribution({
+    participantId: "test-participant",
+    seasonId: "season-1",
+    categoryId: "bug-friction-log",
+    title: "Critical bug report with repro",
+    description: "Critical blocking bug report with reproduction steps, workaround, and suggested fix for reviewers.",
+    evidenceUrl: "https://example.com/bug-report",
+  });
+  appendRewardContribution(contribution);
+
+  const suggestion = buildSuggestedRewardReview(contribution);
+  assert.equal(suggestion.suggestedPoints, 60);
+
+  const result = updateRewardContributionReview(
+    contribution.id,
+    "approved",
+    "reviewer-1",
+    "Approved suggested score",
+    "No farm detected",
+    5,
+    true,
+  );
+
+  assert.equal(result.contribution.status, "approved");
+  assert.equal(result.contribution.assignedPoints, suggestion.suggestedPoints);
+  assert.equal(result.contribution.payoutEligible, true);
+  assert.match(result.contribution.reviewerNotes || "", /Approved suggested score/);
+  assert.equal(result.reviewLogEntry.assignedPoints, suggestion.suggestedPoints);
+
+  cleanupTestFiles();
+});
+
+test("Wildcard without requested points requires manual review instead of Approve Suggested", async () => {
+  const { buildRewardContribution, buildSuggestedRewardReview, appendRewardContribution, updateRewardContributionReview } = await loadRewardStore();
+  cleanupTestFiles();
+
+  const contribution = buildRewardContribution({
+    participantId: "test-participant",
+    seasonId: "season-1",
+    categoryId: "wildcard",
+    title: "Unusual contribution",
+    description: "Something useful but not enough information for a deterministic score.",
+  });
+  appendRewardContribution(contribution);
+
+  const suggestion = buildSuggestedRewardReview(contribution);
+  assert.equal(suggestion.suggestedPoints, null);
+  assert.equal(suggestion.approveSuggestedAvailable, false);
+  assert.match(suggestion.reviewFlags.join(" "), /manual review/i);
+
+  assert.throws(
+    () => updateRewardContributionReview(contribution.id, "approved", "reviewer-1", null, null, undefined, true),
+    /manual review/i,
+  );
+
+  cleanupTestFiles();
+});

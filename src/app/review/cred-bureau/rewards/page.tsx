@@ -5,7 +5,7 @@ import Link from "next/link";
 import { SiteShell } from "@/components/site-shell";
 import { CRED_BUREAU_REWARD_CONFIG } from "@/lib/cred-bureau-rewards-config";
 import { buildCredBureauLeaderboard } from "@/lib/cred-bureau-rewards-scoring";
-import { getRewardContributions, getRewardParticipants } from "@/lib/cred-bureau-rewards-store";
+import { buildSuggestedRewardReview, getRewardContributions, getRewardParticipants } from "@/lib/cred-bureau-rewards-store";
 import type {
   CredBureauRewardContribution,
   CredBureauRewardParticipant,
@@ -68,7 +68,9 @@ function participantName(participant: CredBureauRewardParticipant | undefined, c
   return participant?.displayName || `Unknown participant (${contribution.participantId})`;
 }
 
-function ContributionCard({ contribution, participant, reviewKey }: { contribution: CredBureauRewardContribution; participant?: CredBureauRewardParticipant; reviewKey: string }) {
+type SuggestedRewardReview = ReturnType<typeof buildSuggestedRewardReview>;
+
+function ContributionCard({ contribution, participant, reviewKey, suggestion }: { contribution: CredBureauRewardContribution; participant?: CredBureauRewardParticipant; reviewKey: string; suggestion: SuggestedRewardReview }) {
   const profileLink = participant?.helixaProfileUrl;
 
   return (
@@ -95,6 +97,7 @@ function ContributionCard({ contribution, participant, reviewKey }: { contributi
         <Field label="Season" value={contribution.seasonId} />
         <Field label="Category" value={categoryLabel(contribution.categoryId)} />
         <Field label="Requested points" value={contribution.requestedPoints ?? null} />
+        <Field label="Suggested points" value={suggestion.suggestedPoints ?? "Manual review"} />
         <Field label="Assigned points" value={contribution.assignedPoints} />
         <Field label="Payout eligible" value={contribution.payoutEligible ? "Yes" : "No"} />
         <Field label="Social evidence" value={contribution.socialEvidence ? "Yes" : "No"} />
@@ -107,6 +110,8 @@ function ContributionCard({ contribution, participant, reviewKey }: { contributi
 
       <div style={{ display: "grid", gap: "12px", marginBottom: "16px" }}>
         <Field label="Description" value={contribution.description} />
+        <Field label="Suggested reason" value={suggestion.suggestedReason} />
+        {suggestion.reviewFlags.length > 0 && <Field label="Review flags" value={suggestion.reviewFlags.join("; ")} />}
         {contribution.evidenceUrl && (
           <a href={contribution.evidenceUrl} target="_blank" rel="noreferrer" style={{ color: theme.accent, overflowWrap: "anywhere" }}>
             Evidence link
@@ -116,7 +121,7 @@ function ContributionCard({ contribution, participant, reviewKey }: { contributi
         <Field label="Anti-farm notes" value={contribution.antiFarmNotes} />
       </div>
 
-      <RewardReviewControls contribution={contribution} reviewKey={reviewKey} />
+      <RewardReviewControls contribution={contribution} reviewKey={reviewKey} suggestion={suggestion} />
     </article>
   );
 }
@@ -325,7 +330,7 @@ export default async function CredBureauRewardsReviewPage({
               ) : (
                 <div style={{ display: "grid", gap: "16px" }}>
                   {contributionQueue.map((contribution) => (
-                    <ContributionCard key={contribution.id} contribution={contribution} participant={participantById.get(contribution.participantId)} reviewKey={reviewKey} />
+                    <ContributionCard key={contribution.id} contribution={contribution} participant={participantById.get(contribution.participantId)} reviewKey={reviewKey} suggestion={buildSuggestedRewardReview(contribution)} />
                   ))}
                 </div>
               )}
@@ -346,7 +351,7 @@ export default async function CredBureauRewardsReviewPage({
               ) : (
                 <div style={{ display: "grid", gap: "16px" }}>
                   {visibleReviewedContributions.map((contribution) => (
-                    <ContributionCard key={contribution.id} contribution={contribution} participant={participantById.get(contribution.participantId)} reviewKey={reviewKey} />
+                    <ContributionCard key={contribution.id} contribution={contribution} participant={participantById.get(contribution.participantId)} reviewKey={reviewKey} suggestion={buildSuggestedRewardReview(contribution)} />
                   ))}
                 </div>
               )}

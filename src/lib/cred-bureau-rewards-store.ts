@@ -111,6 +111,112 @@ function countSocialContributionsForDay(
   }).length;
 }
 
+type SuggestedRewardReview = {
+  suggestedPoints: number | null;
+  suggestedReason: string;
+  reviewFlags: string[];
+  approveSuggestedAvailable: boolean;
+};
+
+const CATEGORY_POINT_RANGES: Record<string, { min: number; max: number; label: string }> = {
+  "matched-task": { min: 25, max: 100, label: "Matched-task rewards" },
+  "task-creation": { min: 10, max: 40, label: "High-quality task creation" },
+  "bug-friction-log": { min: 10, max: 60, label: "Bug reports and friction logs" },
+  "product-feedback": { min: 10, max: 50, label: "Product-changing feedback" },
+  referral: { min: 10, max: 30, label: "Active referrals" },
+  wildcard: { min: 1, max: 250, label: "Wildcard grants" },
+};
+
+function clampPointValue(value: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, Math.round(value)));
+}
+
+function hasAnySignal(text: string, signals: string[]) {
+  return signals.some((signal) => text.includes(signal));
+}
+
+export function buildSuggestedRewardReview(contribution: CredBureauRewardContribution): SuggestedRewardReview {
+  const reviewFlags: string[] = [];
+  const text = `${contribution.title} ${contribution.description}`.toLowerCase();
+
+  if (contribution.socialEvidence && isLowEffortSocial(contribution.description)) {
+    return {
+      suggestedPoints: 0,
+      suggestedReason: "Low-effort social evidence is excluded by the anti-farm rubric.",
+      reviewFlags: ["Low-effort social evidence"],
+      approveSuggestedAvailable: true,
+    };
+  }
+
+  if (contribution.categoryId === "wildcard" && !contribution.requestedPoints) {
+    return {
+      suggestedPoints: null,
+      suggestedReason: "Wildcard grants without requested points need manual reviewer judgment.",
+      reviewFlags: ["Wildcard requires manual review"],
+      approveSuggestedAvailable: false,
+    };
+  }
+
+  const range = CATEGORY_POINT_RANGES[contribution.categoryId] || { min: 1, max: 250, label: contribution.categoryId };
+
+  if (contribution.categoryId === "wildcard" && contribution.requestedPoints) {
+    const suggestedPoints = clampPointValue(contribution.requestedPoints, 1, 250);
+    return {
+      suggestedPoints,
+      suggestedReason: `Wildcard grant requested ${contribution.requestedPoints}; clamped to ${suggestedPoints} for reviewer confirmation.`,
+      reviewFlags,
+      approveSuggestedAvailable: true,
+    };
+  }
+
+  if (contribution.requestedPoints) {
+    const suggestedPoints = clampPointValue(contribution.requestedPoints, range.min, range.max);
+    return {
+      suggestedPoints,
+      suggestedReason: `${range.label}: contributor requested ${contribution.requestedPoints}; suggested ${suggestedPoints} within the ${range.min}-${range.max} rubric range.`,
+      reviewFlags,
+      approveSuggestedAvailable: true,
+    };
+  }
+
+  let suggestedPoints = range.min;
+  const span = range.max - range.min;
+  const words = contribution.description.trim().split(/\s+/).filter(Boolean).length;
+  if (contribution.evidenceUrl) suggestedPoints += span * 0.25;
+  if (words >= 20) suggestedPoints += span * 0.2;
+  if (words >= 60) suggestedPoints += span * 0.15;
+
+  if (contribution.categoryId === "bug-friction-log" && hasAnySignal(text, ["critical", "blocking", "security"])) {
+    suggestedPoints = range.max;
+  } else if (contribution.categoryId === "bug-friction-log" && hasAnySignal(text, ["repro", "reproduction", "workaround", "fix"])) {
+    suggestedPoints += span * 0.35;
+  }
+
+  if (contribution.categoryId === "matched-task" && hasAnySignal(text, ["complex", "high-impact", "exceptional", "rated"])) {
+    suggestedPoints += span * 0.35;
+  }
+
+  if (contribution.categoryId === "task-creation" && hasAnySignal(text, ["framework", "deliverables", "success criteria", "comprehensive"])) {
+    suggestedPoints += span * 0.35;
+  }
+
+  if (contribution.categoryId === "product-feedback" && hasAnySignal(text, ["implementation", "roadmap", "workflow", "design", "mockup"])) {
+    suggestedPoints += span * 0.35;
+  }
+
+  if (contribution.categoryId === "referral" && hasAnySignal(text, ["active", "contributed", "multiple", "top contributor"])) {
+    suggestedPoints += span * 0.35;
+  }
+
+  const finalPoints = clampPointValue(suggestedPoints, range.min, range.max);
+  return {
+    suggestedPoints: finalPoints,
+    suggestedReason: `${range.label}: suggested ${finalPoints} points from rubric range ${range.min}-${range.max} based on evidence, detail, and category signals.`,
+    reviewFlags,
+    approveSuggestedAvailable: true,
+  };
+}
+
 export function buildRewardContribution(payload: {
   participantId: string;
   seasonId: CredBureauRewardSeasonId;
@@ -291,6 +397,7 @@ export function updateRewardContributionReview(
   reviewerNotes?: string | null,
   antiFarmNotes?: string | null,
   assignedPoints?: number,
+  useSuggestedPoints = false,
 ): { contribution: CredBureauRewardContribution; reviewLogEntry: CredBureauRewardReviewLogEntry } {
   // This function should be called from an API endpoint that validates SYNAGENT_REVIEW token
   // The reviewedBy parameter should come from validated reviewer identity
@@ -310,6 +417,14 @@ export function updateRewardContributionReview(
   let finalAssignedPoints = status === "approved"
     ? assignedPoints !== undefined ? assignedPoints : previous.assignedPoints
     : 0;
+
+  if (status === "approved" && useSuggestedPoints) {
+    const suggestion = buildSuggestedRewardReview(previous);
+    if (suggestion.suggestedPoints === null) {
+      throw new Error("Suggested points unavailable; manual review required");
+    }
+    finalAssignedPoints = suggestion.suggestedPoints;
+  }
   let finalPayoutEligible = status === "approved" && finalAssignedPoints > 0;
   let finalReviewerNotes = cleanOptionalString(reviewerNotes);
 

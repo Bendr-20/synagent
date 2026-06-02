@@ -174,11 +174,12 @@ export async function PATCH(req: Request) {
       : "reviewer";
 
     const assignedPoints = typeof payload.assignedPoints === "number" ? payload.assignedPoints : undefined;
+    const useSuggestedPoints = payload.useSuggestedPoints === true;
     const reviewerNotes = typeof payload.reviewerNotes === "string" ? payload.reviewerNotes : undefined;
     const antiFarmNotes = typeof payload.antiFarmNotes === "string" ? payload.antiFarmNotes : undefined;
 
-    // Validate points
-    if (assignedPoints !== undefined) {
+    // Validate manual points. Approve Suggested ignores stale client-side assignedPoints.
+    if (assignedPoints !== undefined && !(status === "approved" && useSuggestedPoints)) {
       if (assignedPoints < 0) {
         throw new Error("Points cannot be negative");
       }
@@ -199,7 +200,8 @@ export async function PATCH(req: Request) {
       reviewedBy,
       reviewerNotes,
       antiFarmNotes,
-      assignedPoints
+      assignedPoints,
+      useSuggestedPoints
     );
 
     return NextResponse.json({

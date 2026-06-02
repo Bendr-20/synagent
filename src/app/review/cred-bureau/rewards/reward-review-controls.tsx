@@ -10,9 +10,17 @@ import type {
 } from "@/lib/cred-bureau-rewards-types";
 import { outlineButtonStyle, solidButtonStyle, theme } from "@/lib/theme";
 
+type SuggestedRewardReview = {
+  suggestedPoints: number | null;
+  suggestedReason: string;
+  reviewFlags: string[];
+  approveSuggestedAvailable: boolean;
+};
+
 type RewardReviewControlsProps = {
   contribution: CredBureauRewardContribution;
   reviewKey: string;
+  suggestion?: SuggestedRewardReview;
 };
 
 type PayoutExportSummary = Pick<CredBureauPayoutExportRecord, "id" | "createdAt" | "seasonId" | "seasonTokenPool" | "totalPoints" | "rowCount" | "createdBy">;
@@ -67,11 +75,12 @@ function makeJsonDownloadLink(exportRecord: unknown) {
   return URL.createObjectURL(blob);
 }
 
-export function RewardReviewControls({ contribution, reviewKey }: RewardReviewControlsProps) {
+export function RewardReviewControls({ contribution, reviewKey, suggestion }: RewardReviewControlsProps) {
   const router = useRouter();
+  const initialAssignedPoints = contribution.assignedPoints > 0 ? contribution.assignedPoints : suggestion?.suggestedPoints ?? contribution.assignedPoints;
   const [targetStatus, setTargetStatus] = useState<CredBureauRewardContributionStatus>(contribution.status);
   const [currentStatus, setCurrentStatus] = useState<CredBureauRewardContributionStatus>(contribution.status);
-  const [assignedPoints, setAssignedPoints] = useState(String(contribution.assignedPoints));
+  const [assignedPoints, setAssignedPoints] = useState(String(initialAssignedPoints));
   const [payoutEligible, setPayoutEligible] = useState(contribution.payoutEligible);
   const [reviewerNotes, setReviewerNotes] = useState(contribution.reviewerNotes || "");
   const [antiFarmNotes, setAntiFarmNotes] = useState(contribution.antiFarmNotes || "");
@@ -80,6 +89,18 @@ export function RewardReviewControls({ contribution, reviewKey }: RewardReviewCo
   const [saving, setSaving] = useState(false);
 
   const isTerminal = contribution.status === "approved" || contribution.status === "rejected";
+
+  function applyReviewResponse(body: any, fallbackReviewedBy: string, label: string) {
+    setCurrentStatus(body.contribution.status);
+    setTargetStatus(body.contribution.status);
+    setAssignedPoints(String(body.contribution.assignedPoints));
+    setPayoutEligible(Boolean(body.contribution.payoutEligible));
+    setReviewerNotes(body.contribution.reviewerNotes || "");
+    setAntiFarmNotes(body.contribution.antiFarmNotes || "");
+    setReviewedBy(body.contribution.reviewedBy || fallbackReviewedBy);
+    setMessage(`${label}: ${body.contribution.status}`);
+    router.refresh();
+  }
 
   async function saveReview() {
     const nextStatus = targetStatus;
@@ -126,15 +147,49 @@ export function RewardReviewControls({ contribution, reviewKey }: RewardReviewCo
       return;
     }
 
-    setCurrentStatus(body.contribution.status);
-    setTargetStatus(body.contribution.status);
-    setAssignedPoints(String(body.contribution.assignedPoints));
-    setPayoutEligible(Boolean(body.contribution.payoutEligible));
-    setReviewerNotes(body.contribution.reviewerNotes || "");
-    setAntiFarmNotes(body.contribution.antiFarmNotes || "");
-    setReviewedBy(body.contribution.reviewedBy || reviewedBy);
-    setMessage(`Saved reward review: ${body.contribution.status}`);
-    router.refresh();
+    applyReviewResponse(body, reviewedBy, "Saved reward review");
+  }
+
+  async function approveSuggested() {
+    if (!suggestion?.approveSuggestedAvailable || suggestion.suggestedPoints === null) {
+      setMessage("No safe suggested score is available. Use manual review controls.");
+      return;
+    }
+
+    if (isTerminal) {
+      setMessage("Approved or rejected contributions cannot be changed via the status controls. Use the needs-info state if reopening is required.");
+      return;
+    }
+
+    const parsedPoints = Number.parseInt(assignedPoints || "0", 10);
+    setSaving(true);
+    setMessage(null);
+
+    const response = await fetch("/api/cred-bureau/rewards/contributions", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${reviewKey}`,
+      },
+      body: JSON.stringify({
+        id: contribution.id,
+        status: "approved",
+        assignedPoints: suggestion?.suggestedPoints ?? parsedPoints,
+        useSuggestedPoints: true,
+        reviewerNotes,
+        antiFarmNotes,
+        reviewedBy,
+      }),
+    });
+    const body = await response.json();
+    setSaving(false);
+
+    if (!response.ok || !body.success) {
+      setMessage(body.error || "Approve Suggested failed");
+      return;
+    }
+
+    applyReviewResponse(body, reviewedBy, "Approved suggested score");
   }
 
   return (
@@ -181,9 +236,16 @@ export function RewardReviewControls({ contribution, reviewKey }: RewardReviewCo
         <div style={{ color: theme.textMuted, fontSize: "12px", fontFamily: "JetBrains Mono, monospace" }}>
           Current status: <span style={{ color: theme.accent }}>{currentStatus}</span> | Payout eligible: <span style={{ color: payoutEligible ? theme.accent : theme.textMuted }}>{payoutEligible ? "yes" : "no"}</span> (API-managed)
         </div>
-        <button type="button" disabled={saving || isTerminal} onClick={saveReview} style={{ ...solidButtonStyle, width: "auto", opacity: (saving || isTerminal) ? 0.7 : 1 }}>
-          {isTerminal ? "Status locked" : "Save status controls"}
-        </button>
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+          {suggestion?.approveSuggestedAvailable && (
+            <button type="button" disabled={saving || isTerminal} onClick={approveSuggested} style={{ ...solidButtonStyle, width: "auto", opacity: (saving || isTerminal) ? 0.7 : 1 }}>
+              Approve Suggested
+            </button>
+          )}
+          <button type="button" disabled={saving || isTerminal} onClick={saveReview} style={{ ...outlineButtonStyle, width: "auto", opacity: (saving || isTerminal) ? 0.7 : 1 }}>
+            {isTerminal ? "Status locked" : "Save status controls"}
+          </button>
+        </div>
       </div>
 
       {message && <div style={{ color: message.startsWith("Saved") ? theme.accent : "#ffc8c8", fontSize: "13px", lineHeight: 1.5 }}>{message}</div>}

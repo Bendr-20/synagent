@@ -350,6 +350,30 @@ test("Cred Bureau rewards API integration tests", { timeout: 60_000 }, async () 
     assert.ok(patchResult.body.reviewLogEntry);
     assert.equal((patchResult.body.reviewLogEntry as any).reviewedBy, "test-reviewer");
 
+    // Test 7b: protected PATCH can approve with the server-side suggested score even if a stale client sends another number
+    const suggestedPatchResult = await patchContribution(
+      port,
+      contribution2.body.contributionId as string,
+      {
+        status: "approved",
+        useSuggestedPoints: true,
+        assignedPoints: 1,
+        reviewerNotes: "Approve suggested score",
+        reviewedBy: "test-reviewer",
+      },
+      "Bearer test-review-key"
+    );
+
+    assert.equal(suggestedPatchResult.status, 200, "PATCH approve suggested failed");
+    assert.equal(suggestedPatchResult.body.success, true);
+
+    const getSuggestedResult = await getContributions(port, "Bearer test-review-key");
+    const suggestedContrib = (getSuggestedResult.body.contributions as any[]).find(c => c.id === contribution2.body.contributionId);
+
+    assert.equal(suggestedContrib.status, "approved");
+    assert.equal(suggestedContrib.assignedPoints, 10);
+    assert.equal(suggestedContrib.payoutEligible, true);
+
     // Test 8: protected payout export refuses to generate without explicit anti‑farm review confirmation
     const payoutExportNoConfirm = await postPayoutExport(port, {
       seasonId: "season-1",
