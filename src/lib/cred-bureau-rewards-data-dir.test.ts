@@ -88,3 +88,55 @@ test("reward review page reads payout exports through the shared data dir", () =
   assert.match(reviewPage, /SYNAGENT_DATA_DIR/);
   assert.doesNotMatch(reviewPage, /path\.join\(process\.cwd\(\), "data", "cred-bureau-payout-exports\.json"\)/);
 });
+
+
+test("reward store snapshots the previous rewards JSON before overwriting it", async (t) => {
+  const originalDataDir = process.env.SYNAGENT_DATA_DIR;
+  const isolatedDataDir = mkdtempSync(path.join(tmpdir(), "synagent-rewards-backup-"));
+
+  t.after(() => {
+    if (originalDataDir === undefined) delete process.env.SYNAGENT_DATA_DIR;
+    else process.env.SYNAGENT_DATA_DIR = originalDataDir;
+    rmSync(isolatedDataDir, { recursive: true, force: true });
+  });
+
+  process.env.SYNAGENT_DATA_DIR = isolatedDataDir;
+  const contributionsPath = path.join(isolatedDataDir, "cred-bureau-rewards-contributions.json");
+  const originalRows = [
+    {
+      id: "existing-contribution",
+      createdAt: "2026-06-01T00:00:00.000Z",
+      updatedAt: "2026-06-01T00:00:00.000Z",
+      participantId: "existing-participant",
+      seasonId: "season-1",
+      categoryId: "product-feedback",
+      title: "Existing report",
+      description: "This row must survive in the automatic backup.",
+      evidenceUrl: null,
+      socialEvidence: false,
+      requestedPoints: null,
+      assignedPoints: 0,
+      status: "submitted",
+      payoutEligible: false,
+    },
+  ];
+  fs.mkdirSync(isolatedDataDir, { recursive: true });
+  fs.writeFileSync(contributionsPath, `${JSON.stringify(originalRows, null, 2)}\n`);
+
+  const store = await loadRewardStore();
+  const newContribution = store.buildRewardContribution({
+    participantId: "new-participant",
+    seasonId: "season-1",
+    categoryId: "product-feedback",
+    title: "New report",
+    description: "Writing this should snapshot the previous file first.",
+  });
+
+  store.appendRewardContribution(newContribution);
+
+  const backupDir = path.join(isolatedDataDir, "auto-backups");
+  const backups = fs.readdirSync(backupDir).filter((name) => name.startsWith("cred-bureau-rewards-contributions.json.") && name.endsWith(".bak"));
+
+  assert.equal(backups.length, 1);
+  assert.deepEqual(JSON.parse(fs.readFileSync(path.join(backupDir, backups[0]), "utf8")), originalRows);
+});

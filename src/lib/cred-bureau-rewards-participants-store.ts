@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { writeJsonFileWithBackup } from "./json-file-backups.js";
 import type { CredBureauRewardParticipant } from "./cred-bureau-rewards-types";
 
 function getDataDir() {
@@ -24,7 +25,7 @@ function readJsonFile<T>(filePath: string, fallback: T): T {
 
 function writeJsonFile<T>(filePath: string, value: T) {
   ensureDataDir();
-  fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`);
+  writeJsonFileWithBackup(filePath, value);
 }
 
 function makeParticipantId() {

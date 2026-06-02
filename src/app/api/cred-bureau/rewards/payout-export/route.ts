@@ -4,6 +4,7 @@ import { calculateSeasonPayoutRows, buildPayoutCsv } from "@/lib/cred-bureau-rew
 import { getRewardParticipants, getRewardContributions } from "@/lib/cred-bureau-rewards-store";
 import fs from "node:fs";
 import path from "node:path";
+import { writeJsonFileWithBackup } from "@/lib/json-file-backups.js";
 
 export const runtime = "nodejs";
 
