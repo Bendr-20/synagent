@@ -168,4 +168,6 @@ export type MatchApiResponse =
   | {
       success: false;
       error: string;
+      resetAt?: string;
+      retryAfterSeconds?: number;
     };

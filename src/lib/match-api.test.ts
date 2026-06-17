@@ -10,6 +10,8 @@ const TEST_CONTACTS = new Set([
   "synagent-api-default@example.com",
   "synagent-api-urgent@example.com",
   "synagent-api-explicit-low@example.com",
+  "synagent-api-after-invalid@example.com",
+  "synagent-api-rate-limit@example.com",
 ]);
 
 function getFreePort() {
@@ -62,6 +64,7 @@ async function postMatch(port: number, body: Record<string, unknown>, clientKey:
 
   return {
     status: response.status,
+    retryAfter: response.headers.get("retry-after"),
     body: await response.json() as Record<string, unknown>,
   };
 }
@@ -110,6 +113,83 @@ test("match API treats an API-provided MVP category as explicit user intent", { 
 
   try {
     await waitForServer(port, server);
+
+    for (let i = 0; i < 6; i++) {
+      const invalidAttempt = await postMatch(port, {
+        title: `Invalid missing-contact attempt ${i + 1}`,
+        category: "mvp-build",
+        categorySource: "user",
+        budgetRange: "3k-10k",
+        urgency: "this-week",
+        deliveryType: "hybrid",
+        communicationPreference: "email",
+        confidentiality: "private",
+        paymentPreference: "usdc",
+        brief: "This should fail validation without burning rate-limit quota.",
+        contact: {},
+        priorities: { cost: 5, time: 8, quality: 8, credibility: 8 },
+      }, "203.0.113.200");
+
+      assert.equal(invalidAttempt.status, 400, `invalid attempt ${i + 1} should stay a validation error`);
+      assert.match(String(invalidAttempt.body.error), /email or Telegram/i);
+    }
+
+    const validAfterInvalids = await postMatch(port, {
+      title: "Need an MVP after fixing contact info",
+      category: "mvp-build",
+      categorySource: "user",
+      budgetRange: "3k-10k",
+      urgency: "this-week",
+      deliveryType: "hybrid",
+      communicationPreference: "email",
+      confidentiality: "private",
+      paymentPreference: "usdc",
+      brief: "Valid contact info should recover immediately after earlier validation errors.",
+      contact: { email: "synagent-api-after-invalid@example.com" },
+      priorities: { cost: 5, time: 8, quality: 8, credibility: 8 },
+    }, "203.0.113.200");
+
+    assert.equal(validAfterInvalids.status, 201);
+
+    for (let i = 0; i < 5; i++) {
+      const allowedAttempt = await postMatch(port, {
+        title: `Rate-limit allowed attempt ${i + 1}`,
+        category: "mvp-build",
+        categorySource: "user",
+        budgetRange: "3k-10k",
+        urgency: "this-week",
+        deliveryType: "hybrid",
+        communicationPreference: "email",
+        confidentiality: "private",
+        paymentPreference: "usdc",
+        brief: "Valid requests should be capped with a recoverable match-form cooldown.",
+        contact: { email: "synagent-api-rate-limit@example.com" },
+        priorities: { cost: 5, time: 8, quality: 8, credibility: 8 },
+      }, "203.0.113.201");
+
+      assert.equal(allowedAttempt.status, 201, `allowed attempt ${i + 1} should pass before the cap`);
+    }
+
+    const cappedAttempt = await postMatch(port, {
+      title: "Rate-limit capped attempt",
+      category: "mvp-build",
+      categorySource: "user",
+      budgetRange: "3k-10k",
+      urgency: "this-week",
+      deliveryType: "hybrid",
+      communicationPreference: "email",
+      confidentiality: "private",
+      paymentPreference: "usdc",
+      brief: "The 429 response should tell the client exactly when to recover.",
+      contact: { email: "synagent-api-rate-limit@example.com" },
+      priorities: { cost: 5, time: 8, quality: 8, credibility: 8 },
+    }, "203.0.113.201");
+
+    assert.equal(cappedAttempt.status, 429);
+    assert.equal(typeof cappedAttempt.body.resetAt, "string");
+    assert.match(cappedAttempt.retryAfter || "", /^\d+$/);
+    assert.ok(Number(cappedAttempt.retryAfter) >= 1);
+    assert.ok(Number(cappedAttempt.retryAfter) <= 60, `expected match cooldown of a minute or less, got ${cappedAttempt.retryAfter}`);
 
     const explicitMvp = await postMatch(port, {
       title: "Need an MVP for a reviewed routing pilot",

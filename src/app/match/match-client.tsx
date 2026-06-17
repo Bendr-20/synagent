@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { SiteShell } from "@/components/site-shell";
 import { solidButtonStyle, glassCardStyle, theme } from "@/lib/theme";
 import type { Synagent } from "@/app/synagents/data";
@@ -155,6 +155,17 @@ function parseImportedContact(value?: string | null) {
   return { email: "", telegram: "", note: contact };
 }
 
+function getRetrySeconds(resetAt: string | null, nowMs: number) {
+  if (!resetAt) return 0;
+  const resetMs = Date.parse(resetAt);
+  if (!Number.isFinite(resetMs)) return 0;
+  return Math.max(0, Math.ceil((resetMs - nowMs) / 1000));
+}
+
+function formatRateLimitMessage(seconds: number) {
+  return `Too many requests. Try again in ${seconds} second${seconds === 1 ? "" : "s"}.`;
+}
+
 function buildInitialPrefs(selectedAgent: Synagent | undefined, handoff?: MatchHandoffPrefill | null): PrefState {
   const importedContact = parseImportedContact(handoff?.contact);
   const initialCategory = resolveInitialCategory(selectedAgent, handoff);
@@ -185,15 +196,35 @@ function buildInitialPrefs(selectedAgent: Synagent | undefined, handoff?: MatchH
 }
 
 export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synagent; handoff?: MatchHandoffPrefill | null }) {
+  const inFlightRef = useRef(false);
   const [prefs, setPrefs] = useState<PrefState>(() => buildInitialPrefs(selectedAgent, handoff));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [rateLimitResetAt, setRateLimitResetAt] = useState<string | null>(null);
+  const [nowMs, setNowMs] = useState(() => Date.now());
   const [requestId, setRequestId] = useState<string | null>(null);
   const [notificationsQueued, setNotificationsQueued] = useState<number>(0);
   const [notificationMode, setNotificationMode] = useState<NotificationDispatchMode>("queue-only");
   const [requestStatus, setRequestStatus] = useState<MatchRequestStatus | null>(null);
   const [review, setReview] = useState<MatchReviewMetadata | null>(null);
   const [matches, setMatches] = useState<MatchResult[]>([]);
+  const retrySeconds = getRetrySeconds(rateLimitResetAt, nowMs);
+  const cooldownActive = retrySeconds > 0;
+  const isSubmitDisabled = isSubmitting || cooldownActive;
+  const visibleError = cooldownActive ? formatRateLimitMessage(retrySeconds) : error;
+
+  useEffect(() => {
+    if (!rateLimitResetAt) return;
+    setNowMs(Date.now());
+    const timer = window.setInterval(() => setNowMs(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, [rateLimitResetAt]);
+
+  useEffect(() => {
+    if (!rateLimitResetAt || retrySeconds > 0) return;
+    setRateLimitResetAt(null);
+    setError((current) => current?.startsWith("Too many requests") ? null : current);
+  }, [rateLimitResetAt, retrySeconds]);
 
   const sliderBackground = (value: number) => {
     const pct = ((value - 1) / 9) * 100;
@@ -255,8 +286,9 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
     },
   };
 
-  function clearResponseState() {
+  function clearResponseState(options: { preserveRateLimit?: boolean } = {}) {
     setError(null);
+    if (!options.preserveRateLimit) setRateLimitResetAt(null);
     setRequestId(null);
     setNotificationsQueued(0);
     setNotificationMode("queue-only");
@@ -266,6 +298,13 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
   }
 
   async function handleSubmit() {
+    if (inFlightRef.current) return;
+    if (rateLimitResetAt && getRetrySeconds(rateLimitResetAt, Date.now()) > 0) {
+      setNowMs(Date.now());
+      return;
+    }
+
+    inFlightRef.current = true;
     setIsSubmitting(true);
     clearResponseState();
 
@@ -277,11 +316,25 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
       });
       const data = await res.json() as MatchApiResponse;
       if (!data.success) {
-        throw new Error(data.error || "Submission failed");
+        clearResponseState({ preserveRateLimit: Boolean(data.resetAt) });
+        if (data.resetAt) {
+          const nextNow = Date.now();
+          const seconds = typeof data.retryAfterSeconds === "number"
+            ? Math.max(1, data.retryAfterSeconds)
+            : Math.max(1, getRetrySeconds(data.resetAt, nextNow));
+          setNowMs(nextNow);
+          setRateLimitResetAt(data.resetAt);
+          setError(formatRateLimitMessage(seconds));
+          return;
+        }
+
+        setError(data.error || "Submission failed");
+        return;
       }
       if (!res.ok) {
         throw new Error("Submission failed");
       }
+      setRateLimitResetAt(null);
       setRequestId(data.requestId || null);
       setNotificationsQueued(data.notificationsQueued || 0);
       setNotificationMode(data.notificationMode || "queue-only");
@@ -292,6 +345,7 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
       clearResponseState();
       setError(err instanceof Error ? err.message : "Submission failed");
     } finally {
+      inFlightRef.current = false;
       setIsSubmitting(false);
     }
   }
@@ -418,7 +472,7 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
             <input value={prefs.telegram} onChange={(e) => setPrefs((prev) => ({ ...prev, telegram: e.target.value }))} placeholder="@handle" style={inputStyle} />
           </Field>
           <Field label="Contact Note">
-            <input value={prefs.contactNote} onChange={(e) => setPrefs((prev) => ({ ...prev, contactNote: e.target.value }))} placeholder="Optional contact context or fallback note" style={inputStyle} />
+            <input value={prefs.contactNote} onChange={(e) => setPrefs((prev) => ({ ...prev, contactNote: e.target.value }))} placeholder="Optional context - still include email or Telegram above" style={inputStyle} />
           </Field>
         </div>
 
@@ -451,9 +505,9 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
           </pre>
         </details>
 
-        {error && (
+        {visibleError && (
           <div style={{ padding: "14px 16px", borderRadius: "14px", border: "1px solid rgba(255,120,120,0.35)", background: "rgba(60,10,10,0.18)", color: "#ffb3b3", lineHeight: 1.7 }}>
-            {error}
+            {visibleError}
           </div>
         )}
 
@@ -505,8 +559,8 @@ export function MatchClient({ selectedAgent, handoff }: { selectedAgent?: Synage
           </div>
         )}
 
-        <button className="match-submit-button" style={{ ...solidButtonStyle, opacity: isSubmitting ? 0.7 : 1, cursor: isSubmitting ? "progress" : "pointer" }} onClick={handleSubmit} disabled={isSubmitting}>
-          {isSubmitting ? "Submitting..." : "Find Your Matches"}
+        <button className="match-submit-button" style={{ ...solidButtonStyle, opacity: isSubmitDisabled ? 0.7 : 1, cursor: cooldownActive ? "not-allowed" : isSubmitting ? "progress" : "pointer" }} onClick={handleSubmit} disabled={isSubmitDisabled}>
+          {cooldownActive ? `Try again in ${retrySeconds}s` : isSubmitting ? "Submitting..." : "Find Your Matches"}
         </button>
       </div>
     </SiteShell>

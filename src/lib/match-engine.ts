@@ -259,7 +259,7 @@ export function normalizeMatchPayload(input: unknown): MatchRequestPayload {
   };
 
   if (!normalized.contact.email && !normalized.contact.telegram) {
-    throw new Error("At least one contact method is required, email or Telegram");
+    throw new Error("Enter a valid email or Telegram handle before submitting. Contact notes are optional and do not count as a reply channel.");
   }
   if (!normalized.title && !normalized.brief) {
     throw new Error("A title or project brief is required");

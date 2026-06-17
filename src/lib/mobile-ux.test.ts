@@ -33,3 +33,17 @@ test("site header CRED and DOCS navigation use real targets on desktop and mobil
   assert.equal((siteShell.match(/href=\{CRED_LINK\}/g) || []).length, 2);
   assert.equal((siteShell.match(/href=\{DOCS_LINK\}/g) || []).length, 2);
 });
+
+
+test("mobile match intake gives recoverable rate-limit feedback and blocks rapid double taps", () => {
+  assert.match(matchClient, /useRef/);
+  assert.match(matchClient, /inFlightRef\.current/);
+  assert.match(matchClient, /rateLimitResetAt/);
+  assert.match(matchClient, /Try again in/);
+  assert.match(matchClient, /setInterval/);
+  assert.match(matchClient, /disabled=\{isSubmitDisabled\}/);
+});
+
+test("match intake copy clarifies contact notes do not replace email or Telegram", () => {
+  assert.match(matchClient, /still include email or Telegram/i);
+});
